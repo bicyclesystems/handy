@@ -74,6 +74,24 @@ class SurfaceAPI:
         else:
             return {"surface": False, "texture": "N/A"}
 
+class HandAPI:
+    def __init__(self):
+        self.mp_hands = mp.solutions.hands
+        self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
+
+    def detect_hand(self, image):
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = self.hands.process(image_rgb)
+        
+        if results.multi_hand_landmarks:
+            hand_landmarks = results.multi_hand_landmarks[0]  # Assuming only one hand is detected
+            if hand_landmarks.landmark[self.mp_hands.HandLandmark.WRIST].x < hand_landmarks.landmark[self.mp_hands.HandLandmark.THUMB_TIP].x:
+                return "Left Hand"
+            else:
+                return "Right Hand"
+        else:
+            return "No Hand"
+
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
@@ -81,32 +99,43 @@ hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_c
 # Initialize video capture
 cap = cv2.VideoCapture(0)
 
+# Create SurfaceAPI instance
+surface_api = None
+
 while cap.isOpened():
     success, image = cap.read()
     if not success:
         print("Failed to get frame from camera")
         continue
     
-    image = cv2.flip(image, 1)
+    image = cv2.flip(image, 1)  # Mirror the image
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = hands.process(image_rgb)
 
-    # Create SurfaceAPI instance
-    surface_api = SurfaceAPI(image)
-
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
+            # Determine hand side based on wrist and thumb tip coordinates
+            if hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].x:
+                hand_label = "Left Hand"
+            else:
+                hand_label = "Right Hand"
+
             index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
             x = int(index_finger_tip.x * image.shape[1])
             y = int(index_finger_tip.y * image.shape[0])
-            
+
+            # Initialize SurfaceAPI instance if not already created
+            if not surface_api:
+                surface_api = SurfaceAPI(image)
+
             # Get surface info at finger tip
             surface_info = surface_api.get_surface_info(x, y)
-            
+
             cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
-            cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            
+            cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
             # Draw the analyzed region
             region_size = 200
             cv2.rectangle(image, 
