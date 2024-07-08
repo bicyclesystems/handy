@@ -70,9 +70,13 @@ class SurfaceAPI:
         if 0 <= x < self.image_width and 0 <= y < self.image_height:
             surface = self.detect_horizontal_surface(x, y)
             texture = self.analyze_texture(x, y) if surface else "N/A"
-            return {"surface": surface, "texture": texture}
+            
+            # Check if finger is touching the surface
+            touching_surface = surface
+            
+            return {"surface": surface, "texture": texture, "touching_surface": touching_surface}
         else:
-            return {"surface": False, "texture": "N/A"}
+            return {"surface": False, "texture": "N/A", "touching_surface": False}
 
 class HandAPI:
     def __init__(self):
@@ -136,7 +140,10 @@ while cap.isOpened():
         cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(image, f"Index Finger Tip: ({x}, {y}, {z})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        
+        # Check if finger is touching the surface and display message
+        if surface_info['touching_surface']:
+            cv2.putText(image, "Finger touching surface", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         # Draw the analyzed region
         region_size = 200
