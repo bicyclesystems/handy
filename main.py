@@ -39,7 +39,7 @@ class SurfaceAPI:
         vertical_count = np.sum((angle[strong_edges] > 80) & (angle[strong_edges] < 100))
         
         # If there are significantly more horizontal gradients than vertical, it's likely a horizontal surface
-        return horizontal_count > 2 * vertical_count
+        return horizontal_count > vertical_count
 
     def analyze_texture(self, x, y, region_size=100):
         x1 = max(0, x - region_size // 2)
@@ -85,22 +85,16 @@ class HandAPI:
         
         if results.multi_hand_landmarks:
             hand_landmarks = results.multi_hand_landmarks[0]  # Assuming only one hand is detected
-            if hand_landmarks.landmark[self.mp_hands.HandLandmark.WRIST].x < hand_landmarks.landmark[self.mp_hands.HandLandmark.THUMB_TIP].x:
-                return "Left Hand"
-            else:
-                return "Right Hand"
+            return hand_landmarks
         else:
-            return "No Hand"
-
-# Initialize MediaPipe Hands
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
+            return None
 
 # Initialize video capture
 cap = cv2.VideoCapture(0)
 
-# Create SurfaceAPI instance
+# Create SurfaceAPI and HandAPI instances
 surface_api = None
+hand_api = HandAPI()
 
 while cap.isOpened():
     success, image = cap.read()
@@ -110,38 +104,46 @@ while cap.isOpened():
     
     image = cv2.flip(image, 1)  # Mirror the image
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    results = hands.process(image_rgb)
+    hand_landmarks = hand_api.detect_hand(image)
 
-    if results.multi_hand_landmarks:
-        for hand_landmarks in results.multi_hand_landmarks:
-            # Determine hand side based on wrist and thumb tip coordinates
-            if hand_landmarks.landmark[mp_hands.HandLandmark.WRIST].x < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].x:
-                hand_label = "Left Hand"
-            else:
-                hand_label = "Right Hand"
+    if hand_landmarks:
+        # Determine hand side based on wrist and thumb tip coordinates
+        if hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].x < hand_landmarks.landmark[mp.solutions.hands.HandLandmark.THUMB_TIP].x:
+            hand_label = "Left Hand"
+        else:
+            hand_label = "Right Hand"
 
-            index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
-            x = int(index_finger_tip.x * image.shape[1])
-            y = int(index_finger_tip.y * image.shape[0])
+        # Draw landmarks for all fingers
+        for landmark in hand_landmarks.landmark:
+            x = int(landmark.x * image.shape[1])
+            y = int(landmark.y * image.shape[0])
+            cv2.circle(image, (x, y), 5, (255, 0, 0), -1)
 
-            # Initialize SurfaceAPI instance if not already created
-            if not surface_api:
-                surface_api = SurfaceAPI(image)
+        # Get surface info at index finger tip
+        index_finger_tip = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP]
+        x = int(index_finger_tip.x * image.shape[1])
+        y = int(index_finger_tip.y * image.shape[0])
+        z = index_finger_tip.z  # Depth value (not directly used in the current example)
 
-            # Get surface info at finger tip
-            surface_info = surface_api.get_surface_info(x, y)
+        # Initialize SurfaceAPI instance if not already created
+        if not surface_api:
+            surface_api = SurfaceAPI(image)
 
-            cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
-            cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # Get surface info at finger tip
+        surface_info = surface_api.get_surface_info(x, y)
 
-            # Draw the analyzed region
-            region_size = 200
-            cv2.rectangle(image, 
-                          (max(0, x - region_size // 2), max(0, y - region_size // 2)),
-                          (min(image.shape[1], x + region_size // 2), min(image.shape[0], y + region_size // 2)),
-                          (255, 0, 0), 2)
+        cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
+        cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Index Finger Tip: ({x}, {y}, {z})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        # Draw the analyzed region
+        region_size = 200
+        cv2.rectangle(image, 
+                      (max(0, x - region_size // 2), max(0, y - region_size // 2)),
+                      (min(image.shape[1], x + region_size // 2), min(image.shape[0], y + region_size // 2)),
+                      (255, 0, 0), 2)
     else:
         cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
