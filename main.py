@@ -109,7 +109,7 @@ class FingerTracker:
         self.no_movement_counter = 0
         self.no_movement_threshold = 30
         self.movement_history = []
-        self.history_size = 5
+        self.history_size = 10
         self.screen_width, self.screen_height = pyautogui.size()
         self.sensitivity = 2.5
         self.last_click_time = 0
