@@ -7,7 +7,7 @@ import pyautogui
 class SurfaceAPI:
     def __init__(self, image):
         self.image = image
-        self.image_height, self.image_width, _ = image.shape
+        self.image_height, self.image_width = image.shape
         self.last_known_surface_info = None
 
     def detect_horizontal_surface(self, x, y, region_size=200):
@@ -24,10 +24,8 @@ class SurfaceAPI:
         if region.size == 0:
             return False
         
-        gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
-        
-        gradient_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
-        gradient_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
+        gradient_x = cv2.Sobel(region, cv2.CV_64F, 1, 0, ksize=3)
+        gradient_y = cv2.Sobel(region, cv2.CV_64F, 0, 1, ksize=3)
         
         magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
         angle = np.arctan2(gradient_y, gradient_x) * 180 / np.pi
@@ -53,8 +51,7 @@ class SurfaceAPI:
         if region.size == 0:
             return "N/A"
         
-        gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
-        glcm = cv2.GaussianBlur(gray, (5,5), 0)
+        glcm = cv2.GaussianBlur(region, (5,5), 0)
         contrast = cv2.Laplacian(glcm, cv2.CV_64F).var()
         
         if contrast > 100:
@@ -90,8 +87,7 @@ class HandAPI:
         self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 
     def detect_hand(self, image):
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = self.hands.process(image_rgb)
+        results = self.hands.process(image)
         
         if results.multi_hand_landmarks:
             hand_landmarks = results.multi_hand_landmarks[0]
@@ -164,6 +160,7 @@ class FingerTracker:
         pyautogui.click()
 
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FPS, 20)  # Set frame rate to 20 FPS
 
 surface_api = None
 hand_api = HandAPI()
@@ -176,8 +173,9 @@ while cap.isOpened():
         continue
     
     image = cv2.flip(image, 1)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    hand_landmarks = hand_api.detect_hand(image)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+    image_rgb = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGB)  # Convert back to RGB for MediaPipe
+    hand_landmarks = hand_api.detect_hand(image_rgb)
 
     if hand_landmarks:
         if hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].x < hand_landmarks.landmark[mp.solutions.hands.HandLandmark.THUMB_TIP].x:
@@ -186,23 +184,23 @@ while cap.isOpened():
             hand_label = "Right Hand"
 
         for landmark in hand_landmarks.landmark:
-            x = int(landmark.x * image.shape[1])
-            y = int(landmark.y * image.shape[0])
-            cv2.circle(image, (x, y), 5, (255, 0, 0), -1)
+            x = int(landmark.x * gray_image.shape[1])
+            y = int(landmark.y * gray_image.shape[0])
+            cv2.circle(gray_image, (x, y), 5, (255), -1)
 
         index_finger_tip = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP]
         wrist = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST]
 
         finger_raised = index_finger_tip.y < wrist.y
 
-        x = int(index_finger_tip.x * image.shape[1])
-        y = int(index_finger_tip.y * image.shape[0])
+        x = int(index_finger_tip.x * gray_image.shape[1])
+        y = int(index_finger_tip.y * gray_image.shape[0])
         z = index_finger_tip.z
 
         if not surface_api:
-            surface_api = SurfaceAPI(image)
+            surface_api = SurfaceAPI(gray_image)
         else:
-            surface_api.image = image
+            surface_api.image = gray_image
 
         surface_info = surface_api.get_surface_info(x, y, finger_raised)
 
@@ -214,28 +212,28 @@ while cap.isOpened():
         if click:
             finger_tracker.perform_click()
 
-        cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
-        cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.circle(gray_image, (x, y), 5, (255), -1)
+        cv2.putText(gray_image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
+        cv2.putText(gray_image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
+        cv2.putText(gray_image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
         
         if surface_info['touching_surface']:
-            cv2.putText(image, "Finger touching surface", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(gray_image, "Finger touching surface", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
 
-        cv2.putText(image, movement, (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(gray_image, movement, (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
 
         if click or (time.time() - finger_tracker.click_time < 1):
-            cv2.putText(image, "Click", (10, 230), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.putText(gray_image, "Click", (10, 230), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
 
         region_size = 200
-        cv2.rectangle(image, 
+        cv2.rectangle(gray_image, 
                       (max(0, x - region_size // 2), max(0, y - region_size // 2)),
-                      (min(image.shape[1], x + region_size // 2), min(image.shape[0], y + region_size // 2)),
-                      (255, 0, 0), 2)
+                      (min(gray_image.shape[1], x + region_size // 2), min(gray_image.shape[0], y + region_size // 2)),
+                      (255), 2)
     else:
-        cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.putText(gray_image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
 
-    cv2.imshow('Hand Tracking', image)
+    cv2.imshow('Hand Tracking', gray_image)
     
     if cv2.waitKey(5) & 0xFF == 27:
         break
