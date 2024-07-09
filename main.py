@@ -102,11 +102,13 @@ class FingerTracker:
     def __init__(self):
         self.prev_x = None
         self.prev_y = None
-        self.movement_threshold = 5
-        self.click_threshold = 30
+        self.movement_threshold = 10  
+        self.click_threshold = 30 
         self.click_time = 0
         self.no_movement_counter = 0
-        self.no_movement_threshold = 10
+        self.no_movement_threshold = 30 
+        self.movement_history = []
+        self.history_size = 5  
 
     def track_movement(self, x, y):
         movement = "No movement"
@@ -116,13 +118,20 @@ class FingerTracker:
             dx = x - self.prev_x
             dy = y - self.prev_y
 
-            if abs(dx) > self.movement_threshold and abs(dy) < self.movement_threshold:
+            self.movement_history.append((dx, dy))
+            if len(self.movement_history) > self.history_size:
+                self.movement_history.pop(0)
+
+            avg_dx = sum(dx for dx, _ in self.movement_history) / len(self.movement_history)
+            avg_dy = sum(dy for _, dy in self.movement_history) / len(self.movement_history)
+
+            if abs(avg_dx) > self.movement_threshold and abs(avg_dy) < self.movement_threshold:
                 movement = "Horizontal movement"
                 self.no_movement_counter = 0
-            elif abs(dy) > self.click_threshold:
+            elif abs(dy) > self.click_threshold:  # Используем оригинальный dy для клика
                 click = True
                 self.click_time = time.time()
-            elif abs(dx) < self.movement_threshold and abs(dy) < self.movement_threshold:
+            elif abs(avg_dx) < self.movement_threshold / 2 and abs(avg_dy) < self.movement_threshold / 2:
                 self.no_movement_counter += 1
                 if self.no_movement_counter >= self.no_movement_threshold:
                     movement = "No movement"
