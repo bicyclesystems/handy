@@ -112,6 +112,8 @@ class FingerTracker:
         self.history_size = 5
         self.screen_width, self.screen_height = pyautogui.size()
         self.sensitivity = 2.5
+        self.last_click_time = 0
+        self.click_cooldown = 1  # Минимальное время между кликами (в секундах)
 
     def track_movement(self, x, y):
         movement = "No movement"
@@ -135,8 +137,11 @@ class FingerTracker:
                 cursor_dx = avg_dx * self.sensitivity
                 cursor_dy = -avg_dy * self.sensitivity 
             elif abs(dy) > self.click_threshold:
-                click = True
-                self.click_time = time.time()
+                current_time = time.time()
+                if current_time - self.last_click_time > self.click_cooldown:
+                    click = True
+                    self.click_time = current_time
+                    self.last_click_time = current_time
             elif abs(avg_dx) < self.movement_threshold / 2 and abs(avg_dy) < self.movement_threshold / 2:
                 self.no_movement_counter += 1
                 if self.no_movement_counter >= self.no_movement_threshold:
@@ -154,6 +159,9 @@ class FingerTracker:
         new_x = max(0, min(self.screen_width, current_x + dx))
         new_y = max(0, min(self.screen_height, current_y + dy))
         pyautogui.moveTo(new_x, new_y)
+
+    def perform_click(self):
+        pyautogui.click()
 
 cap = cv2.VideoCapture(0)
 
@@ -202,6 +210,9 @@ while cap.isOpened():
 
         if movement == "Horizontal movement":
             finger_tracker.move_cursor(cursor_dx, cursor_dy)
+
+        if click:
+            finger_tracker.perform_click()
 
         cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
         cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
