@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import time
+import pyautogui
 
 class SurfaceAPI:
     def __init__(self, image):
@@ -102,21 +103,24 @@ class FingerTracker:
     def __init__(self):
         self.prev_x = None
         self.prev_y = None
-        self.movement_threshold = 10  
-        self.click_threshold = 30 
+        self.movement_threshold = 10
+        self.click_threshold = 30
         self.click_time = 0
         self.no_movement_counter = 0
-        self.no_movement_threshold = 30 
+        self.no_movement_threshold = 30
         self.movement_history = []
-        self.history_size = 5  
+        self.history_size = 5
+        self.screen_width, self.screen_height = pyautogui.size()
+        self.sensitivity = 2.5
 
     def track_movement(self, x, y):
         movement = "No movement"
         click = False
+        cursor_dx, cursor_dy = 0, 0
 
         if self.prev_x is not None and self.prev_y is not None:
             dx = x - self.prev_x
-            dy = y - self.prev_y
+            dy = y - self.prev_y 
 
             self.movement_history.append((dx, dy))
             if len(self.movement_history) > self.history_size:
@@ -125,10 +129,12 @@ class FingerTracker:
             avg_dx = sum(dx for dx, _ in self.movement_history) / len(self.movement_history)
             avg_dy = sum(dy for _, dy in self.movement_history) / len(self.movement_history)
 
-            if abs(avg_dx) > self.movement_threshold and abs(avg_dy) < self.movement_threshold:
+            if abs(avg_dx) > self.movement_threshold or abs(avg_dy) > self.movement_threshold:
                 movement = "Horizontal movement"
                 self.no_movement_counter = 0
-            elif abs(dy) > self.click_threshold:  # Используем оригинальный dy для клика
+                cursor_dx = avg_dx * self.sensitivity
+                cursor_dy = -avg_dy * self.sensitivity 
+            elif abs(dy) > self.click_threshold:
                 click = True
                 self.click_time = time.time()
             elif abs(avg_dx) < self.movement_threshold / 2 and abs(avg_dy) < self.movement_threshold / 2:
@@ -141,7 +147,13 @@ class FingerTracker:
         self.prev_x = x
         self.prev_y = y
 
-        return movement, click
+        return movement, click, cursor_dx, cursor_dy
+
+    def move_cursor(self, dx, dy):
+        current_x, current_y = pyautogui.position()
+        new_x = max(0, min(self.screen_width, current_x + dx))
+        new_y = max(0, min(self.screen_height, current_y + dy))
+        pyautogui.moveTo(new_x, new_y)
 
 cap = cv2.VideoCapture(0)
 
@@ -186,7 +198,10 @@ while cap.isOpened():
 
         surface_info = surface_api.get_surface_info(x, y, finger_raised)
 
-        movement, click = finger_tracker.track_movement(x, y)
+        movement, click, cursor_dx, cursor_dy = finger_tracker.track_movement(x, y)
+
+        if movement == "Horizontal movement":
+            finger_tracker.move_cursor(cursor_dx, cursor_dy)
 
         cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
         cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
