@@ -104,16 +104,16 @@ class FingerTracker:
         self.prev_x = None
         self.prev_y = None
         self.movement_threshold = 10
-        self.click_threshold = 30
+        self.click_threshold = 50
         self.click_time = 0
         self.no_movement_counter = 0
-        self.no_movement_threshold = 30
+        self.no_movement_threshold = 50
         self.movement_history = []
         self.history_size = 10
         self.screen_width, self.screen_height = pyautogui.size()
-        self.sensitivity = 2.5
+        self.sensitivity = 4
         self.last_click_time = 0
-        self.click_cooldown = 1  # Минимальное время между кликами (в секундах)
+        self.click_cooldown = 0.5
 
     def track_movement(self, x, y):
         movement = "No movement"
