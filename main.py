@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import time
 
 class SurfaceAPI:
     def __init__(self, image):
@@ -97,10 +98,47 @@ class HandAPI:
         else:
             return None
 
+class FingerTracker:
+    def __init__(self):
+        self.prev_x = None
+        self.prev_y = None
+        self.movement_threshold = 5
+        self.click_threshold = 30
+        self.click_time = 0
+        self.no_movement_counter = 0
+        self.no_movement_threshold = 10
+
+    def track_movement(self, x, y):
+        movement = "No movement"
+        click = False
+
+        if self.prev_x is not None and self.prev_y is not None:
+            dx = x - self.prev_x
+            dy = y - self.prev_y
+
+            if abs(dx) > self.movement_threshold and abs(dy) < self.movement_threshold:
+                movement = "Horizontal movement"
+                self.no_movement_counter = 0
+            elif abs(dy) > self.click_threshold:
+                click = True
+                self.click_time = time.time()
+            elif abs(dx) < self.movement_threshold and abs(dy) < self.movement_threshold:
+                self.no_movement_counter += 1
+                if self.no_movement_counter >= self.no_movement_threshold:
+                    movement = "No movement"
+            else:
+                self.no_movement_counter = 0
+
+        self.prev_x = x
+        self.prev_y = y
+
+        return movement, click
+
 cap = cv2.VideoCapture(0)
 
 surface_api = None
 hand_api = HandAPI()
+finger_tracker = FingerTracker()
 
 while cap.isOpened():
     success, image = cap.read()
@@ -139,6 +177,8 @@ while cap.isOpened():
 
         surface_info = surface_api.get_surface_info(x, y, finger_raised)
 
+        movement, click = finger_tracker.track_movement(x, y)
+
         cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
         cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -146,6 +186,11 @@ while cap.isOpened():
         
         if surface_info['touching_surface']:
             cv2.putText(image, "Finger touching surface", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        cv2.putText(image, movement, (10, 190), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        if click or (time.time() - finger_tracker.click_time < 1):
+            cv2.putText(image, "Click", (10, 230), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
         region_size = 200
         cv2.rectangle(image, 
