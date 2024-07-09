@@ -6,6 +6,7 @@ class SurfaceAPI:
     def __init__(self, image):
         self.image = image
         self.image_height, self.image_width, _ = image.shape
+        self.last_known_surface_info = None
 
     def detect_horizontal_surface(self, x, y, region_size=200):
         x1 = max(0, x - region_size // 2)
@@ -23,22 +24,17 @@ class SurfaceAPI:
         
         gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
         
-        # Compute gradients
         gradient_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
         gradient_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
         
-        # Compute gradient magnitudes and angles
         magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
         angle = np.arctan2(gradient_y, gradient_x) * 180 / np.pi
         
-        # Consider only strong edges
         strong_edges = magnitude > np.percentile(magnitude, 70)
         
-        # Count horizontal gradients
         horizontal_count = np.sum((angle[strong_edges] > -10) & (angle[strong_edges] < 10))
         vertical_count = np.sum((angle[strong_edges] > 80) & (angle[strong_edges] < 100))
         
-        # If there are significantly more horizontal gradients than vertical, it's likely a horizontal surface
         return horizontal_count > vertical_count
 
     def analyze_texture(self, x, y, region_size=100):
@@ -66,15 +62,23 @@ class SurfaceAPI:
         else:
             return "Smooth"
 
-    def get_surface_info(self, x, y):
+    def get_surface_info(self, x, y, finger_raised):
         if 0 <= x < self.image_width and 0 <= y < self.image_height:
             surface = self.detect_horizontal_surface(x, y)
             texture = self.analyze_texture(x, y) if surface else "N/A"
             
-            # Check if finger is touching the surface
             touching_surface = surface
             
-            return {"surface": surface, "texture": texture, "touching_surface": touching_surface}
+            current_info = {"surface": surface, "texture": texture, "touching_surface": touching_surface}
+            
+            if self.last_known_surface_info is None or finger_raised:
+                self.last_known_surface_info = current_info
+            elif not surface and self.last_known_surface_info["surface"]:
+                return self.last_known_surface_info
+            else:
+                self.last_known_surface_info = current_info
+            
+            return current_info
         else:
             return {"surface": False, "texture": "N/A", "touching_surface": False}
 
@@ -88,15 +92,13 @@ class HandAPI:
         results = self.hands.process(image_rgb)
         
         if results.multi_hand_landmarks:
-            hand_landmarks = results.multi_hand_landmarks[0]  # Assuming only one hand is detected
+            hand_landmarks = results.multi_hand_landmarks[0]
             return hand_landmarks
         else:
             return None
 
-# Initialize video capture
 cap = cv2.VideoCapture(0)
 
-# Create SurfaceAPI and HandAPI instances
 surface_api = None
 hand_api = HandAPI()
 
@@ -106,46 +108,45 @@ while cap.isOpened():
         print("Failed to get frame from camera")
         continue
     
-    image = cv2.flip(image, 1)  # Mirror the image
+    image = cv2.flip(image, 1)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     hand_landmarks = hand_api.detect_hand(image)
 
     if hand_landmarks:
-        # Determine hand side based on wrist and thumb tip coordinates
         if hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].x < hand_landmarks.landmark[mp.solutions.hands.HandLandmark.THUMB_TIP].x:
             hand_label = "Left Hand"
         else:
             hand_label = "Right Hand"
 
-        # Draw landmarks for all fingers
         for landmark in hand_landmarks.landmark:
             x = int(landmark.x * image.shape[1])
             y = int(landmark.y * image.shape[0])
             cv2.circle(image, (x, y), 5, (255, 0, 0), -1)
 
-        # Get surface info at index finger tip
         index_finger_tip = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP]
+        wrist = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST]
+
+        finger_raised = index_finger_tip.y < wrist.y
+
         x = int(index_finger_tip.x * image.shape[1])
         y = int(index_finger_tip.y * image.shape[0])
-        z = index_finger_tip.z  # Depth value (not directly used in the current example)
+        z = index_finger_tip.z
 
-        # Initialize SurfaceAPI instance if not already created
         if not surface_api:
             surface_api = SurfaceAPI(image)
+        else:
+            surface_api.image = image
 
-        # Get surface info at finger tip
-        surface_info = surface_api.get_surface_info(x, y)
+        surface_info = surface_api.get_surface_info(x, y, finger_raised)
 
         cv2.circle(image, (x, y), 5, (0, 255, 0), -1)
         cv2.putText(image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(image, f"Texture: {surface_info['texture']}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
-        # Check if finger is touching the surface and display message
         if surface_info['touching_surface']:
             cv2.putText(image, "Finger touching surface", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-        # Draw the analyzed region
         region_size = 200
         cv2.rectangle(image, 
                       (max(0, x - region_size // 2), max(0, y - region_size // 2)),
