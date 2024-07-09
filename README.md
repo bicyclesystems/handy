@@ -11,5 +11,5 @@ To run the project, follow these steps:
 2. Navigate to the cloned repository directory: `cd hendi`
 3. Create a virtual environment: `python -m venv venv`
 4. Activate the virtual environment: `source venv/bin/activate`
-5. Install the required dependencies:: `pip install -r requirements.txt`
+5. Install the required dependencies: `pip install -r requirements.txt`
 6. Run the project: `python main.py`
