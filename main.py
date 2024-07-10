@@ -4,12 +4,14 @@ import numpy as np
 import time
 import pyautogui
 
+# Class for detecting and analyzing surfaces in images
 class SurfaceAPI:
     def __init__(self, image):
         self.image = image
         self.image_height, self.image_width = image.shape
         self.last_known_surface_info = None
 
+    # Method to detect horizontal surfaces in the image
     def detect_horizontal_surface(self, x, y, region_size=200):
         x1 = max(0, x - region_size // 2)
         y1 = max(0, y - region_size // 2)
@@ -37,6 +39,7 @@ class SurfaceAPI:
         
         return horizontal_count > vertical_count
 
+    # Method to analyze the texture of a surface
     def analyze_texture(self, x, y, region_size=100):
         x1 = max(0, x - region_size // 2)
         y1 = max(0, y - region_size // 2)
@@ -61,6 +64,7 @@ class SurfaceAPI:
         else:
             return "Smooth"
 
+    # Method to get combined surface information
     def get_surface_info(self, x, y, finger_raised):
         if 0 <= x < self.image_width and 0 <= y < self.image_height:
             surface = self.detect_horizontal_surface(x, y)
@@ -81,11 +85,13 @@ class SurfaceAPI:
         else:
             return {"surface": False, "texture": "N/A", "touching_surface": False}
 
+# Class for hand detection using MediaPipe
 class HandAPI:
     def __init__(self):
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
 
+    # Method to detect hand landmarks in an image
     def detect_hand(self, image):
         results = self.hands.process(image)
         
@@ -95,6 +101,7 @@ class HandAPI:
         else:
             return None
 
+# Class for tracking finger movements and simulating mouse actions
 class FingerTracker:
     def __init__(self):
         self.prev_x = None
@@ -111,6 +118,7 @@ class FingerTracker:
         self.last_click_time = 0
         self.click_cooldown = 0.5
 
+    # Method to track finger movement and determine actions
     def track_movement(self, x, y):
         movement = "No movement"
         click = False
@@ -150,15 +158,18 @@ class FingerTracker:
 
         return movement, click, cursor_dx, cursor_dy
 
+    # Method to move the cursor based on finger movement
     def move_cursor(self, dx, dy):
         current_x, current_y = pyautogui.position()
         new_x = max(0, min(self.screen_width, current_x + dx))
         new_y = max(0, min(self.screen_height, current_y + dy))
         pyautogui.moveTo(new_x, new_y)
 
+    # Method to perform a mouse click
     def perform_click(self):
         pyautogui.click()
 
+# Initialize video capture
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 20)  # Set frame rate to 20 FPS
 
@@ -166,28 +177,33 @@ surface_api = None
 hand_api = HandAPI()
 finger_tracker = FingerTracker()
 
+# Main loop for processing video frames
 while cap.isOpened():
     success, image = cap.read()
     if not success:
         print("Failed to get frame from camera")
         continue
     
+    # Process the image and detect hand landmarks
     image = cv2.flip(image, 1)
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
     image_rgb = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGB)  # Convert back to RGB for MediaPipe
     hand_landmarks = hand_api.detect_hand(image_rgb)
 
     if hand_landmarks:
+        # Determine if it's a left or right hand
         if hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST].x < hand_landmarks.landmark[mp.solutions.hands.HandLandmark.THUMB_TIP].x:
             hand_label = "Left Hand"
         else:
             hand_label = "Right Hand"
 
+        # Draw landmarks on the image
         for landmark in hand_landmarks.landmark:
             x = int(landmark.x * gray_image.shape[1])
             y = int(landmark.y * gray_image.shape[0])
             cv2.circle(gray_image, (x, y), 5, (255), -1)
 
+        # Get index finger tip position
         index_finger_tip = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.INDEX_FINGER_TIP]
         wrist = hand_landmarks.landmark[mp.solutions.hands.HandLandmark.WRIST]
 
@@ -197,13 +213,16 @@ while cap.isOpened():
         y = int(index_finger_tip.y * gray_image.shape[0])
         z = index_finger_tip.z
 
+        # Initialize or update SurfaceAPI
         if not surface_api:
             surface_api = SurfaceAPI(gray_image)
         else:
             surface_api.image = gray_image
 
+        # Get surface information
         surface_info = surface_api.get_surface_info(x, y, finger_raised)
 
+        # Track finger movement and perform actions
         movement, click, cursor_dx, cursor_dy = finger_tracker.track_movement(x, y)
 
         if movement == "Horizontal movement":
@@ -212,6 +231,7 @@ while cap.isOpened():
         if click:
             finger_tracker.perform_click()
 
+        # Draw information on the image
         cv2.circle(gray_image, (x, y), 5, (255), -1)
         cv2.putText(gray_image, f"{hand_label}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
         cv2.putText(gray_image, f"Surface: {surface_info['surface']}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
@@ -225,6 +245,7 @@ while cap.isOpened():
         if click or (time.time() - finger_tracker.click_time < 1):
             cv2.putText(gray_image, "Click", (10, 230), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
 
+        # Draw rectangle around the analyzed region
         region_size = 200
         cv2.rectangle(gray_image, 
                       (max(0, x - region_size // 2), max(0, y - region_size // 2)),
@@ -233,10 +254,13 @@ while cap.isOpened():
     else:
         cv2.putText(gray_image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255), 2)
 
+    # Display the processed image
     cv2.imshow('Hand Tracking', gray_image)
     
+    # Exit the loop if 'ESC' key is pressed
     if cv2.waitKey(5) & 0xFF == 27:
         break
 
+# Release resources
 cap.release()
 cv2.destroyAllWindows()
