@@ -1,0 +1,99 @@
+import cv2
+import mediapipe as mp
+import numpy as np
+from coordinate_system import CoordinateSystem
+
+class HandAPI:
+    def __init__(self):
+        self.mp_hands = mp.solutions.hands
+        self.hands = self.mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5)
+        self.coordinate_system = CoordinateSystem()
+
+    def detect_hand(self, image):
+        results = self.hands.process(image)
+        
+        if results.multi_hand_landmarks:
+            hand_landmarks = results.multi_hand_landmarks[0]
+            return hand_landmarks
+        else:
+            return None
+
+    def get_hand_info(self, image, hand_landmarks):
+        h, w = image.shape[:2]
+        hand_info = {}
+
+        if hand_landmarks.landmark[self.mp_hands.HandLandmark.WRIST].x < hand_landmarks.landmark[self.mp_hands.HandLandmark.THUMB_TIP].x:
+            hand_info['label'] = "Left Hand"
+        else:
+            hand_info['label'] = "Right Hand"
+
+        hand_info['landmarks'] = []
+        for landmark in hand_landmarks.landmark:
+            x = int(landmark.x * w)
+            y = int(landmark.y * h)
+            hand_info['landmarks'].append((x, y))
+
+        palm_landmarks = [
+            hand_landmarks.landmark[self.mp_hands.HandLandmark.WRIST],
+            hand_landmarks.landmark[self.mp_hands.HandLandmark.THUMB_CMC],
+            hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_MCP],
+            hand_landmarks.landmark[self.mp_hands.HandLandmark.PINKY_MCP]
+        ]
+        palm_center = np.mean([[lm.x * w, lm.y * h] for lm in palm_landmarks], axis=0)
+        hand_info['palm_center'] = tuple(map(int, palm_center))
+
+        wrist = hand_landmarks.landmark[self.mp_hands.HandLandmark.WRIST]
+        middle_finger_mcp = hand_landmarks.landmark[self.mp_hands.HandLandmark.MIDDLE_FINGER_MCP]
+        hand_direction = (middle_finger_mcp.x - wrist.x, middle_finger_mcp.y - wrist.y)
+        hand_info['hand_direction'] = hand_direction
+
+        finger_tips = [
+            self.mp_hands.HandLandmark.THUMB_TIP,
+            self.mp_hands.HandLandmark.INDEX_FINGER_TIP,
+            self.mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
+            self.mp_hands.HandLandmark.RING_FINGER_TIP,
+            self.mp_hands.HandLandmark.PINKY_TIP
+        ]
+        finger_bases = [
+            self.mp_hands.HandLandmark.THUMB_CMC,
+            self.mp_hands.HandLandmark.INDEX_FINGER_MCP,
+            self.mp_hands.HandLandmark.MIDDLE_FINGER_MCP,
+            self.mp_hands.HandLandmark.RING_FINGER_MCP,
+            self.mp_hands.HandLandmark.PINKY_MCP
+        ]
+        hand_info['finger_tips'] = [(int(hand_landmarks.landmark[tip].x * w), int(hand_landmarks.landmark[tip].y * h)) for tip in finger_tips]
+        hand_info['finger_directions'] = [
+            (hand_landmarks.landmark[tip].x - hand_landmarks.landmark[base].x,
+             hand_landmarks.landmark[tip].y - hand_landmarks.landmark[base].y)
+            for tip, base in zip(finger_tips, finger_bases)
+        ]
+
+        return hand_info
+
+    def draw_hand(self, image, hand_info):
+        for x, y in hand_info['landmarks']:
+            cv2.circle(image, (x, y), 5, (255, 255, 255), -1)
+
+        cv2.putText(image, hand_info['label'], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.circle(image, hand_info['palm_center'], 8, (0, 255, 255), -1)
+
+        image = self.coordinate_system.draw_hand_axes(image, hand_info)
+
+        return image
+
+    def process_image(self, image):
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        hand_landmarks = self.detect_hand(image_rgb)
+
+        if hand_landmarks:
+            hand_info = self.get_hand_info(image, hand_landmarks)
+            image = self.draw_hand(image, hand_info)
+        else:
+            cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+        self.coordinate_system.draw_buttons(image)
+
+        return image
+
+    def handle_click(self, x, y):
+        self.coordinate_system.handle_click(x, y)
