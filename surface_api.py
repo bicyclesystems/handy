@@ -9,7 +9,7 @@ class SurfaceAPI:
         self.is_surface_locked = False
         self.lock_button_size = (200, 50)
         self.axis_length = 900 
-        self.tick_interval = 100 
+        self.tick_interval = 50 
 
     def detect_surface(self, image):
         if self.is_surface_locked:

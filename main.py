@@ -6,7 +6,7 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 20)
 
 surface_api = SurfaceAPI(highlight_color=(0, 255, 0, 0.05))
-hand_api = HandAPI()
+hand_api = HandAPI(surface_api)  # Передаем surface_api в HandAPI
 
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -21,15 +21,15 @@ while cap.isOpened():
     if not success:
         print("Failed to get frame from camera")
         continue
-    
+
     image = cv2.flip(image, 1)
-    
+
     surface_api.detect_surface(image)
     image = surface_api.highlight_surface(image)
     image = hand_api.process_image(image)
-    
+
     cv2.imshow('Hand and Surface Tracking', image)
-    
+
     if cv2.waitKey(5) & 0xFF == 27:
         break
 

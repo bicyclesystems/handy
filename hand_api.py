@@ -4,16 +4,17 @@ import numpy as np
 from coordinate_system import CoordinateSystem
 
 class HandAPI:
-    def __init__(self):
+    def __init__(self, surface_api):
         self.mp_hands = mp.solutions.hands
         self.hands = self.mp_hands.Hands(
             static_image_mode=False, 
-            max_num_hands=1, 
-            min_detection_confidence=0.5, 
+            max_num_hands=1,
+            min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )
         self.coordinate_system = CoordinateSystem()
         self.prev_finger_tips = None
+        self.surface_api = surface_api
 
     def detect_hand(self, image):
         results = self.hands.process(image)
@@ -53,10 +54,9 @@ class HandAPI:
         if self.prev_finger_tips is None:
             self.prev_finger_tips = current_finger_tips
         else:
-            # Применяем сглаживание для стабилизации положения кончиков пальцев
-            alpha = 0.5  # Коэффициент сглаживания
+            alpha = 0.5
             current_finger_tips = [
-                (int(alpha * curr[0] + (1 - alpha) * prev[0]),
+                (int(alpha * curr[0] + (1 - alpha) * prev[0]), 
                  int(alpha * curr[1] + (1 - alpha) * prev[1]))
                 for curr, prev in zip(current_finger_tips, self.prev_finger_tips)
             ]
@@ -64,7 +64,7 @@ class HandAPI:
 
         hand_info['finger_tips'] = current_finger_tips
         hand_info['finger_directions'] = [
-            (hand_landmarks.landmark[tip].x - hand_landmarks.landmark[base].x,
+            (hand_landmarks.landmark[tip].x - hand_landmarks.landmark[base].x, 
              hand_landmarks.landmark[tip].y - hand_landmarks.landmark[base].y)
             for tip, base in zip(finger_tips, finger_bases)
         ]
@@ -74,13 +74,48 @@ class HandAPI:
         hand_direction = (middle_finger_mcp.x - wrist.x, middle_finger_mcp.y - wrist.y)
         hand_info['hand_direction'] = hand_direction
 
+        # Добавляем проверку положения указательного пальца
+        index_finger_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
+        index_finger_x = int(index_finger_tip.x * w)
+        index_finger_y = int(index_finger_tip.y * h)
+
+        if self.surface_api.is_surface_locked and self.surface_api.surface_contour is not None:
+            M = cv2.moments(self.surface_api.surface_contour)
+            if M["m00"] != 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                
+                # Вычисляем положение пальца относительно начала координат поверхности
+                relative_x = index_finger_x - cX
+                relative_y = cY - index_finger_y  # Инвертируем Y, так как в OpenCV Y растет вниз
+                
+                # Проверяем, находится ли палец не выше 100 по оси Z
+                if relative_y <= 100:
+                    hand_info['index_finger_on_surface'] = True
+                else:
+                    hand_info['index_finger_on_surface'] = False
+            else:
+                hand_info['index_finger_on_surface'] = False
+        else:
+            hand_info['index_finger_on_surface'] = False
+
         return hand_info
 
     def draw_hand(self, image, hand_info):
+        height, width = image.shape[:2]
         for x, y in hand_info['finger_tips']:
             cv2.circle(image, (x, y), 5, (255, 255, 255), -1)
 
         cv2.putText(image, hand_info['label'], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+        # Перемещаем надпись о положении указательного пальца в середину снизу
+        text = "Index finger on surface" if hand_info['index_finger_on_surface'] else "Index finger not on surface"
+        text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+        text_x = (width - text_size[0]) // 2
+        text_y = height - 20  # 20 пикселей от нижнего края
+
+        cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, 
+                    (0, 255, 0) if hand_info['index_finger_on_surface'] else (0, 0, 255), 2)
 
         image = self.coordinate_system.draw_hand_axes(image, hand_info)
 
