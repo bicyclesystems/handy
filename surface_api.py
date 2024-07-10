@@ -2,12 +2,17 @@ import cv2
 import numpy as np
 
 class SurfaceAPI:
-    def __init__(self, highlight_color=(0, 255, 0)):
+    def __init__(self, highlight_color=(0, 255, 0, 0.05)):
         self.surface_color = None
         self.surface_contour = None
         self.highlight_color = highlight_color
+        self.is_surface_locked = False
+        self.lock_button_size = (200, 50)
 
     def detect_surface(self, image):
+        if self.is_surface_locked:
+            return
+
         height, width = image.shape[:2]
         lower_half = image[height//2:, :]
         
@@ -23,9 +28,9 @@ class SurfaceAPI:
             for j in range(10):
                 cell = hsv[i*cell_height:(i+1)*cell_height, j*cell_width:(j+1)*cell_width]
                 color_std = np.std(cell, axis=(0,1))
-                if np.all(color_std < 20): 
+                if np.all(color_std < 20):  
                     mean_color = np.mean(cell, axis=(0,1)).astype(np.uint8)
-                    if mean_color[1] < 30:
+                    if mean_color[1] < 30:  
                         lower_bound = np.array([0, 0, max(0, mean_color[2]-30)], dtype=np.uint8)
                         upper_bound = np.array([180, 30, min(255, mean_color[2]+30)], dtype=np.uint8)
                     else:
@@ -52,14 +57,32 @@ class SurfaceAPI:
             self.surface_contour = None
 
     def highlight_surface(self, image):
+        height, width = image.shape[:2]
+        
         if self.surface_color is not None:
-            height, width = image.shape[:2]
             cv2.rectangle(image, (width-50, height-50), (width-10, height-10), self.surface_color.tolist(), -1)
             
             if self.surface_contour is not None:
                 overlay = image.copy()
-                cv2.drawContours(overlay, [self.surface_contour], 0, self.highlight_color, -1)
-                cv2.addWeighted(overlay, 0.4, image, 0.6, 0, image)
-                cv2.drawContours(image, [self.surface_contour], 0, self.highlight_color, 2)
+                cv2.drawContours(overlay, [self.surface_contour], 0, self.highlight_color[:3], -1)
+                cv2.addWeighted(overlay, self.highlight_color[3], image, 1 - self.highlight_color[3], 0, image)
+                cv2.drawContours(image, [self.surface_contour], 0, self.highlight_color[:3], 2)
         
+        self.lock_button_pos = (width - self.lock_button_size[0] - 10, 10)
+        self.draw_lock_button(image)
         return image
+
+    def draw_lock_button(self, image):
+        x, y = self.lock_button_pos
+        w, h = self.lock_button_size
+        cv2.rectangle(image, (x, y), (x + w, y + h), (200, 200, 200), -1)
+        text = "Unlock Surface" if self.is_surface_locked else "Lock Surface"
+        cv2.putText(image, text, (x + 10, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+
+    def handle_click(self, x, y):
+        if self.is_mouse_over_button((x, y), self.lock_button_pos, self.lock_button_size):
+            self.is_surface_locked = not self.is_surface_locked
+
+    def is_mouse_over_button(self, mouse_pos, button_pos, button_size):
+        return (button_pos[0] < mouse_pos[0] < button_pos[0] + button_size[0] and
+                button_pos[1] < mouse_pos[1] < button_pos[1] + button_size[1])
