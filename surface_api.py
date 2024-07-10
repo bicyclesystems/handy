@@ -8,6 +8,8 @@ class SurfaceAPI:
         self.highlight_color = highlight_color
         self.is_surface_locked = False
         self.lock_button_size = (200, 50)
+        self.axis_length = 900 
+        self.tick_interval = 100 
 
     def detect_surface(self, image):
         if self.is_surface_locked:
@@ -70,6 +72,9 @@ class SurfaceAPI:
         
         self.lock_button_pos = (width - self.lock_button_size[0] - 10, 10)
         self.draw_lock_button(image)
+        
+        self.draw_axes(image)
+        
         return image
 
     def draw_lock_button(self, image):
@@ -86,3 +91,36 @@ class SurfaceAPI:
     def is_mouse_over_button(self, mouse_pos, button_pos, button_size):
         return (button_pos[0] < mouse_pos[0] < button_pos[0] + button_size[0] and
                 button_pos[1] < mouse_pos[1] < button_pos[1] + button_size[1])
+
+    def draw_axes(self, image):
+        if self.surface_contour is not None and self.is_surface_locked:
+            M = cv2.moments(self.surface_contour)
+            if M["m00"] != 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+            else:
+                return
+
+            cv2.line(image, (cX, cY), (cX + self.axis_length, cY), (0, 0, 255), 2) 
+            cv2.line(image, (cX, cY), (cX, cY + self.axis_length), (0, 255, 0), 2)  
+            cv2.line(image, (cX, cY), (cX, cY - self.axis_length), (255, 0, 0), 2) 
+
+            for i in range(1, self.axis_length // self.tick_interval + 1):
+                tick_length = 10
+                tick_value = i * self.tick_interval
+                
+                x_tick = cX + i * self.tick_interval
+                cv2.line(image, (x_tick, cY - tick_length), (x_tick, cY + tick_length), (0, 0, 255), 1)
+                cv2.putText(image, str(tick_value), (x_tick - 10, cY + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                
+                y_tick = cY + i * self.tick_interval
+                cv2.line(image, (cX - tick_length, y_tick), (cX + tick_length, y_tick), (0, 255, 0), 1)
+                cv2.putText(image, str(tick_value), (cX - 40, y_tick + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                
+                z_tick = cY - i * self.tick_interval
+                cv2.line(image, (cX - tick_length, z_tick), (cX + tick_length, z_tick), (255, 0, 0), 1)
+                cv2.putText(image, str(tick_value), (cX + 15, z_tick + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+
+            cv2.putText(image, "X", (cX + self.axis_length + 10, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.putText(image, "Y", (cX, cY + self.axis_length + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.putText(image, "Z", (cX, cY - self.axis_length - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
