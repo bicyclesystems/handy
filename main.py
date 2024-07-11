@@ -34,7 +34,6 @@ while cap.isOpened():
         image = hand_api.draw_hand(image, hand_info)
     else:
         cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        hand_api.prev_finger_tips = None
     
     image = surface_api.highlight_surface(image)
     

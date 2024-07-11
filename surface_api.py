@@ -68,7 +68,6 @@ class SurfaceAPI:
                     self.center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
                     self.surface_level = self.center[1]
             
-            # Обновляем только X координату, Y остается на уровне поверхности
             self.center = (finger_position[0], self.surface_level)
 
     def highlight_surface(self, image):
