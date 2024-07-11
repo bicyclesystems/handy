@@ -10,8 +10,7 @@ class SurfaceAPI:
         self.lock_button_size = (200, 50)
         self.axis_length = 900 
         self.tick_interval = 50 
-        self.center = None
-        self.surface_level = None
+        self.center = None  
 
     def detect_surface(self, image):
         if self.is_surface_locked:
@@ -60,16 +59,6 @@ class SurfaceAPI:
             self.surface_color = None
             self.surface_contour = None
 
-    def update_center(self, finger_position):
-        if self.is_surface_locked and self.surface_contour is not None:
-            if self.center is None:
-                M = cv2.moments(self.surface_contour)
-                if M["m00"] != 0:
-                    self.center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-                    self.surface_level = self.center[1]
-            
-            self.center = (finger_position[0], self.surface_level)
-
     def highlight_surface(self, image):
         height, width = image.shape[:2]
         
@@ -108,9 +97,11 @@ class SurfaceAPI:
         if self.surface_contour is not None and self.is_surface_locked and self.center is not None:
             cX, cY = self.center
 
-            cv2.line(image, (cX, cY), (cX + self.axis_length, cY), (0, 0, 255), 2) 
-            cv2.line(image, (cX, cY), (cX, cY + self.axis_length), (0, 255, 0), 2)  
-            cv2.line(image, (cX, cY), (cX, cY - self.axis_length), (255, 0, 0), 2) 
+            cv2.line(image, (cX, cY), (cX + self.axis_length, cY), (0, 0, 255), 2)
+            
+            cv2.line(image, (cX, cY), (cX - self.axis_length // 2, cY - self.axis_length // 2), (0, 255, 0), 2)
+            
+            cv2.line(image, (cX, cY), (cX, cY - self.axis_length), (255, 0, 0), 2)
 
             for i in range(1, self.axis_length // self.tick_interval + 1):
                 tick_length = 10
@@ -120,14 +111,18 @@ class SurfaceAPI:
                 cv2.line(image, (x_tick, cY - tick_length), (x_tick, cY + tick_length), (0, 0, 255), 1)
                 cv2.putText(image, str(tick_value), (x_tick - 10, cY + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
                 
-                y_tick = cY + i * self.tick_interval
-                cv2.line(image, (cX - tick_length, y_tick), (cX + tick_length, y_tick), (0, 255, 0), 1)
-                cv2.putText(image, str(tick_value), (cX - 40, y_tick + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                y_tick_x = cX - (i * self.tick_interval) // 2
+                y_tick_y = cY - (i * self.tick_interval) // 2
+                cv2.line(image, (y_tick_x - tick_length, y_tick_y), (y_tick_x + tick_length, y_tick_y), (0, 255, 0), 1)
+                cv2.putText(image, str(tick_value), (y_tick_x - 30, y_tick_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                 
                 z_tick = cY - i * self.tick_interval
                 cv2.line(image, (cX - tick_length, z_tick), (cX + tick_length, z_tick), (255, 0, 0), 1)
                 cv2.putText(image, str(tick_value), (cX + 15, z_tick + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
 
             cv2.putText(image, "X", (cX + self.axis_length + 10, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-            cv2.putText(image, "Y", (cX, cY + self.axis_length + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.putText(image, "Y", (cX - self.axis_length // 2 - 30, cY - self.axis_length // 2 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.putText(image, "Z", (cX, cY - self.axis_length - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+
+    def update_center(self, new_center):
+        self.center = new_center
