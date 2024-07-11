@@ -10,6 +10,8 @@ class SurfaceAPI:
         self.lock_button_size = (200, 50)
         self.axis_length = 900 
         self.tick_interval = 50 
+        self.center = None
+        self.surface_level = None
 
     def detect_surface(self, image):
         if self.is_surface_locked:
@@ -58,6 +60,17 @@ class SurfaceAPI:
             self.surface_color = None
             self.surface_contour = None
 
+    def update_center(self, finger_position):
+        if self.is_surface_locked and self.surface_contour is not None:
+            if self.center is None:
+                M = cv2.moments(self.surface_contour)
+                if M["m00"] != 0:
+                    self.center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+                    self.surface_level = self.center[1]
+            
+            # Обновляем только X координату, Y остается на уровне поверхности
+            self.center = (finger_position[0], self.surface_level)
+
     def highlight_surface(self, image):
         height, width = image.shape[:2]
         
@@ -93,13 +106,8 @@ class SurfaceAPI:
                 button_pos[1] < mouse_pos[1] < button_pos[1] + button_size[1])
 
     def draw_axes(self, image):
-        if self.surface_contour is not None and self.is_surface_locked:
-            M = cv2.moments(self.surface_contour)
-            if M["m00"] != 0:
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-            else:
-                return
+        if self.surface_contour is not None and self.is_surface_locked and self.center is not None:
+            cX, cY = self.center
 
             cv2.line(image, (cX, cY), (cX + self.axis_length, cY), (0, 0, 255), 2) 
             cv2.line(image, (cX, cY), (cX, cY + self.axis_length), (0, 255, 0), 2)  

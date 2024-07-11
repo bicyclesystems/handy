@@ -74,7 +74,6 @@ class HandAPI:
         hand_direction = (middle_finger_mcp.x - wrist.x, middle_finger_mcp.y - wrist.y)
         hand_info['hand_direction'] = hand_direction
 
-        # Добавляем проверку положения указательного пальца
         index_finger_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
         index_finger_x = int(index_finger_tip.x * w)
         index_finger_y = int(index_finger_tip.y * h)
@@ -85,11 +84,9 @@ class HandAPI:
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
                 
-                # Вычисляем положение пальца относительно начала координат поверхности
                 relative_x = index_finger_x - cX
-                relative_y = cY - index_finger_y  # Инвертируем Y, так как в OpenCV Y растет вниз
+                relative_y = cY - index_finger_y  
                 
-                # Проверяем, находится ли палец не выше 100 по оси Z
                 if relative_y <= 100:
                     hand_info['index_finger_on_surface'] = True
                 else:
@@ -108,11 +105,10 @@ class HandAPI:
 
         cv2.putText(image, hand_info['label'], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-        # Перемещаем надпись о положении указательного пальца в середину снизу
         text = "Index finger on surface" if hand_info['index_finger_on_surface'] else "Index finger not on surface"
         text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
         text_x = (width - text_size[0]) // 2
-        text_y = height - 20  # 20 пикселей от нижнего края
+        text_y = height - 20
 
         cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, 
                     (0, 255, 0) if hand_info['index_finger_on_surface'] else (0, 0, 255), 2)
