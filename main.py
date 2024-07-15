@@ -24,8 +24,14 @@ threshold_y = 10
 threshold_size = 0.03
 
 current_state = "Initializing"
+state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0, "Y stable, size changing": 0, "Y changing, size changing": 0}
+state_transition_threshold = 3
 
 finger_tips_history = [deque(maxlen=2) for _ in range(5)]
+
+graph_height = 150 
+graph_width = 300  
+size_change_history = deque(maxlen=150) 
 
 def calculate_hand_size(landmarks):
     points = np.array([(lm.x, lm.y) for lm in landmarks.landmark])
@@ -38,6 +44,26 @@ def smooth_finger_tips(new_tips):
         avg_tip = np.mean(finger_tips_history[i], axis=0)
         smoothed_tips.append((int(avg_tip[0]), int(avg_tip[1])))
     return smoothed_tips
+
+def update_state(new_state):
+    global current_state
+    for state in state_transition:
+        if state == new_state:
+            state_transition[state] += 1
+        else:
+            state_transition[state] = max(0, state_transition[state] - 1)
+    
+    if state_transition[new_state] >= state_transition_threshold:
+        current_state = new_state
+
+def draw_size_change_graph(image, size_changes):
+    graph = np.zeros((graph_height, graph_width, 3), dtype=np.uint8)
+    for i, change in enumerate(size_changes):
+        y = int((1 - change) * (graph_height - 1))
+        cv2.circle(graph, (i * 2, y), 1, (0, 255, 0), -1)
+    
+    image[10:10+graph_height, -graph_width-10:-10] = graph
+    return image
 
 while cap.isOpened():
     success, image = cap.read()
@@ -70,24 +96,30 @@ while cap.isOpened():
             size_changes = [abs(size_history[i] - size_history[i-1]) / size_history[i-1] for i in range(1, len(size_history))]
             size_changing = any(change > threshold_size for change in size_changes)
             
+            size_change_history.append(size_changes[-1])
+            
+            new_state = "Hand at rest"
             if y_change > threshold_y and size_changing:
-                current_state = "Y changing, size changing"
+                new_state = "Y changing, size changing"
             elif y_change > threshold_y:
-                current_state = "Y changing, size stable"
+                new_state = "Y changing, size stable"
             elif size_changing:
-                current_state = "Y stable, size changing"
-            else:
-                current_state = "Hand at rest"
+                new_state = "Y stable, size changing"
+            
+            update_state(new_state)
         
         cv2.putText(image, current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info)
+        
+        image = draw_size_change_graph(image, size_change_history)
     else:
         cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        current_state = "Initializing"
+        update_state("Initializing")
         y_history.clear()
         size_history.clear()
+        size_change_history.clear()
         for history in finger_tips_history:
             history.clear()
     
