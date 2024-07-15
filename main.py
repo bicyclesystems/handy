@@ -21,11 +21,11 @@ cv2.setMouseCallback('Hand and Surface Tracking', mouse_callback)
 y_history = deque(maxlen=3)
 size_history = deque(maxlen=3)
 threshold_y = 10
-threshold_size = 0.02
+threshold_size = 0.03
 
 current_state = "Initializing"
 
-finger_tips_history = [deque(maxlen=5) for _ in range(5)]
+finger_tips_history = [deque(maxlen=2) for _ in range(5)]
 
 def calculate_hand_size(landmarks):
     points = np.array([(lm.x, lm.y) for lm in landmarks.landmark])
