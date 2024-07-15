@@ -58,25 +58,6 @@ class HandAPI:
         hand_direction = (middle_finger_mcp.x - wrist.x, middle_finger_mcp.y - wrist.y)
         hand_info['hand_direction'] = hand_direction
 
-        index_finger_tip = hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_TIP]
-        index_finger_x = int(index_finger_tip.x * w)
-        index_finger_y = int(index_finger_tip.y * h)
-
-        if self.surface_api.is_surface_locked and self.surface_api.surface_contour is not None:
-            M = cv2.moments(self.surface_api.surface_contour)
-            if M["m00"] != 0:
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                
-                relative_x = index_finger_x - cX
-                relative_y = cY - index_finger_y  
-                
-                hand_info['index_finger_on_surface'] = relative_y <= 50 
-            else:
-                hand_info['index_finger_on_surface'] = False
-        else:
-            hand_info['index_finger_on_surface'] = False
-
         return hand_info
 
     def draw_hand(self, image, hand_info):
@@ -86,15 +67,7 @@ class HandAPI:
 
         cv2.putText(image, hand_info['label'], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-        text = "Index finger on surface" if hand_info['index_finger_on_surface'] else "Index finger not on surface"
-        text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-        text_x = (width - text_size[0]) // 2
-        text_y = height - 20
-
-        cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, 
-                    (0, 255, 0) if hand_info['index_finger_on_surface'] else (0, 0, 255), 2)
-
         return image
 
     def handle_click(self, x, y):
-        pass 
+        pass
