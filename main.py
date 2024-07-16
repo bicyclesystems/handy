@@ -17,6 +17,10 @@ hand_api = HandAPI(surface_api)
 hand_api.image_width = width
 hand_api.image_height = height
 
+screen_width, screen_height = pyautogui.size()
+last_x, last_y = None, None
+cursor_sensitivity = 2.5
+
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         hand_api.handle_click(x, y)
@@ -125,8 +129,17 @@ while cap.isOpened():
             
             elif y_change > threshold_y and size_changing:
                 new_state = "Y changing, size changing"
+                if last_x is not None and last_y is not None:
+                    dx = (index_finger_tip[0] - last_x) * cursor_sensitivity
+                    dy = (index_finger_tip[1] - last_y) * cursor_sensitivity
+                    current_x, current_y = pyautogui.position()
+                    new_x = max(0, min(screen_width, current_x + dx))
+                    new_y = max(0, min(screen_height, current_y + dy))
+                    pyautogui.moveTo(new_x, new_y)
             elif size_changing:
                 new_state = "Y stable, size changing"
+            
+            last_x, last_y = index_finger_tip
             
             update_state(new_state)
         
@@ -135,6 +148,9 @@ while cap.isOpened():
         
         cv2.putText(image, current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(image, f"Click state: {click_state}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        
+        cursor_x, cursor_y = pyautogui.position()
+        cv2.putText(image, f"Cursor: ({cursor_x}, {cursor_y})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info, hand_landmarks)
