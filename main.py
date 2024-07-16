@@ -32,7 +32,7 @@ cv2.setMouseCallback('Hand and Surface Tracking', mouse_callback)
 y_history = deque(maxlen=10)
 size_history = deque(maxlen=10)
 threshold_y = 30
-threshold_size = 0.03
+threshold_size = 0.025
 
 current_state = "Initializing"
 state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0, "Y stable, size changing": 0, "Y changing, size changing": 0}
