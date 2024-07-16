@@ -66,8 +66,6 @@ class SurfaceAPI:
                 M = cv2.moments(self.surface_contour)
                 if M["m00"] != 0:
                     self.center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            
-            self.center = finger_position
 
     def highlight_surface(self, image):
         height, width = image.shape[:2]

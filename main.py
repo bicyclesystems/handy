@@ -7,8 +7,14 @@ from collections import deque
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 20)
 
+_, image = cap.read()
+height, width = image.shape[:2]
+
 surface_api = SurfaceAPI(highlight_color=(0, 255, 0, 0.05))
 hand_api = HandAPI(surface_api)
+
+hand_api.image_width = width
+hand_api.image_height = height
 
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -111,7 +117,7 @@ while cap.isOpened():
         cv2.putText(image, current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
         surface_api.update_center(index_finger_tip)
-        image = hand_api.draw_hand(image, hand_info)
+        image = hand_api.draw_hand(image, hand_info, hand_landmarks)
         
         image = draw_size_change_graph(image, size_change_history)
     else:
@@ -124,6 +130,8 @@ while cap.isOpened():
             history.clear()
     
     image = surface_api.highlight_surface(image)
+    
+    hand_api.draw_finger_buttons(image)
     
     cv2.imshow('Hand and Surface Tracking', image)
     

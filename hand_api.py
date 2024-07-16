@@ -12,6 +12,13 @@ class HandAPI:
             min_tracking_confidence=0.5
         )
         self.surface_api = surface_api
+        self.finger_axis_length = 50  
+        self.image_width = 0
+        self.image_height = 0
+        self.finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
+        self.show_axes = {name: True for name in self.finger_names}
+        self.button_size = (100, 30)
+        self.button_margin = 10
 
     def detect_hand(self, image):
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -60,14 +67,48 @@ class HandAPI:
 
         return hand_info
 
-    def draw_hand(self, image, hand_info):
+    def draw_hand(self, image, hand_info, hand_landmarks):
         height, width = image.shape[:2]
-        for x, y in hand_info['finger_tips']:
+        for i, (x, y) in enumerate(hand_info['finger_tips']):
             cv2.circle(image, (x, y), 5, (255, 255, 255), -1)
+            if self.show_axes[self.finger_names[i]]:
+                self.draw_finger_axes(image, (x, y), hand_info['finger_directions'][i])
+        
+        for landmark in hand_landmarks.landmark:
+            px, py = int(landmark.x * width), int(landmark.y * height)
+            cv2.circle(image, (px, py), 5, (255, 0, 0), -1)
 
         cv2.putText(image, hand_info['label'], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
         return image
 
+    def draw_finger_axes(self, image, tip, direction):
+        norm = np.sqrt(direction[0]**2 + direction[1]**2)
+        if norm == 0:
+            return
+        direction = (direction[0] / norm, direction[1] / norm)
+        
+        ortho = (-direction[1], direction[0])
+        
+        cv2.line(image, tip, (int(tip[0] + self.finger_axis_length * direction[0]), 
+                              int(tip[1] + self.finger_axis_length * direction[1])), (0, 0, 255), 2)
+        cv2.line(image, tip, (int(tip[0] + self.finger_axis_length * ortho[0]), 
+                              int(tip[1] + self.finger_axis_length * ortho[1])), (0, 255, 0), 2)
+        cv2.line(image, tip, (int(tip[0] - self.finger_axis_length * 0.5 * (direction[0] + ortho[0])), 
+                              int(tip[1] - self.finger_axis_length * 0.5 * (direction[1] + ortho[1]))), (255, 0, 0), 2)
+
+    def draw_finger_buttons(self, image):
+        for i, finger in enumerate(self.finger_names):
+            x = self.button_margin + i * (self.button_size[0] + self.button_margin)
+            y = self.image_height - self.button_size[1] - self.button_margin
+            cv2.rectangle(image, (x, y), (x + self.button_size[0], y + self.button_size[1]), (200, 200, 200), -1)
+            text = f"{finger}: {'On' if self.show_axes[finger] else 'Off'}"
+            cv2.putText(image, text, (x + 5, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
+
     def handle_click(self, x, y):
-        pass
+        for i, finger in enumerate(self.finger_names):
+            button_x = self.button_margin + i * (self.button_size[0] + self.button_margin)
+            button_y = self.image_height - self.button_size[1] - self.button_margin
+            if button_x < x < button_x + self.button_size[0] and button_y < y < button_y + self.button_size[1]:
+                self.show_axes[finger] = not self.show_axes[finger]
+                break
