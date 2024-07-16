@@ -3,6 +3,7 @@ import numpy as np
 from hand_api import HandAPI
 from surface_api import SurfaceAPI
 from collections import deque
+import pyautogui
 
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 20)
@@ -24,9 +25,9 @@ def mouse_callback(event, x, y, flags, param):
 cv2.namedWindow('Hand and Surface Tracking')
 cv2.setMouseCallback('Hand and Surface Tracking', mouse_callback)
 
-y_history = deque(maxlen=3)
-size_history = deque(maxlen=3)
-threshold_y = 10
+y_history = deque(maxlen=10)
+size_history = deque(maxlen=10)
+threshold_y = 30
 threshold_size = 0.03
 
 current_state = "Initializing"
@@ -38,6 +39,10 @@ finger_tips_history = [deque(maxlen=2) for _ in range(5)]
 graph_height = 150 
 graph_width = 300  
 size_change_history = deque(maxlen=150) 
+
+click_state = "up"
+click_cooldown = 0
+click_cooldown_threshold = 1
 
 def calculate_hand_size(landmarks):
     points = np.array([(lm.x, lm.y) for lm in landmarks.landmark])
@@ -79,7 +84,8 @@ while cap.isOpened():
     
     image = cv2.flip(image, 1)
     
-    surface_api.detect_surface(image)
+    if not surface_api.is_surface_locked:
+        surface_api.detect_surface(image)
     
     hand_landmarks = hand_api.detect_hand(image)
     if hand_landmarks:
@@ -105,16 +111,30 @@ while cap.isOpened():
             size_change_history.append(size_changes[-1])
             
             new_state = "Hand at rest"
-            if y_change > threshold_y and size_changing:
-                new_state = "Y changing, size changing"
-            elif y_change > threshold_y:
+            if y_change > threshold_y and not size_changing:
                 new_state = "Y changing, size stable"
+                
+                if click_state == "up" and current_y > y_history[0]:
+                    click_state = "down"
+                    print("Click started")
+                elif click_state == "down" and current_y < y_history[0] and click_cooldown == 0:
+                    click_state = "up"
+                    print("Click finished")
+                    pyautogui.click()
+                    click_cooldown = click_cooldown_threshold
+            
+            elif y_change > threshold_y and size_changing:
+                new_state = "Y changing, size changing"
             elif size_changing:
                 new_state = "Y stable, size changing"
             
             update_state(new_state)
         
+        if click_cooldown > 0:
+            click_cooldown -= 1
+        
         cv2.putText(image, current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Click state: {click_state}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info, hand_landmarks)
@@ -132,6 +152,9 @@ while cap.isOpened():
     image = surface_api.highlight_surface(image)
     
     hand_api.draw_finger_buttons(image)
+    
+    lock_status = "Locked" if surface_api.is_surface_locked else "Unlocked"
+    cv2.putText(image, f"Surface: {lock_status}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     
     cv2.imshow('Hand and Surface Tracking', image)
     
