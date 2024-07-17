@@ -19,7 +19,9 @@ hand_api.image_height = height
 
 screen_width, screen_height = pyautogui.size()
 last_x, last_y = None, None
-cursor_sensitivity = 2.5
+cursor_sensitivity = 3.0  
+smoothing_factor = 0.2
+smooth_x, smooth_y = 0, 0
 
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -32,7 +34,7 @@ cv2.setMouseCallback('Hand and Surface Tracking', mouse_callback)
 y_history = deque(maxlen=10)
 size_history = deque(maxlen=10)
 threshold_y = 30
-threshold_size = 0.025
+threshold_size = 0.04
 
 current_state = "Initializing"
 state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0, "Y stable, size changing": 0, "Y changing, size changing": 0}
@@ -132,9 +134,13 @@ while cap.isOpened():
                 if last_x is not None and last_y is not None:
                     dx = (index_finger_tip[0] - last_x) * cursor_sensitivity
                     dy = (index_finger_tip[1] - last_y) * cursor_sensitivity
+                    
+                    smooth_x = smoothing_factor * dx + (1 - smoothing_factor) * smooth_x
+                    smooth_y = smoothing_factor * dy + (1 - smoothing_factor) * smooth_y
+                    
                     current_x, current_y = pyautogui.position()
-                    new_x = max(0, min(screen_width, current_x + dx))
-                    new_y = max(0, min(screen_height, current_y + dy))
+                    new_x = max(0, min(screen_width, current_x + smooth_x))
+                    new_y = max(0, min(screen_height, current_y + smooth_y))
                     pyautogui.moveTo(new_x, new_y)
             elif size_changing:
                 new_state = "Y stable, size changing"
