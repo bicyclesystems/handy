@@ -128,3 +128,8 @@ class SurfaceAPI:
             cv2.putText(image, "X", (cX + self.axis_length + 10, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             cv2.putText(image, "Y", (cX, cY + self.axis_length + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.putText(image, "Z", (cX, cY - self.axis_length - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+
+    def is_point_inside_contour(self, point):
+        if self.surface_contour is None:
+            return False
+        return cv2.pointPolygonTest(self.surface_contour, point, False) >= 0

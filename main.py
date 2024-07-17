@@ -102,66 +102,79 @@ while cap.isOpened():
         
         index_finger_tip = hand_info['finger_tips'][1]
         
-        current_y = index_finger_tip[1]
-        current_size = calculate_hand_size(hand_landmarks)
+        # Check if hand is on the surface
+        hand_on_surface = surface_api.is_point_inside_contour(index_finger_tip)
+        hand_status = "On surface" if hand_on_surface else "Off surface"
+        cv2.putText(image, f"Hand: {hand_status}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
-        y_history.append(current_y)
-        size_history.append(current_size)
-        
-        if len(y_history) == y_history.maxlen:
-            y_change = max(y_history) - min(y_history)
+        if hand_on_surface and surface_api.is_surface_locked:
+            current_y = index_finger_tip[1]
+            current_size = calculate_hand_size(hand_landmarks)
             
-            size_changes = [abs(size_history[i] - size_history[i-1]) / size_history[i-1] for i in range(1, len(size_history))]
-            size_changing = any(change > threshold_size for change in size_changes)
+            y_history.append(current_y)
+            size_history.append(current_size)
             
-            size_change_history.append(size_changes[-1])
-            
-            new_state = "Hand at rest"
-            if y_change > threshold_y and not size_changing:
-                new_state = "Y changing, size stable"
+            if len(y_history) == y_history.maxlen:
+                y_change = max(y_history) - min(y_history)
                 
-                if click_state == "up" and current_y > y_history[0]:
-                    click_state = "down"
-                    print("Click started")
-                elif click_state == "down" and current_y < y_history[0] and click_cooldown == 0:
-                    click_state = "up"
-                    print("Click finished")
-                    pyautogui.click()
-                    click_cooldown = click_cooldown_threshold
-            
-            elif y_change > threshold_y and size_changing:
-                new_state = "Y changing, size changing"
-                if last_x is not None and last_y is not None:
-                    dx = (index_finger_tip[0] - last_x) * cursor_sensitivity
-                    dy = (index_finger_tip[1] - last_y) * cursor_sensitivity
+                size_changes = [abs(size_history[i] - size_history[i-1]) / size_history[i-1] for i in range(1, len(size_history))]
+                size_changing = any(change > threshold_size for change in size_changes)
+                
+                size_change_history.append(size_changes[-1])
+                
+                new_state = "Hand at rest"
+                if y_change > threshold_y and not size_changing:
+                    new_state = "Y changing, size stable"
                     
-                    smooth_x = smoothing_factor * dx + (1 - smoothing_factor) * smooth_x
-                    smooth_y = smoothing_factor * dy + (1 - smoothing_factor) * smooth_y
-                    
-                    current_x, current_y = pyautogui.position()
-                    new_x = max(0, min(screen_width, current_x + smooth_x))
-                    new_y = max(0, min(screen_height, current_y + smooth_y))
-                    pyautogui.moveTo(new_x, new_y)
-            elif size_changing:
-                new_state = "Y stable, size changing"
+                    if click_state == "up" and current_y > y_history[0]:
+                        click_state = "down"
+                        print("Click started")
+                    elif click_state == "down" and current_y < y_history[0] and click_cooldown == 0:
+                        click_state = "up"
+                        print("Click finished")
+                        pyautogui.click()
+                        click_cooldown = click_cooldown_threshold
+                
+                elif y_change > threshold_y and size_changing:
+                    new_state = "Y changing, size changing"
+                    if last_x is not None and last_y is not None:
+                        dx = (index_finger_tip[0] - last_x) * cursor_sensitivity
+                        dy = (index_finger_tip[1] - last_y) * cursor_sensitivity
+                        
+                        smooth_x = smoothing_factor * dx + (1 - smoothing_factor) * smooth_x
+                        smooth_y = smoothing_factor * dy + (1 - smoothing_factor) * smooth_y
+                        
+                        current_x, current_y = pyautogui.position()
+                        new_x = max(0, min(screen_width, current_x + smooth_x))
+                        new_y = max(0, min(screen_height, current_y + smooth_y))
+                        pyautogui.moveTo(new_x, new_y)
+                elif size_changing:
+                    new_state = "Y stable, size changing"
+                
+                last_x, last_y = index_finger_tip
+                
+                update_state(new_state)
             
-            last_x, last_y = index_finger_tip
+            if click_cooldown > 0:
+                click_cooldown -= 1
             
-            update_state(new_state)
-        
-        if click_cooldown > 0:
-            click_cooldown -= 1
-        
-        cv2.putText(image, current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(image, f"Click state: {click_state}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        
-        cursor_x, cursor_y = pyautogui.position()
-        cv2.putText(image, f"Cursor: ({cursor_x}, {cursor_y})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(image, current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(image, f"Click state: {click_state}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            
+            cursor_x, cursor_y = pyautogui.position()
+            cv2.putText(image, f"Cursor: ({cursor_x}, {cursor_y})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            
+            image = draw_size_change_graph(image, size_change_history)
+        else:
+            current_state = "Hand off surface"
+            click_state = "up"
+            y_history.clear()
+            size_history.clear()
+            last_x, last_y = None, None
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info, hand_landmarks)
         
-        image = draw_size_change_graph(image, size_change_history)
     else:
         cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         update_state("Initializing")
