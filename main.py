@@ -139,7 +139,7 @@ while cap.isOpened():
                     new_state = "Y changing, size changing"
                     if last_x is not None and last_y is not None:
                         dx = (index_finger_tip[0] - last_x) * cursor_sensitivity
-                        dy = (index_finger_tip[1] - last_y) * cursor_sensitivity
+                        dy = (last_y - index_finger_tip[1]) * cursor_sensitivity 
                         
                         smooth_x = smoothing_factor * dx + (1 - smoothing_factor) * smooth_x
                         smooth_y = smoothing_factor * dy + (1 - smoothing_factor) * smooth_y
