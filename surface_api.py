@@ -13,7 +13,7 @@ class SurfaceAPI:
         self.center = None
         self.surface_level = None
         self.last_surface_update = None
-        self.surface_stability_threshold = 2  # 2 seconds
+        self.surface_stability_threshold = 2
         self.previous_surface_contour = None
 
     def detect_surface(self, image):

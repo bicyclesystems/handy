@@ -23,6 +23,9 @@ cursor_sensitivity = 3.0
 smoothing_factor = 0.2
 smooth_x, smooth_y = 0, 0
 
+last_cursor_position = None
+hand_was_on_surface = False
+
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         hand_api.handle_click(x, y)
@@ -102,12 +105,17 @@ while cap.isOpened():
         
         index_finger_tip = hand_info['finger_tips'][1]
         
-        # Check if hand is on the surface
         hand_on_surface = surface_api.is_point_inside_contour(index_finger_tip)
         hand_status = "On surface" if hand_on_surface else "Off surface"
         cv2.putText(image, f"Hand: {hand_status}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
         if hand_on_surface and surface_api.is_surface_locked:
+            if not hand_was_on_surface:
+                if last_cursor_position is not None:
+                    pyautogui.moveTo(*last_cursor_position)
+                    last_x, last_y = index_finger_tip
+                hand_was_on_surface = True
+            
             current_y = index_finger_tip[1]
             current_size = calculate_hand_size(hand_landmarks)
             
@@ -148,6 +156,8 @@ while cap.isOpened():
                         new_x = max(0, min(screen_width, current_x + smooth_x))
                         new_y = max(0, min(screen_height, current_y + smooth_y))
                         pyautogui.moveTo(new_x, new_y)
+                        
+                        last_cursor_position = (new_x, new_y)
                 elif size_changing:
                     new_state = "Y stable, size changing"
                 
@@ -171,6 +181,7 @@ while cap.isOpened():
             y_history.clear()
             size_history.clear()
             last_x, last_y = None, None
+            hand_was_on_surface = False
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info, hand_landmarks)
@@ -183,6 +194,7 @@ while cap.isOpened():
         size_change_history.clear()
         for history in finger_tips_history:
             history.clear()
+        hand_was_on_surface = False
     
     image = surface_api.highlight_surface(image)
     
