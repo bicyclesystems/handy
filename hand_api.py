@@ -19,6 +19,11 @@ class HandAPI:
         self.show_axes = {name: True for name in self.finger_names}
         self.button_size = (100, 30)
         self.button_margin = 10
+        
+        self.max_smooth_factor = 0.5
+        self.min_smooth_factor = 0.1
+        self.prev_landmarks = None
+        self.speed_threshold = 0.01
 
     def detect_hand(self, image):
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -52,7 +57,27 @@ class HandAPI:
             self.mp_hands.HandLandmark.RING_FINGER_MCP,
             self.mp_hands.HandLandmark.PINKY_MCP
         ]
-        
+
+        if self.prev_landmarks is None:
+            self.prev_landmarks = hand_landmarks
+        else:
+            max_speed = 0
+            for i, landmark in enumerate(hand_landmarks.landmark):
+                prev_x, prev_y = self.prev_landmarks.landmark[i].x, self.prev_landmarks.landmark[i].y
+                speed = np.sqrt((landmark.x - prev_x)**2 + (landmark.y - prev_y)**2)
+                max_speed = max(max_speed, speed)
+
+            smooth_factor = max(self.min_smooth_factor, 
+                                min(self.max_smooth_factor, 
+                                    1 - (max_speed / self.speed_threshold)))
+
+            for i, landmark in enumerate(hand_landmarks.landmark):
+                prev_x, prev_y = self.prev_landmarks.landmark[i].x, self.prev_landmarks.landmark[i].y
+                landmark.x = smooth_factor * prev_x + (1 - smooth_factor) * landmark.x
+                landmark.y = smooth_factor * prev_y + (1 - smooth_factor) * landmark.y
+
+        self.prev_landmarks = hand_landmarks
+
         hand_info['finger_tips'] = [(int(hand_landmarks.landmark[tip].x * w), int(hand_landmarks.landmark[tip].y * h)) for tip in finger_tips]
         hand_info['finger_directions'] = [
             (hand_landmarks.landmark[tip].x - hand_landmarks.landmark[base].x, 
