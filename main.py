@@ -5,6 +5,8 @@ from surface_api import SurfaceAPI
 from collections import deque
 import pyautogui
 
+pyautogui.FAILSAFE = False
+
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FPS, 20)
 
@@ -43,7 +45,7 @@ current_state = "Initializing"
 state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0, "Y stable, size changing": 0, "Y changing, size changing": 0}
 state_transition_threshold = 3
 
-finger_tips_history = [deque(maxlen=2) for _ in range(5)]
+finger_tips_history = [deque(maxlen=2) for _ in range(5)] 
 
 graph_height = 150 
 graph_width = 300  
@@ -116,6 +118,19 @@ while cap.isOpened():
                     last_x, last_y = index_finger_tip
                 hand_was_on_surface = True
             
+            if surface_api.center is not None:
+                cX, cY = surface_api.center
+
+                norm_x = (index_finger_tip[0] - cX) / (width / 2)
+                norm_y = (index_finger_tip[1] - cY) / (height / 2)
+                
+                screen_x = int(screen_width * (0.5 + norm_x * 0.5))
+                screen_y = int(screen_height * (0.5 + norm_y * 0.5))
+                
+                pyautogui.moveTo(screen_x, screen_y, duration=0.01)
+
+                last_cursor_position = (screen_x, screen_y)
+            
             current_y = index_finger_tip[1]
             current_size = calculate_hand_size(hand_landmarks)
             
@@ -145,23 +160,8 @@ while cap.isOpened():
                 
                 elif y_change > threshold_y and size_changing:
                     new_state = "Y changing, size changing"
-                    if last_x is not None and last_y is not None:
-                        dx = (index_finger_tip[0] - last_x) * cursor_sensitivity
-                        dy = (last_y - index_finger_tip[1]) * cursor_sensitivity 
-                        
-                        smooth_x = smoothing_factor * dx + (1 - smoothing_factor) * smooth_x
-                        smooth_y = smoothing_factor * dy + (1 - smoothing_factor) * smooth_y
-                        
-                        current_x, current_y = pyautogui.position()
-                        new_x = max(0, min(screen_width, current_x + smooth_x))
-                        new_y = max(0, min(screen_height, current_y + smooth_y))
-                        pyautogui.moveTo(new_x, new_y)
-                        
-                        last_cursor_position = (new_x, new_y)
                 elif size_changing:
                     new_state = "Y stable, size changing"
-                
-                last_x, last_y = index_finger_tip
                 
                 update_state(new_state)
             
@@ -180,7 +180,6 @@ while cap.isOpened():
             click_state = "up"
             y_history.clear()
             size_history.clear()
-            last_x, last_y = None, None
             hand_was_on_surface = False
         
         surface_api.update_center(index_finger_tip)
