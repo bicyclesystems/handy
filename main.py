@@ -39,7 +39,7 @@ cv2.setMouseCallback('Hand and Surface Tracking', mouse_callback)
 y_history = deque(maxlen=10)
 size_history = deque(maxlen=10)
 threshold_y = 30
-threshold_size = 0.04
+threshold_size = 0.03
 
 current_state = "Initializing"
 state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0, "Y stable, size changing": 0, "Y changing, size changing": 0}
@@ -118,19 +118,6 @@ while cap.isOpened():
                     last_x, last_y = index_finger_tip
                 hand_was_on_surface = True
             
-            if surface_api.center is not None:
-                cX, cY = surface_api.center
-
-                norm_x = (index_finger_tip[0] - cX) / (width / 2)
-                norm_y = (index_finger_tip[1] - cY) / (height / 2)
-                
-                screen_x = int(screen_width * (0.5 + norm_x * 0.5))
-                screen_y = int(screen_height * (0.5 + norm_y * 0.5))
-                
-                pyautogui.moveTo(screen_x, screen_y, duration=0.01)
-
-                last_cursor_position = (screen_x, screen_y)
-            
             current_y = index_finger_tip[1]
             current_size = calculate_hand_size(hand_landmarks)
             
@@ -148,7 +135,6 @@ while cap.isOpened():
                 new_state = "Hand at rest"
                 if y_change > threshold_y and not size_changing:
                     new_state = "Y changing, size stable"
-                    
                     if click_state == "up" and current_y > y_history[0]:
                         click_state = "down"
                         print("Click started")
@@ -160,6 +146,17 @@ while cap.isOpened():
                 
                 elif y_change > threshold_y and size_changing:
                     new_state = "Y changing, size changing"
+                    if surface_api.center is not None:
+                        cX, cY = surface_api.center
+                        norm_x = (index_finger_tip[0] - cX) / (width / 2)
+                        norm_y = (index_finger_tip[1] - cY) / (height / 2)
+                        
+                        screen_x = int(screen_width * (0.5 + norm_x * 0.5))
+                        screen_y = int(screen_height * (0.5 + norm_y * 0.5))
+                        
+                        pyautogui.moveTo(screen_x, screen_y, duration=0.01)
+                        last_cursor_position = (screen_x, screen_y)
+                
                 elif size_changing:
                     new_state = "Y stable, size changing"
                 
