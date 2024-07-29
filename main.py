@@ -8,7 +8,7 @@ import pyautogui
 pyautogui.FAILSAFE = False
 
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FPS, 20)
+cap.set(cv2.CAP_PROP_FPS, 60)
 
 _, image = cap.read()
 height, width = image.shape[:2]
@@ -21,8 +21,8 @@ hand_api.image_height = height
 
 screen_width, screen_height = pyautogui.size()
 last_x, last_y = None, None
-cursor_sensitivity = 3.0  
-smoothing_factor = 0.2
+cursor_sensitivity = 4.5 
+smoothing_factor = 0.8 
 smooth_x, smooth_y = 0, 0
 
 last_cursor_position = None
@@ -46,7 +46,6 @@ state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stab
 state_transition_threshold = 3
 
 finger_tips_history = [deque(maxlen=2) for _ in range(5)] 
-
 graph_height = 150 
 graph_width = 300  
 size_change_history = deque(maxlen=150) 
@@ -86,6 +85,8 @@ def draw_size_change_graph(image, size_changes):
     
     image[10:10+graph_height, -graph_width-10:-10] = graph
     return image
+
+cursor_position_history = deque(maxlen=5)
 
 while cap.isOpened():
     success, image = cap.read()
@@ -153,9 +154,14 @@ while cap.isOpened():
                         
                         screen_x = int(screen_width * (0.5 + norm_x * 0.5))
                         screen_y = int(screen_height * (0.5 + norm_y * 0.5))
+
+                        cursor_position_history.append((screen_x, screen_y))
+                        avg_position = np.mean(cursor_position_history, axis=0)
+                        smooth_x = int(avg_position[0])
+                        smooth_y = int(avg_position[1])
                         
-                        pyautogui.moveTo(screen_x, screen_y, duration=0.01)
-                        last_cursor_position = (screen_x, screen_y)
+                        pyautogui.moveTo(smooth_x, smooth_y, duration=0.01, _pause=False)
+                        last_cursor_position = (smooth_x, smooth_y)
                 
                 elif size_changing:
                     new_state = "Y stable, size changing"
@@ -190,6 +196,7 @@ while cap.isOpened():
         size_change_history.clear()
         for history in finger_tips_history:
             history.clear()
+        cursor_position_history.clear()
         hand_was_on_surface = False
     
     image = surface_api.highlight_surface(image)
