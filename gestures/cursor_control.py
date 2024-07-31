@@ -6,7 +6,7 @@ class CursorControl:
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.cursor_sensitivity = 2.0
+        self.cursor_sensitivity = 1.5
         self.smoothing_factor = 0.9
         self.smooth_x, self.smooth_y = 0, 0
         self.cursor_position_history = deque(maxlen=5)

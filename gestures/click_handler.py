@@ -4,7 +4,7 @@ class ClickHandler:
     def __init__(self):
         self.click_state = "up"
         self.click_cooldown = 0
-        self.click_cooldown_threshold = 1
+        self.click_cooldown_threshold = 5
 
     def handle_click(self, current_y, initial_y):
         if self.click_state == "up" and current_y > initial_y:
