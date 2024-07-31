@@ -20,13 +20,9 @@ hand_api.image_width = width
 hand_api.image_height = height
 
 screen_width, screen_height = pyautogui.size()
-last_x, last_y = None, None
-cursor_sensitivity = 4.5 
-smoothing_factor = 0.8 
+cursor_sensitivity = 2.0
+smoothing_factor = 0.9 
 smooth_x, smooth_y = 0, 0
-
-last_cursor_position = None
-hand_was_on_surface = False
 
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -39,7 +35,7 @@ cv2.setMouseCallback('Hand and Surface Tracking', mouse_callback)
 y_history = deque(maxlen=10)
 size_history = deque(maxlen=10)
 threshold_y = 30
-threshold_size = 0.03
+threshold_size = 0.025
 
 current_state = "Initializing"
 state_transition = {"Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0, "Y stable, size changing": 0, "Y changing, size changing": 0}
@@ -113,12 +109,6 @@ while cap.isOpened():
         cv2.putText(image, f"Hand: {hand_status}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
         if hand_on_surface and surface_api.is_surface_locked:
-            if not hand_was_on_surface:
-                if last_cursor_position is not None:
-                    pyautogui.moveTo(*last_cursor_position)
-                    last_x, last_y = index_finger_tip
-                hand_was_on_surface = True
-            
             current_y = index_finger_tip[1]
             current_size = calculate_hand_size(hand_landmarks)
             
@@ -152,8 +142,8 @@ while cap.isOpened():
                         norm_x = (index_finger_tip[0] - cX) / (width / 2)
                         norm_y = (index_finger_tip[1] - cY) / (height / 2)
                         
-                        screen_x = int(screen_width * (0.5 + norm_x * 0.5))
-                        screen_y = int(screen_height * (0.5 + norm_y * 0.5))
+                        screen_x = int(screen_width * (0.5 + norm_x * 0.5 * cursor_sensitivity))
+                        screen_y = int(screen_height * (0.5 + norm_y * 0.5 * cursor_sensitivity))
 
                         cursor_position_history.append((screen_x, screen_y))
                         avg_position = np.mean(cursor_position_history, axis=0)
@@ -161,7 +151,6 @@ while cap.isOpened():
                         smooth_y = int(avg_position[1])
                         
                         pyautogui.moveTo(smooth_x, smooth_y, duration=0.01, _pause=False)
-                        last_cursor_position = (smooth_x, smooth_y)
                 
                 elif size_changing:
                     new_state = "Y stable, size changing"
@@ -183,7 +172,6 @@ while cap.isOpened():
             click_state = "up"
             y_history.clear()
             size_history.clear()
-            hand_was_on_surface = False
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info, hand_landmarks)
@@ -197,7 +185,6 @@ while cap.isOpened():
         for history in finger_tips_history:
             history.clear()
         cursor_position_history.clear()
-        hand_was_on_surface = False
     
     image = surface_api.highlight_surface(image)
     
