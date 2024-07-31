@@ -1,6 +1,6 @@
 # Project Name
 
-hendi
+Handy
 
 ## First-time Installation and Launch
 
