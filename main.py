@@ -50,6 +50,9 @@ click_state = "up"
 click_cooldown = 0
 click_cooldown_threshold = 1
 
+hand_center_history = deque(maxlen=10)
+move_threshold = 20  
+
 def calculate_hand_size(landmarks):
     points = np.array([(lm.x, lm.y) for lm in landmarks.landmark])
     return np.linalg.norm(points.max(axis=0) - points.min(axis=0))
@@ -81,6 +84,10 @@ def draw_size_change_graph(image, size_changes):
     
     image[10:10+graph_height, -graph_width-10:-10] = graph
     return image
+
+def calculate_hand_center(landmarks):
+    points = np.array([(lm.x * width, lm.y * height) for lm in landmarks.landmark])
+    return np.mean(points, axis=0)
 
 cursor_position_history = deque(maxlen=5)
 
@@ -115,13 +122,18 @@ while cap.isOpened():
             y_history.append(current_y)
             size_history.append(current_size)
             
-            if len(y_history) == y_history.maxlen:
+            hand_center = calculate_hand_center(hand_landmarks)
+            hand_center_history.append(hand_center)
+            
+            if len(y_history) == y_history.maxlen and len(hand_center_history) == hand_center_history.maxlen:
                 y_change = max(y_history) - min(y_history)
                 
                 size_changes = [abs(size_history[i] - size_history[i-1]) / size_history[i-1] for i in range(1, len(size_history))]
                 size_changing = any(change > threshold_size for change in size_changes)
                 
                 size_change_history.append(size_changes[-1])
+                
+                hand_movement = np.linalg.norm(hand_center_history[-1] - hand_center_history[0])
                 
                 new_state = "Hand at rest"
                 if y_change > threshold_y and not size_changing:
@@ -134,8 +146,7 @@ while cap.isOpened():
                         print("Click finished")
                         pyautogui.click()
                         click_cooldown = click_cooldown_threshold
-                
-                elif y_change > threshold_y and size_changing:
+                elif hand_movement > move_threshold:
                     new_state = "Y changing, size changing"
                     if surface_api.center is not None:
                         cX, cY = surface_api.center
@@ -151,7 +162,6 @@ while cap.isOpened():
                         smooth_y = int(avg_position[1])
                         
                         pyautogui.moveTo(smooth_x, smooth_y, duration=0.01, _pause=False)
-                
                 elif size_changing:
                     new_state = "Y stable, size changing"
                 
@@ -172,6 +182,7 @@ while cap.isOpened():
             click_state = "up"
             y_history.clear()
             size_history.clear()
+            hand_center_history.clear()
         
         surface_api.update_center(index_finger_tip)
         image = hand_api.draw_hand(image, hand_info, hand_landmarks)
@@ -185,6 +196,7 @@ while cap.isOpened():
         for history in finger_tips_history:
             history.clear()
         cursor_position_history.clear()
+        hand_center_history.clear()
     
     image = surface_api.highlight_surface(image)
     
