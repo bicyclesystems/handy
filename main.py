@@ -24,6 +24,9 @@ cursor_sensitivity = 2.0
 smoothing_factor = 0.9 
 smooth_x, smooth_y = 0, 0
 
+prev_frame = None
+change_threshold = 30  # Порог для определения значительных изменений
+
 def mouse_callback(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         hand_api.handle_click(x, y)
@@ -52,6 +55,8 @@ click_cooldown_threshold = 1
 
 hand_center_history = deque(maxlen=10)
 move_threshold = 20  
+
+cursor_position_history = deque(maxlen=5)
 
 def calculate_hand_size(landmarks):
     points = np.array([(lm.x, lm.y) for lm in landmarks.landmark])
@@ -89,7 +94,16 @@ def calculate_hand_center(landmarks):
     points = np.array([(lm.x * width, lm.y * height) for lm in landmarks.landmark])
     return np.mean(points, axis=0)
 
-cursor_position_history = deque(maxlen=5)
+def detect_significant_changes(current_frame, prev_frame):
+    if prev_frame is None:
+        return False
+    
+    diff = cv2.absdiff(current_frame, prev_frame)
+    gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    _, threshold = cv2.threshold(gray_diff, 25, 255, cv2.THRESH_BINARY)
+    change_percent = (np.sum(threshold) / 255) / (threshold.shape[0] * threshold.shape[1]) * 100
+    
+    return change_percent > change_threshold
 
 while cap.isOpened():
     success, image = cap.read()
@@ -98,6 +112,14 @@ while cap.isOpened():
         continue
     
     image = cv2.flip(image, 1)
+    
+    # Проверка на значительные изменения в кадре
+    if detect_significant_changes(image, prev_frame):
+        if surface_api.is_surface_locked:
+            surface_api.is_surface_locked = False
+            print("Significant changes detected. Surface unlocked.")
+    
+    prev_frame = image.copy()
     
     if not surface_api.is_surface_locked:
         surface_api.detect_surface(image)
