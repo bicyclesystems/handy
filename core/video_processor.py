@@ -19,8 +19,7 @@ class VideoProcessor:
         
         self.prev_frame = None
         self.change_threshold = 30
-        
-        # Предварительно создаем матрицу для отражения изображения
+
         self.flip_matrix = np.array([[-1, 0, self.width - 1], [0, 1, 0]], dtype=np.float32)
 
     def is_camera_opened(self):
@@ -31,11 +30,9 @@ class VideoProcessor:
         if not success:
             print("Failed to get frame from camera")
             return None
-        
-        # Используем аффинное преобразование для отражения изображения (быстрее, чем cv2.flip)
+
         image = cv2.warpAffine(image, self.flip_matrix, (self.width, self.height))
 
-        # Преобразуем в оттенки серого и обратно в BGR более эффективно
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         

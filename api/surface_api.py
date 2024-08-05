@@ -20,7 +20,6 @@ class SurfaceAPI:
         self.click_cooldown = 10
         self.click_counter = 0
         
-        # Предварительно создаем матрицы для масок
         self.lower_bound_matrix = np.array([30], dtype=np.uint8)
         self.upper_bound_matrix = np.array([30], dtype=np.uint8)
 
@@ -31,7 +30,6 @@ class SurfaceAPI:
         height, width = image.shape[:2]
         lower_half = image[height//2:, :]
         
-        # Используем более эффективный метод поиска однородных областей
         gray = cv2.cvtColor(lower_half, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
         _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -41,7 +39,7 @@ class SurfaceAPI:
         if contours:
             largest_contour = max(contours, key=cv2.contourArea)
             area = cv2.contourArea(largest_contour)
-            if area > 1000:  # Минимальная площадь для рассмотрения
+            if area > 1000: 
                 self.surface_color = np.mean(lower_half[largest_contour[:,:,1], largest_contour[:,:,0]])
                 new_surface_contour = largest_contour
                 new_surface_contour[:,:,1] += height // 2
@@ -50,7 +48,7 @@ class SurfaceAPI:
                     similarity = cv2.matchShapes(self.previous_surface_contour, new_surface_contour, 1, 0.0)
                     current_time = time.time()
 
-                    if similarity < 0.1:  # Поверхность считается стабильной
+                    if similarity < 0.1: 
                         if self.last_surface_update is None:
                             self.last_surface_update = current_time
                         elif current_time - self.last_surface_update >= self.surface_stability_threshold:
