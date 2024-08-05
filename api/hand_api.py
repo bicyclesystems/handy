@@ -26,7 +26,6 @@ class HandAPI:
         self.speed_threshold = 0.01
 
     def detect_hand(self, image):
-        # Преобразование в RGB для MediaPipe
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = self.hands.process(image_rgb)
         

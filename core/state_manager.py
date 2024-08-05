@@ -61,10 +61,10 @@ class StateManager:
         if len(self.y_history) == self.y_history.maxlen and len(self.hand_center_history) == self.hand_center_history.maxlen:
             y_change = max(self.y_history) - min(self.y_history)
             
-            size_changes = [abs(self.size_history[i] - self.size_history[i-1]) / self.size_history[i-1] for i in range(1, len(self.size_history))]
-            size_changing = any(change > self.threshold_size for change in size_changes)
+            size_changes = np.abs(np.diff(self.size_history) / np.array(self.size_history)[:-1])
+            size_changing = np.any(size_changes > self.threshold_size)
             
-            self.size_change_history.append(size_changes[-1])
+            self.size_change_history.append(size_changes[-1] if len(size_changes) > 0 else 0)
             
             hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
             

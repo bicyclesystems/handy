@@ -1,5 +1,6 @@
 import cv2
 import pyautogui
+import numpy as np
 from api import HandAPI, SurfaceAPI
 from additional.utils import detect_significant_changes
 
@@ -18,6 +19,9 @@ class VideoProcessor:
         
         self.prev_frame = None
         self.change_threshold = 30
+        
+        # Предварительно создаем матрицу для отражения изображения
+        self.flip_matrix = np.array([[-1, 0, self.width - 1], [0, 1, 0]], dtype=np.float32)
 
     def is_camera_opened(self):
         return self.cap.isOpened()
@@ -28,13 +32,12 @@ class VideoProcessor:
             print("Failed to get frame from camera")
             return None
         
-        image = cv2.flip(image, 1)
-        
-        # Преобразование в черно-белое изображение
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        
-        # Преобразование обратно в BGR для совместимости с остальным кодом
-        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        # Используем аффинное преобразование для отражения изображения (быстрее, чем cv2.flip)
+        image = cv2.warpAffine(image, self.flip_matrix, (self.width, self.height))
+
+        # Преобразуем в оттенки серого и обратно в BGR более эффективно
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         
         if detect_significant_changes(image, self.prev_frame, self.change_threshold):
             if self.surface_api.is_surface_locked:

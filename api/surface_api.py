@@ -19,6 +19,10 @@ class SurfaceAPI:
         self.is_clicking = False
         self.click_cooldown = 10
         self.click_counter = 0
+        
+        # Предварительно создаем матрицы для масок
+        self.lower_bound_matrix = np.array([30], dtype=np.uint8)
+        self.upper_bound_matrix = np.array([30], dtype=np.uint8)
 
     def detect_surface(self, image):
         if self.is_surface_locked:
@@ -27,58 +31,46 @@ class SurfaceAPI:
         height, width = image.shape[:2]
         lower_half = image[height//2:, :]
         
-        cell_height = height // 10
-        cell_width = width // 10
+        # Используем более эффективный метод поиска однородных областей
+        gray = cv2.cvtColor(lower_half, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         
-        best_homogeneity = 0
-        best_color = None
-        best_contour = None
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
-        for i in range(5):  
-            for j in range(10):
-                cell = lower_half[i*cell_height:(i+1)*cell_height, j*cell_width:(j+1)*cell_width]
-                color_std = np.std(cell)
-                if color_std < 20:  
-                    mean_color = np.mean(cell).astype(np.uint8)
-                    lower_bound = np.array([max(0, mean_color - 30)], dtype=np.uint8)
-                    upper_bound = np.array([min(255, mean_color + 30)], dtype=np.uint8)
-                    
-                    mask = cv2.inRange(lower_half, lower_bound, upper_bound)
-                    
-                    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                    if contours:
-                        largest_contour = max(contours, key=cv2.contourArea)
-                        area = cv2.contourArea(largest_contour)
-                        if area > best_homogeneity:
-                            best_homogeneity = area
-                            best_color = mean_color
-                            best_contour = largest_contour
-        
-        if best_color is not None:
-            self.surface_color = best_color
-            new_surface_contour = best_contour
-            new_surface_contour[:,:,1] += height // 2
+        if contours:
+            largest_contour = max(contours, key=cv2.contourArea)
+            area = cv2.contourArea(largest_contour)
+            if area > 1000:  # Минимальная площадь для рассмотрения
+                self.surface_color = np.mean(lower_half[largest_contour[:,:,1], largest_contour[:,:,0]])
+                new_surface_contour = largest_contour
+                new_surface_contour[:,:,1] += height // 2
 
-            if self.previous_surface_contour is not None:
-                similarity = cv2.matchShapes(self.previous_surface_contour, new_surface_contour, 1, 0.0)
-                current_time = time.time()
+                if self.previous_surface_contour is not None:
+                    similarity = cv2.matchShapes(self.previous_surface_contour, new_surface_contour, 1, 0.0)
+                    current_time = time.time()
 
-                if similarity < 0.1:  # Поверхность считается стабильной
-                    if self.last_surface_update is None:
-                        self.last_surface_update = current_time
-                    elif current_time - self.last_surface_update >= self.surface_stability_threshold:
-                        self.is_surface_locked = True
-                        print("Surface automatically locked")
-                else:
-                    self.last_surface_update = None
+                    if similarity < 0.1:  # Поверхность считается стабильной
+                        if self.last_surface_update is None:
+                            self.last_surface_update = current_time
+                        elif current_time - self.last_surface_update >= self.surface_stability_threshold:
+                            self.is_surface_locked = True
+                            print("Surface automatically locked")
+                    else:
+                        self.last_surface_update = None
 
-            self.surface_contour = new_surface_contour
-            self.previous_surface_contour = new_surface_contour
+                self.surface_contour = new_surface_contour
+                self.previous_surface_contour = new_surface_contour
+            else:
+                self.reset_surface()
         else:
-            self.surface_color = None
-            self.surface_contour = None
-            self.previous_surface_contour = None
-            self.last_surface_update = None
+            self.reset_surface()
+
+    def reset_surface(self):
+        self.surface_color = None
+        self.surface_contour = None
+        self.previous_surface_contour = None
+        self.last_surface_update = None
 
     def update_center(self, finger_position):
         if self.is_surface_locked and self.surface_contour is not None:
@@ -154,7 +146,7 @@ class SurfaceAPI:
             if self.prev_frame is not None:
                 diff = cv2.absdiff(image, self.prev_frame)
                 mean_diff = np.mean(diff)
-                if mean_diff > 30:  # Высокий порог для значительных изменений
+                if mean_diff > 30: 
                     self.is_surface_locked = False
                     print("Surface automatically unlocked due to significant changes")
 
