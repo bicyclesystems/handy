@@ -25,6 +25,11 @@ class StateManager:
         self.hand_center_history = deque(maxlen=10)
         self.move_threshold = 20
 
+        self.click_cooldown = 1  
+        self.click_counter = 0
+        self.y_movement_for_click = 40  
+        self.y_speed_threshold = 5  
+
     def process_hand(self, image, hand_landmarks, video_processor, cursor_control, click_handler):
         hand_info = video_processor.hand_api.get_hand_info(image, hand_landmarks)
         
@@ -58,8 +63,9 @@ class StateManager:
         hand_center = calculate_hand_center(hand_landmarks, video_processor.width, video_processor.height)
         self.hand_center_history.append(hand_center)
         
-        if len(self.y_history) == self.y_history.maxlen and len(self.hand_center_history) == self.hand_center_history.maxlen:
+        if len(self.y_history) == self.y_history.maxlen and len(self.size_history) == self.size_history.maxlen:
             y_change = max(self.y_history) - min(self.y_history)
+            y_speed = abs(self.y_history[-1] - self.y_history[0]) / len(self.y_history)
             
             size_changes = np.abs(np.diff(self.size_history) / np.array(self.size_history)[:-1])
             size_changing = np.any(size_changes > self.threshold_size)
@@ -71,8 +77,12 @@ class StateManager:
             new_state = "Hand at rest"
             if y_change > self.threshold_y and not size_changing:
                 new_state = "Y changing, size stable"
-                click_handler.handle_click(current_y, self.y_history[0])
-            elif hand_movement > self.move_threshold:
+                if (y_change > self.y_movement_for_click and 
+                    y_speed < self.y_speed_threshold and 
+                    self.click_counter == 0):
+                    click_handler.handle_click(current_y, self.y_history[0])
+                    self.click_counter = self.click_cooldown
+            elif hand_movement > self.move_threshold * 0.5:
                 new_state = "Y changing, size changing"
                 if video_processor.surface_api.center is not None:
                     cursor_control.move_cursor(index_finger_tip, video_processor.surface_api.center, video_processor.width, video_processor.height)
@@ -80,12 +90,16 @@ class StateManager:
                 new_state = "Y stable, size changing"
             
             self.current_state = update_state(new_state, self.state_transition, self.state_transition_threshold) or self.current_state
+            
+            if self.click_counter > 0:
+                self.click_counter -= 1
 
     def _reset_hand_off_surface(self):
         self.current_state = "Hand off surface"
         self.y_history.clear()
         self.size_history.clear()
         self.hand_center_history.clear()
+        self.click_counter = 0
 
     def reset(self):
         self.current_state = "Initializing"
@@ -95,6 +109,7 @@ class StateManager:
         for history in self.finger_tips_history:
             history.clear()
         self.hand_center_history.clear()
+        self.click_counter = 0
 
     def get_size_change_graph(self, image):
         return draw_size_change_graph(image, self.size_change_history)
