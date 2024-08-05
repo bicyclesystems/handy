@@ -26,6 +26,7 @@ class HandAPI:
         self.speed_threshold = 0.01
 
     def detect_hand(self, image):
+        # Преобразование в RGB для MediaPipe
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = self.hands.process(image_rgb)
         
@@ -101,7 +102,7 @@ class HandAPI:
         
         for landmark in hand_landmarks.landmark:
             px, py = int(landmark.x * width), int(landmark.y * height)
-            cv2.circle(image, (px, py), 5, (255, 0, 0), -1)
+            cv2.circle(image, (px, py), 5, (200, 200, 200), -1)
 
         cv2.putText(image, hand_info['label'], (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
@@ -116,11 +117,11 @@ class HandAPI:
         ortho = (-direction[1], direction[0])
         
         cv2.line(image, tip, (int(tip[0] + self.finger_axis_length * direction[0]), 
-                              int(tip[1] + self.finger_axis_length * direction[1])), (0, 0, 255), 2)
+                              int(tip[1] + self.finger_axis_length * direction[1])), (200, 200, 200), 2)
         cv2.line(image, tip, (int(tip[0] + self.finger_axis_length * ortho[0]), 
-                              int(tip[1] + self.finger_axis_length * ortho[1])), (0, 255, 0), 2)
+                              int(tip[1] + self.finger_axis_length * ortho[1])), (150, 150, 150), 2)
         cv2.line(image, tip, (int(tip[0] - self.finger_axis_length * 0.5 * (direction[0] + ortho[0])), 
-                              int(tip[1] - self.finger_axis_length * 0.5 * (direction[1] + ortho[1]))), (255, 0, 0), 2)
+                              int(tip[1] - self.finger_axis_length * 0.5 * (direction[1] + ortho[1]))), (100, 100, 100), 2)
 
     def draw_finger_buttons(self, image):
         for i, finger in enumerate(self.finger_names):

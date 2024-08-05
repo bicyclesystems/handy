@@ -11,7 +11,7 @@ class VideoProcessor:
         self.height, self.width = image.shape[:2]
         self.screen_size = pyautogui.size()
         
-        self.surface_api = SurfaceAPI(highlight_color=(0, 255, 0, 0.05))
+        self.surface_api = SurfaceAPI(highlight_color=(200, 200, 200, 0.05))
         self.hand_api = HandAPI(self.surface_api)
         self.hand_api.image_width = self.width
         self.hand_api.image_height = self.height
@@ -29,6 +29,12 @@ class VideoProcessor:
             return None
         
         image = cv2.flip(image, 1)
+        
+        # Преобразование в черно-белое изображение
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        
+        # Преобразование обратно в BGR для совместимости с остальным кодом
+        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         
         if detect_significant_changes(image, self.prev_frame, self.change_threshold):
             if self.surface_api.is_surface_locked:
@@ -50,13 +56,13 @@ class VideoProcessor:
         self.hand_api.draw_finger_buttons(image)
         
         lock_status = "Locked" if self.surface_api.is_surface_locked else "Unlocked"
-        cv2.putText(image, f"Surface: {lock_status}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Surface: {lock_status}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
-        cv2.putText(image, state_manager.current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(image, f"Click state: {click_handler.click_state}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, state_manager.current_state, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.putText(image, f"Click state: {click_handler.click_state}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
         cursor_x, cursor_y = pyautogui.position()
-        cv2.putText(image, f"Cursor: ({cursor_x}, {cursor_y})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Cursor: ({cursor_x}, {cursor_y})", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
         cv2.imshow('Hand and Surface Tracking', image)
 
@@ -64,7 +70,7 @@ class VideoProcessor:
         cv2.putText(image, "No hand detected", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
     def draw_hand_status(self, image, hand_status):
-        cv2.putText(image, f"Hand: {hand_status}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(image, f"Hand: {hand_status}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
     def should_exit(self):
         return cv2.waitKey(5) & 0xFF == 27
