@@ -1,5 +1,6 @@
 from collections import deque
 import numpy as np
+import pyautogui
 from additional.utils import (
     calculate_hand_size, smooth_finger_tips, update_state, draw_size_change_graph,
     calculate_hand_center
@@ -10,7 +11,8 @@ class StateManager:
         self.current_state = "Initializing"
         self.state_transition = {
             "Initializing": 0, "Hand at rest": 0, "Y changing, size stable": 0,
-            "Y stable, size changing": 0, "Y changing, size changing": 0
+            "Y stable, size changing": 0, "Y changing, size changing": 0,
+            "Hand off surface": 0
         }
         self.state_transition_threshold = 3
         
@@ -28,7 +30,9 @@ class StateManager:
         self.click_cooldown = 1  
         self.click_counter = 0
         self.y_movement_for_click = 40  
-        self.y_speed_threshold = 5  
+        self.y_speed_threshold = 5
+
+        self.last_on_surface_position = None
 
     def process_hand(self, image, hand_landmarks, video_processor, cursor_control, click_handler):
         hand_info = video_processor.hand_api.get_hand_info(image, hand_landmarks)
@@ -45,8 +49,9 @@ class StateManager:
         
         if hand_on_surface and video_processor.surface_api.is_surface_locked:
             self._process_hand_on_surface(index_finger_tip, hand_landmarks, video_processor, cursor_control, click_handler)
+            self.last_on_surface_position = index_finger_tip
         else:
-            self._reset_hand_off_surface()
+            self._process_hand_off_surface(cursor_control)
         
         video_processor.surface_api.update_center(index_finger_tip)
         image = video_processor.hand_api.draw_hand(image, hand_info, hand_landmarks)
@@ -94,12 +99,10 @@ class StateManager:
             if self.click_counter > 0:
                 self.click_counter -= 1
 
-    def _reset_hand_off_surface(self):
-        self.current_state = "Hand off surface"
-        self.y_history.clear()
-        self.size_history.clear()
-        self.hand_center_history.clear()
-        self.click_counter = 0
+    def _process_hand_off_surface(self, cursor_control):
+        new_state = "Hand off surface"
+        self.current_state = update_state(new_state, self.state_transition, self.state_transition_threshold) or self.current_state
+        cursor_control.reset()
 
     def reset(self):
         self.current_state = "Initializing"
@@ -110,6 +113,7 @@ class StateManager:
             history.clear()
         self.hand_center_history.clear()
         self.click_counter = 0
+        self.last_on_surface_position = None
 
     def get_size_change_graph(self, image):
         return draw_size_change_graph(image, self.size_change_history)

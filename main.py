@@ -21,6 +21,7 @@ def main():
             image = state_manager.process_hand(image, hand_landmarks, video_processor, cursor_control, click_handler)
         else:
             state_manager.reset()
+            cursor_control.reset()
             video_processor.draw_no_hand_message(image)
 
         video_processor.draw_interface(image, state_manager, click_handler)
