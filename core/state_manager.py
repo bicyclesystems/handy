@@ -16,10 +16,10 @@ class StateManager:
         }
         self.state_transition_threshold = 3
         
-        self.y_history = deque(maxlen=10)
-        self.size_history = deque(maxlen=10)
-        self.threshold_y = 30
-        self.threshold_size = 0.025
+        self.y_history = deque(maxlen=3)
+        self.size_history = deque(maxlen=5) 
+        self.threshold_y = 15
+        self.threshold_size = 0.02 
         
         self.finger_tips_history = [deque(maxlen=2) for _ in range(5)]
         self.size_change_history = deque(maxlen=150)
@@ -27,10 +27,9 @@ class StateManager:
         self.hand_center_history = deque(maxlen=10)
         self.move_threshold = 20
 
-        self.click_cooldown = 1  
+        self.click_threshold = 15
+        self.click_cooldown = 5
         self.click_counter = 0
-        self.y_movement_for_click = 40  
-        self.y_speed_threshold = 5
 
         self.last_on_surface_position = None
 
@@ -69,24 +68,25 @@ class StateManager:
         self.hand_center_history.append(hand_center)
         
         if len(self.y_history) == self.y_history.maxlen and len(self.size_history) == self.size_history.maxlen:
-            y_change = max(self.y_history) - min(self.y_history)
-            y_speed = abs(self.y_history[-1] - self.y_history[0]) / len(self.y_history)
+            y_change = self.y_history[0] - self.y_history[-1]
+            y_change_back = self.y_history[-1] - self.y_history[-2]
             
             size_changes = np.abs(np.diff(self.size_history) / np.array(self.size_history)[:-1])
             size_changing = np.any(size_changes > self.threshold_size)
+            
+            if not size_changing:
+                if y_change > self.click_threshold and y_change_back < -self.click_threshold and self.click_counter == 0:
+                    self._perform_click()
+                    self.click_counter = self.click_cooldown
+                    print(f"Click performed! Y-change up: {y_change}, Y-change down: {y_change_back}")
             
             self.size_change_history.append(size_changes[-1] if len(size_changes) > 0 else 0)
             
             hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
             
             new_state = "Hand at rest"
-            if y_change > self.threshold_y and not size_changing:
+            if abs(y_change) > self.threshold_y and not size_changing:
                 new_state = "Y changing, size stable"
-                if (y_change > self.y_movement_for_click and 
-                    y_speed < self.y_speed_threshold and 
-                    self.click_counter == 0):
-                    click_handler.handle_click(current_y, self.y_history[0])
-                    self.click_counter = self.click_cooldown
             elif hand_movement > self.move_threshold * 0.5:
                 new_state = "Y changing, size changing"
                 if video_processor.surface_api.center is not None:
@@ -98,6 +98,9 @@ class StateManager:
             
             if self.click_counter > 0:
                 self.click_counter -= 1
+
+    def _perform_click(self):
+        pyautogui.click()
 
     def _process_hand_off_surface(self, cursor_control):
         new_state = "Hand off surface"
