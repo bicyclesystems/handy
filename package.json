@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@rnbws/renecss": "^0.0.2",
+    "@rnbws/svg-icon.js": "^0.0.1"
+  }
+}
