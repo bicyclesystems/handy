@@ -1,0 +1,30 @@
+.ticker-text {
+    position: relative;
+    width: 150vw;
+    overflow: hidden;
+    flex-wrap: nowrap;
+}
+
+@keyframes ticker {
+    0% {
+        left: 0vw;
+    }
+
+    50% {
+        left: -50vw;
+    }
+
+    100% {
+        left: 0vw;
+    }
+}
+
+.ticker {
+    position: absolute;
+    left: 0vw;
+    animation: ticker 10s linear infinite;
+}
+
+.ticker:hover {
+    animation-play-state: paused;
+}
