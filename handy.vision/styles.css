@@ -1,28 +1,25 @@
-.ticker-text {
-    position: relative;
-    width: 150vw;
+.ticker-container {
+    width: 100%;
     overflow: hidden;
-    flex-wrap: nowrap;
+    position: relative;
+}
+
+.ticker {
+    display: flex;
+    width: 120vw;
+    animation: ticker 10s linear infinite;
 }
 
 @keyframes ticker {
     0% {
-        left: 0vw;
+        transform: translateX(5vw);
     }
-
     50% {
-        left: -50vw;
+        transform: translateX(-25vw);
     }
-
     100% {
-        left: 0vw;
+        transform: translateX(5vw);
     }
-}
-
-.ticker {
-    position: absolute;
-    left: 0vw;
-    animation: ticker 10s linear infinite;
 }
 
 .ticker:hover {
