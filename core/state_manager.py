@@ -1,6 +1,6 @@
 from collections import deque
 import numpy as np
-import pyautogui
+import time
 from additional.utils import (
     calculate_hand_size, smooth_finger_tips, update_state, draw_size_change_graph,
     calculate_hand_center
@@ -23,6 +23,7 @@ class StateManager:
         self.size_history = deque(maxlen=10)
         self.threshold_y = 15
         self.threshold_size = 0.05
+        self.threshold_size_change = 0.01 
         
         self.finger_tips_history = [deque(maxlen=2) for _ in range(5)]
         self.size_change_history = deque(maxlen=150)
@@ -41,6 +42,23 @@ class StateManager:
 
         self.cursor_stability_threshold = 5  
         self.cursor_movement_enabled = True 
+
+        self.two_finger_click_threshold = 8
+        self.two_finger_click_cooldown = 15
+        self.two_finger_click_counter = 0
+        self.two_finger_click_window = 3
+
+        self.double_tap_threshold = 1 
+        self.last_tap_time = 0
+        self.double_tap_cooldown = 0.5  
+
+        self.index_hold_threshold = 0.5 
+        self.index_hold_start_time = None
+        self.index_hold_triggered = False
+        self.index_click_detected = False
+
+        self.scroll_cooldown = 5
+        self.scroll_counter = 0
 
     def process_hand(self, image, hand_landmarks, video_processor, cursor_control, click_handler):
         hand_info = video_processor.hand_api.get_hand_info(image, hand_landmarks)
@@ -78,16 +96,41 @@ class StateManager:
         self.hand_center_history.append(hand_center)
         
         if len(self.y_history['index']) == self.y_history['index'].maxlen and len(self.size_history) == self.size_history.maxlen:
-            size_changes = np.abs(np.diff(self.size_history) / np.array(self.size_history)[:-1])
-            size_stable = np.mean(size_changes) <= self.threshold_size 
+            size_changes = np.diff(self.size_history) / np.array(self.size_history)[:-1]
+            size_stable = np.mean(np.abs(size_changes)) <= self.threshold_size
+            
+            index_y_change = self.y_history['index'][0] - self.y_history['index'][-1]
+            middle_y_change = self.y_history['middle'][0] - self.y_history['middle'][-1]
+            size_change = (self.size_history[-1] - self.size_history[0]) / self.size_history[0]
+            
+            if self.scroll_counter == 0:
+                if index_y_change > self.threshold_y and middle_y_change > self.threshold_y and size_change > self.threshold_size_change:
+                    print("Down Scroll")
+                    self.scroll_counter = self.scroll_cooldown
+                elif index_y_change < -self.threshold_y and middle_y_change < -self.threshold_y and size_change < -self.threshold_size_change:
+                    print("Up Scroll")
+                    self.scroll_counter = self.scroll_cooldown
             
             hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
             
             if hand_movement < self.cursor_stability_threshold:
                 if size_stable:
-                    self._check_index_finger_click(index_finger_tip, click_handler)
-                    self._check_middle_finger_click(middle_finger_tip)
+                    if self._check_two_finger_click():
+                        self._perform_click("Two Fingers")
+                    elif self.two_finger_click_counter == 0:
+                        if self._check_double_tap():
+                            self._perform_double_tap()
+                        elif self._check_index_finger_click(index_finger_tip, click_handler):
+                            self._perform_click("Index Finger")
+                        elif self._check_middle_finger_click(middle_finger_tip):
+                            self._perform_click("Middle Finger")
+                    
+                    self._check_index_finger_hold(hand_movement)
             else:
+                self.index_hold_start_time = None
+                self.index_hold_triggered = False
+                self.index_click_detected = False
+                
                 if video_processor.surface_api.center is not None and self.cursor_movement_enabled:
                     cursor_control.move_cursor(index_finger_tip, video_processor.surface_api.center, video_processor.width, video_processor.height)
             
@@ -103,10 +146,14 @@ class StateManager:
             
             self.current_state = update_state(new_state, self.state_transition, self.state_transition_threshold) or self.current_state
             
+            if self.scroll_counter > 0:
+                self.scroll_counter -= 1
             if self.click_counter > 0:
                 self.click_counter -= 1
             if self.middle_finger_click_counter > 0:
                 self.middle_finger_click_counter -= 1
+            if self.two_finger_click_counter > 0:
+                self.two_finger_click_counter -= 1
 
     def _check_index_finger_click(self, index_finger_tip, click_handler):
         y_change = self.y_history['index'][0] - self.y_history['index'][-1]
@@ -117,10 +164,13 @@ class StateManager:
         
         if size_stable and y_change > self.click_threshold and y_change_back < -self.click_threshold and self.click_counter == 0:
             self.cursor_movement_enabled = False  
-            self._perform_click("Index Finger")
             self.click_counter = self.click_cooldown
             self.cursor_movement_enabled = True 
-            print(f"Click performed with Index Finger! Y-change up: {y_change}, Y-change down: {y_change_back}")
+            self.index_hold_start_time = time.time()
+            self.index_hold_triggered = False
+            self.index_click_detected = True
+            return True
+        return False
 
     def _check_middle_finger_click(self, middle_finger_tip):
         y_changes = np.diff(self.y_history['middle'])
@@ -133,13 +183,64 @@ class StateManager:
         if size_stable and max_up > self.middle_finger_click_threshold and max_down < -self.middle_finger_click_threshold and self.middle_finger_click_counter == 0:
             self.cursor_movement_enabled = False 
             self.middle_finger_click_counter = self.middle_finger_click_cooldown
-            self._perform_click("Middle Finger")
             self.cursor_movement_enabled = True 
-            print(f"Middle Finger Click! Y-change up: {max_up}, Y-change down: {max_down}")
+            return True
+        return False
+
+    def _check_two_finger_click(self):
+        index_y_changes = np.diff(self.y_history['index'])
+        middle_y_changes = np.diff(self.y_history['middle'])
+        
+        index_up = max(index_y_changes[-self.two_finger_click_window:])
+        index_down = min(index_y_changes[-self.two_finger_click_window:])
+        middle_up = max(middle_y_changes[-self.two_finger_click_window:])
+        middle_down = min(middle_y_changes[-self.two_finger_click_window:])
+        
+        size_changes = np.abs(np.diff(self.size_history) / np.array(self.size_history)[:-1])
+        size_stable = np.mean(size_changes) <= self.threshold_size
+        
+        if (size_stable and
+            index_up > self.two_finger_click_threshold and index_down < -self.two_finger_click_threshold and
+            middle_up > self.two_finger_click_threshold and middle_down < -self.two_finger_click_threshold and
+            self.two_finger_click_counter == 0):
+            self.cursor_movement_enabled = False
+            self.two_finger_click_counter = self.two_finger_click_cooldown
+            self.cursor_movement_enabled = True
+            return True
+        return False
+
+    def _check_double_tap(self):
+        current_time = time.time()
+        y_change = self.y_history['index'][0] - self.y_history['index'][-1]
+        y_change_back = self.y_history['index'][-1] - self.y_history['index'][-2]
+        
+        size_changes = np.abs(np.diff(self.size_history) / np.array(self.size_history)[:-1])
+        size_stable = np.mean(size_changes) <= self.threshold_size
+        
+        if size_stable and y_change > self.click_threshold and y_change_back < -self.click_threshold:
+            if current_time - self.last_tap_time < self.double_tap_threshold:
+                if current_time - self.last_tap_time > self.double_tap_cooldown:
+                    self.last_tap_time = 0
+                    return True
+            self.last_tap_time = current_time
+        return False
+
+    def _check_index_finger_hold(self, hand_movement):
+        if self.index_click_detected and self.index_hold_start_time is not None and not self.index_hold_triggered:
+            current_time = time.time()
+            if current_time - self.index_hold_start_time >= self.index_hold_threshold and hand_movement < self.cursor_stability_threshold:
+                print("Index Hold")
+                self.index_hold_triggered = True
+                self.index_click_detected = False
+            elif hand_movement >= self.cursor_stability_threshold:
+                self.index_hold_start_time = None
+                self.index_click_detected = False
 
     def _perform_click(self, finger_name):
-        pyautogui.click()
-        print(f"Click performed with {finger_name}")
+        print(f"Click with {finger_name}")
+
+    def _perform_double_tap(self):
+        print("Double Tap")
 
     def _process_hand_off_surface(self, cursor_control):
         new_state = "Hand off surface"
@@ -157,7 +258,13 @@ class StateManager:
         self.hand_center_history.clear()
         self.click_counter = 0
         self.middle_finger_click_counter = 0
+        self.two_finger_click_counter = 0
         self.last_on_surface_position = None
+        self.last_tap_time = 0
+        self.index_hold_start_time = None
+        self.index_hold_triggered = False
+        self.index_click_detected = False
+        self.scroll_counter = 0
 
     def get_size_change_graph(self, image):
         return draw_size_change_graph(image, self.size_change_history)
