@@ -18,7 +18,9 @@ class StateManager:
         
         self.y_history = {
             'index': deque(maxlen=5),
-            'middle': deque(maxlen=5)
+            'middle': deque(maxlen=5),
+            'ring': deque(maxlen=5), 
+            'pinky': deque(maxlen=5)   
         }
         self.size_history = deque(maxlen=10)
         self.threshold_y = 15
@@ -60,6 +62,11 @@ class StateManager:
         self.scroll_cooldown = 5
         self.scroll_counter = 0
 
+        self.zoom_threshold = 200  
+        self.last_distance = None  
+        self.ring_finger_history = deque(maxlen=5)  
+        self.swipe_detected = False  
+
     def process_hand(self, image, hand_landmarks, video_processor, cursor_control, click_handler):
         hand_info = video_processor.hand_api.get_hand_info(image, hand_landmarks)
         
@@ -68,6 +75,8 @@ class StateManager:
         
         index_finger_tip = hand_info['finger_tips'][1]
         middle_finger_tip = hand_info['finger_tips'][2]
+        ring_finger_tip = hand_info['finger_tips'][3]
+        pinky_finger_tip = hand_info['finger_tips'][4]  
         
         hand_on_surface = video_processor.surface_api.is_point_inside_contour(index_finger_tip)
         hand_status = "On surface" if hand_on_surface else "Off surface"
@@ -75,7 +84,7 @@ class StateManager:
         video_processor.draw_hand_status(image, hand_status)
         
         if hand_on_surface and video_processor.surface_api.is_surface_locked:
-            self._process_hand_on_surface(index_finger_tip, middle_finger_tip, hand_landmarks, video_processor, cursor_control, click_handler)
+            self._process_hand_on_surface(index_finger_tip, middle_finger_tip, ring_finger_tip, pinky_finger_tip, hand_info, hand_landmarks, video_processor, cursor_control, click_handler)
             self.last_on_surface_position = index_finger_tip
         else:
             self._process_hand_off_surface(cursor_control)
@@ -85,31 +94,78 @@ class StateManager:
         
         return image
 
-    def _process_hand_on_surface(self, index_finger_tip, middle_finger_tip, hand_landmarks, video_processor, cursor_control, click_handler):
+    def _process_hand_on_surface(self, index_finger_tip, middle_finger_tip, ring_finger_tip, pinky_finger_tip, hand_info, hand_landmarks, video_processor, cursor_control, click_handler):
         current_size = calculate_hand_size(hand_landmarks)
         
         self.y_history['index'].append(index_finger_tip[1])
         self.y_history['middle'].append(middle_finger_tip[1])
+        self.y_history['ring'].append(ring_finger_tip[1])  
+        self.y_history['pinky'].append(pinky_finger_tip[1]) 
         self.size_history.append(current_size)
-        
+
         hand_center = calculate_hand_center(hand_landmarks, video_processor.width, video_processor.height)
         self.hand_center_history.append(hand_center)
-        
+
         if len(self.y_history['index']) == self.y_history['index'].maxlen and len(self.size_history) == self.size_history.maxlen:
             size_changes = np.diff(self.size_history) / np.array(self.size_history)[:-1]
             size_stable = np.mean(np.abs(size_changes)) <= self.threshold_size
             
             index_y_change = self.y_history['index'][0] - self.y_history['index'][-1]
             middle_y_change = self.y_history['middle'][0] - self.y_history['middle'][-1]
+            ring_y_change = self.y_history['ring'][0] - self.y_history['ring'][-1]
+            pinky_y_change = self.y_history['pinky'][0] - self.y_history['pinky'][-1]
             size_change = (self.size_history[-1] - self.size_history[0]) / self.size_history[0]
-            
+
+            hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
+            is_moving_slowly = hand_movement < self.cursor_stability_threshold
+
+            is_swiping_right = (abs(index_y_change) < 10 and abs(middle_y_change) < 10 and abs(ring_y_change) < 10 and
+                                (index_finger_tip[0] - self.last_on_surface_position[0] > 30) and
+                                (middle_finger_tip[0] - self.last_on_surface_position[0] > 30) and
+                                (ring_finger_tip[0] - self.last_on_surface_position[0] > 30))
+
+            is_swiping_left = (abs(index_y_change) < 10 and abs(middle_y_change) < 10 and abs(ring_y_change) < 10 and
+                               (self.last_on_surface_position[0] - index_finger_tip[0] > 30) and
+                               (self.last_on_surface_position[0] - middle_finger_tip[0] > 30) and
+                               (self.last_on_surface_position[0] - ring_finger_tip[0] > 30))
+
+            if is_swiping_right and not is_moving_slowly:
+                self.swipe_detected = True 
+
+            if self.swipe_detected and is_moving_slowly:
+                if abs(pinky_y_change) < 1:
+                    print("Right Four-Finger Swipe")
+                else:
+                    print("Swipe Right")
+                self.swipe_detected = False 
+
+            if is_swiping_left and not is_moving_slowly:
+                self.swipe_detected = True  
+
+            if self.swipe_detected and is_moving_slowly:
+                if abs(pinky_y_change) < 1:
+                    print("Left Four-Finger Swipe")
+                else:
+                    print("Swipe Left")
+                self.swipe_detected = False  
+
             if self.scroll_counter == 0:
-                if index_y_change > self.threshold_y and middle_y_change > self.threshold_y and size_change > self.threshold_size_change:
+                if index_y_change > self.threshold_y * 1.5 and middle_y_change > self.threshold_y * 1.5 and size_change > self.threshold_size_change:
                     print("Down Scroll")
                     self.scroll_counter = self.scroll_cooldown
-                elif index_y_change < -self.threshold_y and middle_y_change < -self.threshold_y and size_change < -self.threshold_size_change:
+                elif index_y_change < -self.threshold_y * 1.5 and middle_y_change < -self.threshold_y * 1.5 and size_change < -self.threshold_size_change:
                     print("Up Scroll")
                     self.scroll_counter = self.scroll_cooldown
+
+            distance_between_fingers = np.linalg.norm(np.array(index_finger_tip) - np.array(middle_finger_tip))
+            if self.last_distance is not None:
+                hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
+                if hand_movement < self.cursor_stability_threshold: 
+                    if distance_between_fingers < self.last_distance - 50: 
+                        print("Zoom In")
+                    elif distance_between_fingers > self.last_distance + 50: 
+                        print("Zoom Out")
+            self.last_distance = distance_between_fingers  
             
             hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
             
@@ -154,7 +210,7 @@ class StateManager:
                 self.middle_finger_click_counter -= 1
             if self.two_finger_click_counter > 0:
                 self.two_finger_click_counter -= 1
-
+                
     def _check_index_finger_click(self, index_finger_tip, click_handler):
         y_change = self.y_history['index'][0] - self.y_history['index'][-1]
         y_change_back = self.y_history['index'][-1] - self.y_history['index'][-2]
@@ -251,6 +307,8 @@ class StateManager:
         self.current_state = "Initializing"
         self.y_history['index'].clear()
         self.y_history['middle'].clear()
+        self.y_history['ring'].clear()  # Добавлено для безымянного пальца
+        self.y_history['pinky'].clear()  # Добавлено для мизинца
         self.size_history.clear()
         self.size_change_history.clear()
         for history in self.finger_tips_history:
@@ -265,6 +323,7 @@ class StateManager:
         self.index_hold_triggered = False
         self.index_click_detected = False
         self.scroll_counter = 0
+        self.last_distance = None  
 
     def get_size_change_graph(self, image):
         return draw_size_change_graph(image, self.size_change_history)
