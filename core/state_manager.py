@@ -23,7 +23,7 @@ class StateManager:
             'pinky': deque(maxlen=5)   
         }
         self.size_history = deque(maxlen=10)
-        self.threshold_y = 15
+        self.threshold_y = 5
         self.threshold_size = 0.05
         self.threshold_size_change = 0.01 
         
@@ -137,13 +137,22 @@ class StateManager:
                 self.swipe_detected = False
                 self.swipe_direction = None
 
+            index_x_change = abs(index_finger_tip[0] - self.last_on_surface_position[0])
+            middle_x_change = abs(middle_finger_tip[0] - self.last_on_surface_position[0])
+            fingers_y_difference = abs(index_finger_tip[1] - middle_finger_tip[1])
+
             if self.scroll_counter == 0:
-                if index_y_change > self.threshold_y * 1.5 and middle_y_change > self.threshold_y * 1.5 and size_change > self.threshold_size_change:
-                    print("Down Scroll")
-                    self.scroll_counter = self.scroll_cooldown
-                elif index_y_change < -self.threshold_y * 1.5 and middle_y_change < -self.threshold_y * 1.5 and size_change < -self.threshold_size_change:
-                    print("Up Scroll")
-                    self.scroll_counter = self.scroll_cooldown
+                if (index_x_change < 50 and middle_x_change < 50 and
+                    fingers_y_difference < 15 and
+                    abs(index_y_change) > self.threshold_y and
+                    abs(middle_y_change) > self.threshold_y and
+                    abs(index_y_change - middle_y_change) < 20):
+                    if index_y_change > 0 and middle_y_change > 0:
+                        print("Down Scroll")
+                        self.scroll_counter = self.scroll_cooldown
+                    elif index_y_change < 0 and middle_y_change < 0:
+                        print("Up Scroll")
+                        self.scroll_counter = self.scroll_cooldown
 
             distance_between_fingers = np.linalg.norm(np.array(index_finger_tip) - np.array(middle_finger_tip))
             if self.last_distance is not None:
