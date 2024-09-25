@@ -66,8 +66,11 @@ class StateManager:
         self.scroll_cooldown = 5
         self.scroll_counter = 0
 
-        self.zoom_threshold = 200  
-        self.last_distance = None  
+        self.zoom_threshold = 20  
+        self.last_distance = None
+        self.zoom_cooldown = 10
+        self.zoom_counter = 0
+
         self.ring_finger_history = deque(maxlen=5)  
         self.swipe_detected = False
         self.swipe_direction = None
@@ -169,13 +172,15 @@ class StateManager:
 
                 distance_between_fingers = np.linalg.norm(np.array(index_finger_tip) - np.array(middle_finger_tip))
                 if self.last_distance is not None:
-                    hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
-                    if hand_movement < self.cursor_stability_threshold: 
-                        if distance_between_fingers < self.last_distance - 50: 
-                            print("Zoom In")
-                        elif distance_between_fingers > self.last_distance + 50: 
-                            print("Zoom Out")
-                self.last_distance = distance_between_fingers  
+                    distance_change = distance_between_fingers - self.last_distance
+                    if self.zoom_counter == 0:
+                        if abs(distance_change) > self.zoom_threshold:
+                            if distance_change > 0:
+                                print("Zoom Out")
+                            else:
+                                print("Zoom In")
+                            self.zoom_counter = self.zoom_cooldown
+                self.last_distance = distance_between_fingers
                 
                 hand_movement = np.linalg.norm(self.hand_center_history[-1] - self.hand_center_history[0])
                 
@@ -222,6 +227,8 @@ class StateManager:
                 self.two_finger_click_counter -= 1
             if self.rotate_counter > 0:
                 self.rotate_counter -= 1
+            if self.zoom_counter > 0:
+                self.zoom_counter -= 1
 
     def _check_index_finger_click(self, index_finger_tip, click_handler):
         y_change = self.y_history['index'][0] - self.y_history['index'][-1]
@@ -365,6 +372,7 @@ class StateManager:
         self.swipe_detected = False
         self.swipe_direction = None
         self.rotate_counter = 0
+        self.zoom_counter = 0
 
     def get_size_change_graph(self, image):
         return draw_size_change_graph(image, self.size_change_history)
