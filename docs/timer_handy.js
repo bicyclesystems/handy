@@ -1,8 +1,23 @@
-function updateDisplay(id, value) {
+function updateDisplay(id, value, isLeftZero) {
     const tens = Math.floor(value / 10);
     const ones = value % 10;
-    document.querySelector(`#${id}-tens h1`).textContent = tens;
-    document.querySelector(`#${id}-ones h1`).textContent = ones;
+    updateDigit(`${id}-tens`, tens, isLeftZero);
+    updateDigit(`${id}-ones`, ones, isLeftZero && tens === 0);
+}
+
+function updateDigit(id, value, isLeftZero) {
+    const element = document.querySelector(`#${id}`);
+    element.querySelector('h1').textContent = value;
+    
+    if (value === 0 && isLeftZero) {
+        element.style.backgroundColor = '#F0F0EF';
+        element.style.color = '#F4492B';
+        element.style.border = '1px solid #F4492B';
+    } else {
+        element.style.backgroundColor = '#F4492B';
+        element.style.color = '#F0F0EF';
+        element.style.border = 'none';
+    }
 }
 
 function startTimer(days, hours, minutes) {
@@ -11,9 +26,9 @@ function startTimer(days, hours, minutes) {
     function updateTimer() {
         if (totalMinutes <= 0) {
             clearInterval(timerInterval);
-            updateDisplay('days', 0);
-            updateDisplay('hours', 0);
-            updateDisplay('minutes', 0);
+            updateDisplay('days', 0, true);
+            updateDisplay('hours', 0, true);
+            updateDisplay('minutes', 0, true);
             return;
         }
 
@@ -21,9 +36,9 @@ function startTimer(days, hours, minutes) {
         const h = Math.floor((totalMinutes % 1440) / 60);
         const m = totalMinutes % 60;
 
-        updateDisplay('days', d);
-        updateDisplay('hours', h);
-        updateDisplay('minutes', m);
+        updateDisplay('days', d, true);
+        updateDisplay('hours', h, d === 0);
+        updateDisplay('minutes', m, d === 0 && h === 0);
 
         totalMinutes--;
     }
@@ -31,4 +46,5 @@ function startTimer(days, hours, minutes) {
     updateTimer();
     const timerInterval = setInterval(updateTimer, 60000);
 }
+
 startTimer(5, 23, 45);
