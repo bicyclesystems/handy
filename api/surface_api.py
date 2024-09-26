@@ -27,10 +27,7 @@ class SurfaceAPI:
         if self.is_surface_locked:
             return
 
-        height, width = image.shape[:2]
-        lower_half = image[height//2:, :]
-        
-        gray = cv2.cvtColor(lower_half, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
         _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         
@@ -40,9 +37,8 @@ class SurfaceAPI:
             largest_contour = max(contours, key=cv2.contourArea)
             area = cv2.contourArea(largest_contour)
             if area > 1000: 
-                self.surface_color = np.mean(lower_half[largest_contour[:,:,1], largest_contour[:,:,0]])
+                self.surface_color = np.mean(image[largest_contour[:,:,1], largest_contour[:,:,0]])
                 new_surface_contour = largest_contour
-                new_surface_contour[:,:,1] += height // 2
 
                 if self.previous_surface_contour is not None:
                     similarity = cv2.matchShapes(self.previous_surface_contour, new_surface_contour, 1, 0.0)

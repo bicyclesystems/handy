@@ -24,15 +24,33 @@ class HandAPI:
         self.min_smooth_factor = 0.1
         self.prev_landmarks = None
         self.speed_threshold = 0.01
+        
+        self.clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 
     def detect_hand(self, image):
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_rgb = self.preprocess_image(image_rgb)
         results = self.hands.process(image_rgb)
         
         if results.multi_hand_landmarks:
             return results.multi_hand_landmarks[0]
         else:
             return None
+
+    def preprocess_image(self, image):
+        # Преобразуем изображение в оттенки серого
+        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        
+        # Применяем CLAHE
+        clahe_image = self.clahe.apply(gray)
+        
+        # Преобразуем обратно в RGB
+        enhanced_image = cv2.cvtColor(clahe_image, cv2.COLOR_GRAY2RGB)
+        
+        # Применяем небольшое размытие для уменьшения шума
+        enhanced_image = cv2.GaussianBlur(enhanced_image, (3, 3), 0)
+        
+        return enhanced_image
 
     def get_hand_info(self, image, hand_landmarks):
         h, w = image.shape[:2]
