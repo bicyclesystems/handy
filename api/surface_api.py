@@ -77,7 +77,9 @@ class SurfaceAPI:
 
     def update_center(self, finger_position):
         if self.is_surface_locked and self.surface_contour is not None:
-            if self.center is None:
+            if self.is_point_inside_contour(finger_position):  # Проверяем, находится ли палец на поверхности
+                self.center = (finger_position[0], finger_position[1])  # Обновляем центр по X и Y
+            elif self.center is None:  # Если центр еще не установлен, устанавливаем его
                 M = cv2.moments(self.surface_contour)
                 if M["m00"] != 0:
                     self.center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
@@ -126,6 +128,11 @@ class SurfaceAPI:
             cv2.putText(image, "X", (cX + self.axis_length + 10, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
             cv2.putText(image, "Y", (cX, cY + self.axis_length + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (150, 150, 150), 2)
             cv2.putText(image, "Z", (cX, cY - self.axis_length - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 100, 100), 2)
+
+    def draw_vertical_axis(self, image):
+        if self.center is not None:
+            cX, cY = self.center
+            cv2.line(image, (cX, cY - 100), (cX, cY + 100), (255, 0, 0), 2)  # Рисуем вертикальную ось синего цвета
 
     def is_point_inside_contour(self, point):
         if self.surface_contour is None:

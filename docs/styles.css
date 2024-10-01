@@ -7,7 +7,7 @@
 .ticker {
     display: flex;
     width: 120vw;
-    animation: ticker 10s linear infinite;
+    animation: ticker 30s linear infinite;
 }
 
 @keyframes ticker {
