@@ -16,17 +16,20 @@
 
 </head>
 
-<body data-theme="light">
+<body>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <div class="view ping-pong" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;">
+    <div class="view ping-pong" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; width: 100vw;">
         <a class="circle brand-sprint-circle circle4" style="
             bottom: 10vh;
             left: 10vw; pointer-events: auto; background-color: #F4492B;">
             <h4 class="white">preorder</h4>
         </a>
     </div>
-    <div class="view column product mobile_cover ping-pong justify-stretch"
-        data-desktop-image="./images/first_background.png" data-mobile-image="./images/first_background_mobile.png">
+    <div class="view column product ping-pong justify-stretch">
+        <video autoplay loop muted playsinline
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;">
+            <source src="./images/handy.webm">
+        </video>
         <div class="box-l row justify-stretch align-start gap-xl padding-xl">
             <svg-icon src="./images/handy.svg"></svg-icon>
             <div class="row box-s justify-end gap-m">
@@ -39,21 +42,21 @@
                 </div>
             </div>
         </div>
-        <img class="padding-xl" src="./images/logo.svg">
+        <img class="padding-xl" src="./images/logo.svg" style="mix-blend-mode: multiply;">
     </div>
     <div class="view align-center">
         <div class="page text-center align-center">
-            <h2>wave hello to the future </br> of computing</h2>
-            <h4>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting seamlessly with
+            <h1>wave hello to the future </br> of computing</h1>
+            <h3>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting seamlessly with
                 your computer. leverages advanced technology to convert your hand gestures into digital commands. from
-                casual browsing to professional applications like animation and music software.</h4>
+                casual browsing to professional applications like animation and music software.</h3>
         </div>
     </div>
     <handy-slider></handy-slider>
     <div class="view align-center column gap-xl">
         <div class="page text-center align-center">
-            <h3>from jaw-dropping design to jam sessions - your hand is the only thing you need</h3>
-            <p>ever wished your computer could read your mind? well, we're getting close. handy turns your movements
+            <h3>from jaw-dropping design to jam sessions<br> - your hand is the only thing you need</h3>
+            <p>ever wished your computer could read your mind? well, we're getting close.<br> handy turns your movements
                 into digital commands. it's like magic, but real.</p>
         </div>
         <div class="box-m row justify-stretch gap-xl padding-xl" style="flex-wrap: nowrap;">
@@ -88,7 +91,7 @@
     </div>
     <div class="view align-center column gap-xl padding-xl">
         <div class="page align-center">
-            <h2 class="text-center">your gateway to gestural goodness</h2>
+            <h3 class="text-center">your gateway to gestural goodness</h3>
             <div class="row box-l justify-stretch" style="flex-wrap: nowrap;">
                 <p>instead of relying on a traditional mouse or trackpad, mouve leverages advanced technology to
                     convert your hand gestures into digital commands.</p>
@@ -96,22 +99,13 @@
                     professional applications like animation and music software.</p>
             </div>
         </div>
+        <img class="padding-xl" src="./images/app.png">
     </div>
-    <div class="view">
-    </div>
-
-
-
-
-
-
-
-
     <div class="view align-center column gap-xl">
         <div class="page text-center align-center">
-            <h2>meet hemi, it's like a tiny moon, but way cooler</h2>
-            <h5>this small, hemisphere-shaped device captures movement in the higher performance. hemi enhances the user
-                experience and elevating the gesture control technology.</h5>
+            <h3>meet hemi, it's like a tiny<br> moon, but way cooler</h3>
+            <h5>this small, hemisphere-shaped device captures movement in<br> the higher performance. hemi enhances the user
+                experience<br> and elevating the gesture control technology.</h5>
         </div>
         <div class="box-m row justify-stretch gap-xl padding-xl" style="flex-wrap: nowrap;">
             <div style="width: 12.5%;"></div>
@@ -141,7 +135,7 @@
     <div class="view product column justify-stretch padding-xl"
         style="flex-wrap: nowrap; position: relative; height: 90vw;">
         <img class="box-s" style="z-index: -1; position: absolute; left: 50%; top: 0; transform: translate(-50%, 0);"
-            src="./images/hem.png">
+            src="./images/waves.svg">
         <img style="z-index: -2; position: absolute; left: 50%; bottom: 0; transform: translate(-50%, 0);"
             src="./images/second_background.png">
         <div class="row">
@@ -236,12 +230,11 @@
             </div>
         </div>
     </div>
-    <div class="view column product" style="align-items: center;">
+    <div class="view column product align-center" style="align-items: center; background-color: #EFEEEE;">
         <div class="page text-center align-center" style="align-items: center;">
-            <h2><br>wave hello to the future </br> of computing</h2>
-            <h5>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting seamlessly with
-                your computer. leverages advanced technology to convert your hand gestures into digital commands. from
-                casual browsing to professional applications like animation and music software.</h5>
+            <h3>the magic behind the moves</h3>
+            <h5>ever wished your computer could read your mind? well,<br> we're getting close. handy turns your movements
+                into<br> digital commands. it's like magic, but real.</h5>
             <video class="box-m" src="images/Fingers_motion.webm" autoplay loop muted playsinline></video>
         </div>
     </div>
@@ -250,29 +243,28 @@
     </div>
     <div class="view align-center column gap-xl padding-xl" style="background-color: #E3DFD9;">
         <div class="page text-center" style="align-items: center !important;">
-            <h2>from jaw-dropping design to jam sessions - your hand is the only thing you need</h2>
-            <h5>ever wished your computer could read your mind? well, we're getting close. handy turns your movements
-                into digital commands. it's like magic, but real.</h5>
-            <div class="box-s orange_background white padding-s align-center gap-s radius-m">
+            <h3>join the handy hive mind</h3>
+            <h5>we've opened our garden, and boy, is it thriving. dive into our github, </br> tweak our code, or build
+                something entirely new. handy is not just a </br> product, it's a movement. handy you're invited to the
+                party.
+            </h5>
+            <div class="white padding-m align-center gap-s radius-m text-m" style="background-color: #F4492B;">
                 join the hendi revolution on github
-                <svg-icon src="https://rnbw.design/raincons/github.svg" class="icon-s">
-                </svg-icon>
             </div>
         </div>
-        <div class="box-m row padding-xl justify-stretch gap-xl" style="flex-wrap: nowrap;">
-            <div class="box-s column justify-stretch">
-                <div class="column gap-s">
-                    <p>speak handy: gestures.handy playground</p>
-                    <div class="text-m">ever wished you could high-five your computer? now you can. meet gestures.handy
-                        - our
-                        open-source gesture wonderland. with gestures.handy, you're the maestro. define custom moves,
-                        map them to actions, and watch your computer dance.peace sign to scroll? salute to email? you
-                        got it.<br>
-                        dive in. your hands have stories - let's make your computer listen.</div>
-                </div>
-                <div class="box-m" style="color: #F4492B; text-decoration: underline;">explore gestures.handy</div>
+        <div class="box-l row padding-xl gap-xl"
+            style="flex-wrap: nowrap; justify-content: center; align-items: flex-start;">
+            <div class="box-xs column gap-m">
+                <p>speak handy: gestures.handy playground</p>
+                <div class="text-m">ever wished you could high-five your computer? now you can. meet gestures.handy
+                    - our
+                    open-source gesture wonderland. with gestures.handy, you're the maestro. define custom moves,
+                    map them to actions, and watch your computer dance.peace sign to scroll? salute to email? you
+                    got it.<br>
+                    dive in. your hands have stories - let's make your computer listen.</div>
+                <div class="text-m" style="color: #F4492B; text-decoration: underline;">explore gestures.handy</div>
             </div>
-            <div class="box-s column align-end padding-l gap-xl" style="border: 1px solid #846642;">
+            <div class="box-xs column align-end padding-l gap-xl" style="border: 1px solid #846642;">
                 <img src="./images/hand10.svg">
                 <div class="box-l align-start" style="color: #846642;">
                     {
@@ -293,7 +285,7 @@
     </div>
     <div class="view column align-center gap-xl white padding-xl" style="background-color: #F0F0EF; color:#F4492B;">
         <div class="page text-center align-center">
-            <h2><br>get your hands on the future</h2>
+            <h3><br>get your hands on the future</h3>
             <h5>level up your handy game with hemi to make your <br> gestures smoother, faster, and way cooler.</h5>
         </div>
         <div class="box-s column gap-xl align-center">
@@ -346,11 +338,13 @@
             <div class="box-m" style="position: relative; right: -5%;">
                 <img src="./images/preorder.svg">
             </div>
-            <div class="box-m column align-center padding-xl align-center gap-xl"
+            <div class="box-m column align-center padding-xl align-center justify-stretch"
                 style="background-color: #F4492B; border-radius: 50%; color:#F0F0EF; aspect-ratio: 1 / 1; position: relative; left: -5%; z-index: 1;">
-                <h3>$99</h3>
-                <h1>pre-order</h1>
-                <ul class="text-l" style="list-style-type: disc;">
+                <div class="column gap-xl align-center padding-xl">
+                    <h2>$99</h2>
+                    <h3>pre-order</h3>
+                </div>
+                <ul class="text-l padding-xl" style="list-style-type: disc;">
                     <li>gestures.handy framework</li>
                     <li>early sourcecode access</li>
                     <li>hendi app</li>
@@ -380,38 +374,38 @@
     </div>
     <div class="view column align-center gap-xl">
         <div class="page align-center">
-            <h2 class="text-center">curious minds want to know</h2>
+            <h3 class="text-center">curious minds want to know</h3>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>will hendi work with my potato computer?</h3>
+                    <h4>will hendi work with my potato computer?</h4>
                     <img src="./images/minus.svg">
                 </div>
                 <p>if it can run a modern browser, you're golden. no supercomputer required</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i still use my mouse/trackpad?</h3>
+                    <h4>can i still use my mouse/trackpad?</h4>
                     <img src="./images/minus.svg">
                 </div>
                 <p>absolutely! hendi plays nice with others. mix and match to your heart's content</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>i'm not tech-savvy. will i be able to use hendi?</h3>
+                    <h4>i'm not tech-savvy. will i be able to use hendi?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>if you can wave hello, you can use hendi. it's that simple</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>what operating systems does handy support?</h3>
+                    <h4>what operating systems does handy support?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>handy loves all: windows, macos, and modern linux distributions are all welcome to the party.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>do i need the hemi device to use handy?</h3>
+                    <h4>do i need the hemi device to use handy?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>while handy can show its potential without hemi, the full magic happens when they're together. think
@@ -419,42 +413,42 @@
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how accurate is handy's gesture recognition?</h3>
+                    <h4>how accurate is handy's gesture recognition?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>precise enough to make you wonder if it's reading your mind. we're constantly improving it, too!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i customize gestures?</h3>
+                    <h4>can i customize gestures?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>you bet! handy is like modeling clay for your gestures. shape it to fit your workflow.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is there a learning curve?</h3>
+                    <h4>is there a learning curve?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>it's more of a learning slide - smooth, fun, and before you know it, you're a pro!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>will handy work with my favorite software?</h3>
+                    <h4>will handy work with my favorite software?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>if it runs on your computer, handy can dance with it. we play well with others.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how does handy handle multiple monitors?</h3>
+                    <h4>how does handy handle multiple monitors?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>like a pro juggler - smooth, seamless, and impressive to watch.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is handy suitable for gaming?</h3>
+                    <h4>is handy suitable for gaming?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>we're not aiming to replace your gaming mouse, but for casual gaming? it's a whole new level of fun!
@@ -462,77 +456,77 @@
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i use handy for drawing or design work?</h3>
+                    <h4>can i use handy for drawing or design work?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>absolutely! many creatives find handy brings a new dimension to their digital artistry.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how does handy handle precision tasks?</h3>
+                    <h4>how does handy handle precision tasks?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>with the grace of a surgeon. zoom in, slow down, and nail those pixel-perfect adjustments.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>will hemi work in low light conditions?</h3>
+                    <h4>will hemi work in low light conditions?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>hemi sees in the dark like a cat. late-night work sessions are no problem.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can multiple users share one hemi device?</h3>
+                    <h4>can multiple users share one hemi device?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>yep! hemi adapts to different users faster than you can say "hot desk".</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how often do i need to calibrate handy with hemi?</h3>
+                    <h4>how often do i need to calibrate handy with hemi?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>rarely. they're like old friends - they just get each other, right from the start.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is my data safe with handy?</h3>
+                    <h4>is my data safe with handy?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>safer than fort knox. we don't store or transmit your personal data.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>what kind of support do you offer?</h3>
+                    <h4>what kind of support do you offer?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>the kind that makes you feel warm and fuzzy inside. our team's always here to help.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i take handy and hemi on the go?</h3>
+                    <h4>can i take handy and hemi on the go?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>hemi's more portable than your coffee mug. take the duo anywhere your laptop goes.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>how does handy compare to other gesture-control devices?</h3>
+                    <h4>how does handy compare to other gesture-control devices?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>we don't like to brag, but... okay, we do. we think handy's the bee's knees of gesture control.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>will handy make me more productive?</h3>
+                    <h4>will handy make me more productive?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>like rocket fuel for your workflow. get ready for takeoff!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is there a trial period?</h3>
+                    <h4>is there a trial period?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>yes! take handy for a spin. if you don't love it, we'll be shocked (but we'll still give you a
@@ -540,98 +534,98 @@
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how often do you release updates?</h3>
+                    <h4>how often do you release updates?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>we're always cooking up improvements. expect regular servings of awesome.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i use handy for presentations?</h3>
+                    <h4>can i use handy for presentations?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>it's like having a magic wand for your slides. presenters, prepare to dazzle!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is handy suitable for people with mobility issues?</h3>
+                    <h4>is handy suitable for people with mobility issues?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>we've designed handy with accessibility in mind. it's all about expanding possibilities.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how durable is the hemi device?</h3>
+                    <h4>how durable is the hemi device?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>tough as nails, but we still don't recommend using it as a hockey puck.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>what's the battery life of hemi?</h3>
+                    <h4>what's the battery life of hemi?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>what battery? hemi is usb-powered. no charging, no fuss.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i develop my own apps or plugins for handy?</h3>
+                    <h4>can i develop my own apps or plugins for handy?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>absolutely! we've got an api that's more open than a 24-hour diner.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>how does handy handle different languages and scripts?</h3>
+                    <h4>how does handy handle different languages and scripts?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>handy speaks the universal language of gestures. no translation needed!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is there a community forum for handy users?</h3>
+                    <h4>is there a community forum for handy users?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>you bet! join the handy family and share your cool discoveries.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can handy replace my keyboard for typing?</h3>
+                    <h4>can handy replace my keyboard for typing?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>for short bits, sure! for your next novel? stick to the keyboard for now.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>how does handy handle palm rejection when using a touchscreen?</h3>
+                    <h4>how does handy handle palm rejection when using a touchscreen?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>like a bouncer at an exclusive club - it knows who to let in and who to keep out.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>can i use handy with virtual reality or augmented reality setups?</h3>
+                    <h4>can i use handy with virtual reality or augmented reality setups?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>now you're thinking with portals! we're exploring these exciting possibilities.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is there a limit to how many gestures i can create?</h3>
+                    <h4>is there a limit to how many gestures i can create?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>only your imagination (and maybe your memory). go wild!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>how does handy impact my computer's performance?</h3>
+                    <h4>how does handy impact my computer's performance?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>like a gentle breeze - you'll barely notice it's there.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i use handy for video editing?</h3>
+                    <h4>can i use handy for video editing?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>it's like having an extra pair of hands in the editing room. snip, cut, and transition with flair!
@@ -639,63 +633,63 @@
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how does hemi handle different desk surfaces?</h3>
+                    <h4>how does hemi handle different desk surfaces?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>whether it's wood, glass, or your lucky mousepad, hemi adapts like a chameleon.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>is there a mobile app for handy?</h3>
+                    <h4>is there a mobile app for handy?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>not yet, but we're cooking up some mobile magic. stay tuned!</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>how does handy handle security for gesture-based logins?</h3>
+                    <h4>how does handy handle security for gesture-based logins?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>fort knox level. your secret gestures are safe with us.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>can i use handy in my company's secure environment?</h3>
+                    <h4>can i use handy in my company's secure environment?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>handy plays by the rules. we're committed to meeting enterprise-level security standards.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how does handy impact battery life on laptops?</h3>
+                    <h4>how does handy impact battery life on laptops?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>like a sip of water - barely noticeable. we've optimized for efficiency.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i use handy with cloud-based applications?</h3>
+                    <h4>can i use handy with cloud-based applications?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>if it's in the cloud, handy can reach it. no ladder required.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>how does handy handle multi-touch gestures?</h3>
+                    <h4>how does handy handle multi-touch gestures?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>like a symphony conductor - coordinating multiple inputs with graceful precision.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>is there a way to share my custom gestures with other handy users?</h3>
+                    <h4>is there a way to share my custom gestures with other handy users?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>coming soon! we're building a gesture marketplace that'll knock your socks off.</p>
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch" style="flex-wrap: nowrap;">
-                    <h3>what's the difference between using handy with and without hemi?</h3>
+                    <h4>what's the difference between using handy with and without hemi?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>think of it like the difference between a preview and a blockbuster movie. handy without hemi gives
@@ -703,7 +697,7 @@
             </div>
             <div class="box-l column gap-s align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
                 <div class="box-l row justify-stretch">
-                    <h3>can i start with just handy and add hemi later?</h3>
+                    <h4>can i start with just handy and add hemi later?</h4>
                     <img src="./images/plus.svg">
                 </div>
                 <p>absolutely! it's like starting with a bicycle and upgrading to a motorcycle. begin your journey with
@@ -715,7 +709,7 @@
     </div>
     <under-footer></under-footer>
     <script src="https://weareunder.design/js/circle.js"></script>
-    <script src="https://weareunder.design/js/footer.js"></script>
+    <script src="./footer.js"></script>
     <script src="./pingpong.js"></script>
     <script src="https://weareunder.design/js/mobile_covers.js"></script>
     <script src="./slider_handy.js"></script>
