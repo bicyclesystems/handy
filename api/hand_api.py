@@ -8,8 +8,8 @@ class HandAPI:
         self.hands = self.mp_hands.Hands(
             static_image_mode=False, 
             max_num_hands=1,
-            min_detection_confidence=0.6,
-            min_tracking_confidence=0.6,
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5,
             model_complexity=1
         )
         self.surface_api = surface_api
@@ -34,10 +34,15 @@ class HandAPI:
         ]
 
         self.smoothed_landmarks = None
-        self.alpha = 0.7 
-        self.last_valid_landmarks = None
-        self.frames_since_last_detection = 0
-        self.max_frames_to_keep_last = 10
+        self.alpha_min = 0.3
+        self.alpha_max = 0.8
+        self.velocity_threshold = 0.005
+
+        self.depth_threshold = 0.03
+        self.perpendicular_adjustment = 2.5
+        self.finger_length_threshold = 0.08
+
+        self.smoothing_factor = 0.5  # New smoothing factor
 
     def preprocess_image(self, image):
         lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
@@ -50,9 +55,6 @@ class HandAPI:
         lookup_table = np.array([((i / 255.0) ** (1.0 / gamma)) * 255 for i in np.arange(0, 256)]).astype("uint8")
         image = cv2.LUT(image, lookup_table)
         
-        image = cv2.bilateralFilter(image, 9, 75, 75)
-        image = cv2.GaussianBlur(image, (5, 5), 0)
-        
         return image
 
     def detect_hand(self, image):
@@ -61,28 +63,9 @@ class HandAPI:
         results = self.hands.process(image_rgb)
         
         if results.multi_hand_landmarks:
-            self.frames_since_last_detection = 0
-            landmarks = results.multi_hand_landmarks[0]
-            self.last_valid_landmarks = landmarks
-            if self.smoothed_landmarks is None:
-                self.smoothed_landmarks = landmarks
-            else:
-                self.smooth_landmarks(landmarks)
-            return self.smoothed_landmarks
+            return results.multi_hand_landmarks[0]
         else:
-            self.frames_since_last_detection += 1
-            if self.frames_since_last_detection <= self.max_frames_to_keep_last and self.last_valid_landmarks:
-                return self.last_valid_landmarks
-            else:
-                self.smoothed_landmarks = None
-                self.last_valid_landmarks = None
-                return None
-
-    def smooth_landmarks(self, landmarks):
-        for i, landmark in enumerate(landmarks.landmark):
-            self.smoothed_landmarks.landmark[i].x = self.alpha * landmark.x + (1 - self.alpha) * self.smoothed_landmarks.landmark[i].x
-            self.smoothed_landmarks.landmark[i].y = self.alpha * landmark.y + (1 - self.alpha) * self.smoothed_landmarks.landmark[i].y
-            self.smoothed_landmarks.landmark[i].z = self.alpha * landmark.z + (1 - self.alpha) * self.smoothed_landmarks.landmark[i].z
+            return None
 
     def get_hand_info(self, image, hand_landmarks):
         h, w = image.shape[:2]
@@ -110,13 +93,47 @@ class HandAPI:
             self.mp_hands.HandLandmark.PINKY_MCP
         ]
 
-        hand_info['finger_tips'] = [(int(hand_landmarks.landmark[tip].x * w), int(hand_landmarks.landmark[tip].y * h)) for tip in finger_tips]
-        hand_info['finger_directions'] = [
-            (hand_landmarks.landmark[tip].x - hand_landmarks.landmark[base].x, 
-             hand_landmarks.landmark[tip].y - hand_landmarks.landmark[base].y,
-             hand_landmarks.landmark[tip].z - hand_landmarks.landmark[base].z)
-            for tip, base in zip(finger_tips, finger_bases)
-        ]
+        current_landmarks = np.array([[landmark.x, landmark.y, landmark.z] for landmark in hand_landmarks.landmark])
+        
+        if self.smoothed_landmarks is None:
+            self.smoothed_landmarks = current_landmarks
+        else:
+            # Уменьшаем эффект сглаживания
+            self.smoothed_landmarks = self.smoothing_factor * self.smoothed_landmarks + (1 - self.smoothing_factor) * current_landmarks
+
+        for i, smoothed in enumerate(self.smoothed_landmarks):
+            hand_landmarks.landmark[i].x = smoothed[0]
+            hand_landmarks.landmark[i].y = smoothed[1]
+            hand_landmarks.landmark[i].z = smoothed[2]
+
+        hand_info['finger_tips'] = []
+        hand_info['finger_directions'] = []
+        hand_info['is_perpendicular'] = []
+        hand_info['is_finger_bent'] = []
+
+        for tip, base in zip(finger_tips, finger_bases):
+            tip_landmark = hand_landmarks.landmark[tip]
+            base_landmark = hand_landmarks.landmark[base]
+            
+            direction = (
+                tip_landmark.x - base_landmark.x,
+                tip_landmark.y - base_landmark.y,
+                tip_landmark.z - base_landmark.z
+            )
+            
+            finger_length = np.sqrt(direction[0]**2 + direction[1]**2 + direction[2]**2)
+            is_finger_bent = finger_length < self.finger_length_threshold
+            
+            norm = np.sqrt(direction[0]**2 + direction[1]**2 + direction[2]**2)
+            if norm != 0:
+                direction = tuple(d / norm for d in direction)
+            
+            is_perpendicular = abs(direction[2]) > self.depth_threshold or is_finger_bent
+            
+            hand_info['finger_tips'].append((int(tip_landmark.x * w), int(tip_landmark.y * h)))
+            hand_info['finger_directions'].append(direction)
+            hand_info['is_perpendicular'].append(is_perpendicular)
+            hand_info['is_finger_bent'].append(is_finger_bent)
 
         index_mcp = hand_landmarks.landmark[self.mp_hands.HandLandmark.INDEX_FINGER_MCP]
         pinky_mcp = hand_landmarks.landmark[self.mp_hands.HandLandmark.PINKY_MCP]
@@ -146,8 +163,10 @@ class HandAPI:
             color = self.get_depth_color(depth)
             cv2.circle(image, (px, py), 5, color, -1)
         
-        for i, (x, y) in enumerate(hand_info['finger_tips']):
-            cv2.circle(image, (x, y), 8, self.landmark_colors[i], -1)
+        for i, ((x, y), is_perpendicular, is_bent) in enumerate(zip(hand_info['finger_tips'], hand_info['is_perpendicular'], hand_info['is_finger_bent'])):
+            radius = 8 * (self.perpendicular_adjustment if is_perpendicular else 1)
+            color = (0, 0, 255) if is_bent else self.landmark_colors[i]
+            cv2.circle(image, (x, y), int(radius), color, -1)
             if self.show_axes[self.finger_names[i]]:
                 self.draw_finger_axes(image, (x, y), hand_info['finger_directions'][i])
 
