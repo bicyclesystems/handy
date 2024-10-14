@@ -3,7 +3,7 @@ import numpy as np
 import time
 
 class SurfaceAPI:
-    def __init__(self, highlight_color=(200, 200, 200, 0.05)):
+    def __init__(self, highlight_color=(0, 255, 0, 0.05)):
         self.surface_color = None
         self.surface_contour = None
         self.highlight_color = highlight_color
@@ -22,6 +22,11 @@ class SurfaceAPI:
         
         self.lower_bound_matrix = np.array([30], dtype=np.uint8)
         self.upper_bound_matrix = np.array([30], dtype=np.uint8)
+
+        self.num_rings = 5
+        self.closest_ring = None
+        self.closest_half = None
+        self.rings = []
 
     def detect_surface(self, image):
         if self.is_surface_locked:
@@ -45,7 +50,6 @@ class SurfaceAPI:
                 self.surface_color = np.mean(roi[largest_contour[:,:,1], largest_contour[:,:,0]])
                 new_surface_contour = largest_contour
 
-                # Смещаем контур обратно на полное изображение
                 new_surface_contour[:,:,1] += lower_bound
 
                 if self.previous_surface_contour is not None:
@@ -73,6 +77,7 @@ class SurfaceAPI:
         self.surface_contour = None
         self.previous_surface_contour = None
         self.last_surface_update = None
+        self.rings = []
 
     def update_center(self, finger_position):
         if self.is_surface_locked and self.surface_contour is not None:
@@ -92,13 +97,65 @@ class SurfaceAPI:
             
             if self.surface_contour is not None:
                 overlay = image.copy()
-                cv2.drawContours(overlay, [self.surface_contour], 0, (200, 200, 200), -1)
+                cv2.drawContours(overlay, [self.surface_contour], 0, (0, 255, 0), -1)
                 cv2.addWeighted(overlay, 0.3, image, 0.7, 0, image)
-                cv2.drawContours(image, [self.surface_contour], 0, (255, 255, 255), 2)
-        
+                cv2.drawContours(image, [self.surface_contour], 0, (0, 255, 0), 2)
+
+                self.draw_inner_rings(image, self.surface_contour)
+
+                if self.is_surface_locked and self.center:
+                    self.highlight_closest_ring_half(image, self.center)
+
         self.draw_axes(image)
         
         return image
+
+    def draw_inner_rings(self, image, contour):
+        M = cv2.moments(contour)
+        if M["m00"] != 0:
+            cX = int(M["m10"] / M["m00"])
+            cY = int(M["m01"] / M["m00"])
+        else:
+            return
+
+        max_dist = max([cv2.pointPolygonTest(contour, (cX, cY), True) for point in contour[:, 0]])
+
+        self.rings = []
+        for i in range(self.num_rings + 1):
+            scale = 1 - (i / (self.num_rings + 1))
+            scaled_contour = np.array([[(p[0][0] - cX) * scale + cX, (p[0][1] - cY) * scale + cY] for p in contour])
+            scaled_contour = scaled_contour.astype(np.int32)
+            self.rings.append(scaled_contour)
+            cv2.drawContours(image, [scaled_contour], 0, (0, 255, 0), 2)
+
+    def highlight_closest_ring_half(self, image, finger_position):
+        if not self.rings:
+            return
+
+        distances = [cv2.pointPolygonTest(ring, finger_position, True) for ring in self.rings]
+        self.closest_ring = np.argmin(np.abs(distances))
+
+        ring = self.rings[self.closest_ring]
+        M = cv2.moments(ring)
+        if M["m00"] != 0:
+            cX = int(M["m10"] / M["m00"])
+            cY = int(M["m01"] / M["m00"])
+            self.closest_half = "upper" if finger_position[1] < cY else "lower"
+
+        mask = np.zeros(image.shape[:2], dtype=np.uint8)
+        cv2.drawContours(mask, [ring], 0, 255, -1)
+        if self.closest_half == "upper":
+            mask[cY:, :] = 0
+        else:
+            mask[:cY, :] = 0
+        
+        red_overlay = np.zeros_like(image)
+        red_overlay[mask == 255] = (0, 0, 255)
+        
+        cv2.addWeighted(image, 1, red_overlay, 0.5, 0, image)
+
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(image, contours, -1, (0, 0, 255), 2)  
 
     def draw_axes(self, image):
         if self.surface_contour is not None and self.is_surface_locked and self.center is not None:
@@ -143,9 +200,8 @@ class SurfaceAPI:
             if self.is_point_inside_contour((x, y)):
                 self.is_clicking = True
                 self.click_counter = self.click_cooldown
-                print(f"Click detected at ({x}, {y})")
 
-    def update(self, image):
+    def update(self, image, finger_position):
         if self.is_clicking:
             self.click_counter -= 1
             if self.click_counter <= 0:
@@ -159,4 +215,8 @@ class SurfaceAPI:
                     self.is_surface_locked = False
                     print("Surface automatically unlocked due to significant changes")
 
+        if self.is_surface_locked and self.surface_contour is not None:
+            self.highlight_closest_ring_half(image, finger_position)
+        
+        self.update_center(finger_position)
         self.prev_frame = image.copy()

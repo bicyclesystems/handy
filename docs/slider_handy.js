@@ -43,7 +43,7 @@ function addSlider() {
                 }
                 .slides {
                     display: flex;
-                    transition: none;
+                    transition: transform 0.5s ease;
                     will-change: transform;
                 }
                 .slide {
@@ -56,12 +56,14 @@ function addSlider() {
                     position: absolute;
                     top: 0;
                     left: 0;
-                    max-width: 300px;
+                    width: 100%;
+                    background: linear-gradient(to bottom, rgba(90, 45, 20, 0.4) 0%, rgba(90, 45, 20, 0.1) 100%);
                 }
                 .sliderbuttons {
                     position: absolute;
                     bottom: 20px;
                     right: 20px;
+                    z-index: 99;
                 }
             `;
             this.appendChild(style);
@@ -78,12 +80,8 @@ function addSlider() {
     const nextButton = document.querySelector('.next');
     
     let currentPosition = 0;
-    let isAutoScrolling = true;
-    let scrollDirection = 0.025;
-    let animationFrameId;
 
     function updateSlider() {
-        const totalWidth = (slide.length - 1) * 100;
         slides.style.transform = `translateX(${-currentPosition}%)`;
 
         const currentSlideIndex = Math.round(currentPosition / 100) % slide.length;
@@ -92,53 +90,23 @@ function addSlider() {
         slideTextSubtitle.textContent = currentSlide.dataset.subtitle;
     }
 
-    function autoScroll() {
-        if (!isAutoScrolling) return;
-
-        currentPosition += scrollDirection;
-
-        if (currentPosition <= 0 || currentPosition >= (slide.length - 1) * 100) {
-            scrollDirection *= -1;
-        }
-
-        updateSlider();
-        animationFrameId = requestAnimationFrame(autoScroll);
-    }
-
-    function startAutoScroll() {
-        isAutoScrolling = true;
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = requestAnimationFrame(autoScroll);
-    }
-
-    function stopAutoScroll() {
-        isAutoScrolling = false;
-        cancelAnimationFrame(animationFrameId);
-    }
-
     function moveToSlide(index) {
         currentPosition = index * 100;
         updateSlider();
     }
 
     updateSlider();
-    startAutoScroll();
-
-    slider.addEventListener('mouseenter', stopAutoScroll);
-    slider.addEventListener('mouseleave', startAutoScroll);
 
     prevButton.addEventListener('click', () => {
         let index = Math.round(currentPosition / 100);
         index = (index - 1 + slide.length) % slide.length;
         moveToSlide(index);
-        stopAutoScroll();
     });
 
     nextButton.addEventListener('click', () => {
         let index = Math.round(currentPosition / 100);
         index = (index + 1) % slide.length;
         moveToSlide(index);
-        stopAutoScroll();
     });
 }
 
