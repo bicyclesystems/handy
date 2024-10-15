@@ -16,32 +16,22 @@
 
 </head>
 
-<body>
+<body data-page="handy">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <div class="view view1 ping-pong">
+    <under-header></under-header>
+    <under-navigation></under-navigation>
+    <div class="view view1">
         <a class="circle brand-sprint-circle circle4" style="
             bottom: 10vh;
             left: 10vw; pointer-events: auto; background-color: #F4492B;">
             <h4 class="white">preorder</h4>
         </a>
     </div>
-    <div class="view column product ping-pong justify-stretch">
+    <div class="view column product ping-pong justify-end">
         <video autoplay loop muted playsinline
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;">
             <source src="./images/handy.webm">
         </video>
-        <div class="box-l row justify-stretch align-start gap-xl padding-xl">
-            <svg-icon src="./images/handy.svg"></svg-icon>
-            <div class="row box-s justify-end gap-m">
-                <div class="align-center padding-s box-xs border radius-m">
-                    try now
-                </div>
-                <div class="align-center padding-s gap-s box-xs border radius-m">
-                    github
-                    <svg-icon src="https://raincons.rnbw.dev/icons/github.svg" class="icon-s"></svg-icon>
-                </div>
-            </div>
-        </div>
         <img class="padding-xl" src="./images/logo.svg" style="mix-blend-mode: multiply;">
     </div>
     <div class="view align-center">
@@ -64,7 +54,7 @@
                 ever wished your computer could read your mind? well, we're getting close.<br />
                 handy turns your movements into digital commands. it's like magic, but real.
             </p>
-            <div class="row justify-stretch gap-l" style="flex-wrap: nowrap;">
+            <div class="row justify-stretch gap-m" style="flex-wrap: nowrap;">
                 <div class="box-l column gap-m">
                     <img class="box-l" src="./images/hand1.svg" />
                     <span class="text-m">plays well with others- mac, windows, linux - handy's down to party with
@@ -112,7 +102,7 @@
                 performance. hemi enhances the
                 user
                 experience <br> and elevating the gesture control technology.</h5>
-            <div class="row justify-stretch gap-l" style="flex-wrap: nowrap;">
+            <div class="row justify-stretch gap-m" style="flex-wrap: nowrap;">
                 <div class="box-l column gap-m">
                     <img class="box-l" src="./images/hand6.svg">
                     <span class="text-m">high-resolution, 360 camera module captures hand movements and gestures in
@@ -137,91 +127,93 @@
             </div>
         </div>
     </div>
-    <div class="view row justify-stretch">
-        <h3 class="padding-xl">tech<br>spec</h3>
-        <div class="column gap-xl padding-xl">
-            <div class="row justify-stretch">
-                <div class="column gap-m box-xs">
-                    <h5>physical characteristics</h5>
-                    <span class="text-m">
-                        dimensions:<br>
-                        height: 2.5 cm<br>
-                        width: 5 cm<br>
-                        depth: 5 cm<br>
-                        weight: 100 grams (estimated, to be confirmed)<br>
-                        design: half-spherical shape with a flat base<br>
-                        materials: high-quality plastic and metal for durability and heat dissipation<br>
-                    </span>
+    <div class="view row align-center">
+        <div class="page row justify-stretch" style="flex-wrap: nowrap;">
+            <h3 class="padding-xl">tech<br>spec</h3>
+            <div class="column gap-xl padding-xl">
+                <div class="row justify-stretch">
+                    <div class="column gap-m box-xs">
+                        <h5>physical characteristics</h5>
+                        <span class="text-m">
+                            dimensions:<br>
+                            height: 2.5 cm<br>
+                            width: 5 cm<br>
+                            depth: 5 cm<br>
+                            weight: 100 grams (estimated, to be confirmed)<br>
+                            design: half-spherical shape with a flat base<br>
+                            materials: high-quality plastic and metal for durability and heat dissipation<br>
+                        </span>
+                    </div>
+                    <div class="column gap-m box-xs">
+                        <h5>camera</h5>
+                        <span class="text-m">
+                            type: high-resolution infrared or depth-sensing camera<br>
+                            resolution: 1080p (1920x1080 pixels)<br>
+                            frame rate: 120 fps for ultra-smooth motion capture<br>
+                            field of view: 180° horizontal, 120° vertical<br>
+                            focal length: 2.8mm (wide-angle)<br>
+                            low-light performance: capable of operating in various lighting conditions<br>
+                        </span>
+                    </div>
+                    <div class="column gap-m box-xs">
+                        <h5>processing</h5>
+                        <span class="text-m">
+                            onboard processor: custom-designed image processing chip<br>
+                            ram: 1gb lpddr4 for fast data processing<br>
+                            storage: 4gb emmc for firmware and configuration data<br>
+                        </span>
+                    </div>
                 </div>
-                <div class="column gap-m box-xs">
-                    <h5>camera</h5>
-                    <span class="text-m">
-                        type: high-resolution infrared or depth-sensing camera<br>
-                        resolution: 1080p (1920x1080 pixels)<br>
-                        frame rate: 120 fps for ultra-smooth motion capture<br>
-                        field of view: 180° horizontal, 120° vertical<br>
-                        focal length: 2.8mm (wide-angle)<br>
-                        low-light performance: capable of operating in various lighting conditions<br>
-                    </span>
+                <div class="raw justify-stretch">
+                    <div class="column gap-m box-xs">
+                        <h5>software integration</h5>
+                        <span class="text-m">
+                            sdk: open-source hendi framework for custom gesture development<br>
+                            drivers: virtual trackpad driver for seamless os integration<br>
+                            firmware: field-upgradable via hendi app<br>
+                        </span>
+                    </div>
+                    <div class="column gap-m box-xs">
+                        <h5>additional features</h5>
+                        <span class="text-m">
+                            status indicator: software-based status bar indicator<br>
+                            mounting: non-slip base with twist-lock system for easy attachment/detachment<br>
+                            cable management: built-in cable slot for cleandesk setup<br>
+                        </span>
+                    </div>
+                    <div class="column gap-m box-xs">
+                        <h5>package contents</h5>
+                        <span class="text-m">
+                            1x hemi-3 device1x 1.5m usb-c cable<br>
+                            quick start guide<br>
+                            access code for hendi software download<br>
+                        </span>
+                    </div>
                 </div>
-                <div class="column gap-m box-xs">
-                    <h5>processing</h5>
-                    <span class="text-m">
-                        onboard processor: custom-designed image processing chip<br>
-                        ram: 1gb lpddr4 for fast data processing<br>
-                        storage: 4gb emmc for firmware and configuration data<br>
-                    </span>
-                </div>
-            </div>
-            <div class="raw justify-stretch">
-                <div class="column gap-m box-xs">
-                    <h5>software integration</h5>
-                    <span class="text-m">
-                        sdk: open-source hendi framework for custom gesture development<br>
-                        drivers: virtual trackpad driver for seamless os integration<br>
-                        firmware: field-upgradable via hendi app<br>
-                    </span>
-                </div>
-                <div class="column gap-m box-xs">
-                    <h5>additional features</h5>
-                    <span class="text-m">
-                        status indicator: software-based status bar indicator<br>
-                        mounting: non-slip base with twist-lock system for easy attachment/detachment<br>
-                        cable management: built-in cable slot for cleandesk setup<br>
-                    </span>
-                </div>
-                <div class="column gap-m box-xs">
-                    <h5>package contents</h5>
-                    <span class="text-m">
-                        1x hemi-3 device1x 1.5m usb-c cable<br>
-                        quick start guide<br>
-                        access code for hendi software download<br>
-                    </span>
-                </div>
-            </div>
-            <div class="raw justify-stretch">
-                <div class="column gap-m box-xs">
-                    <h5>connectivity</h5>
-                    <span class="text-m">
-                        interface: usb-c 3.1 gen 2 (10 gbps)<br>
-                        cable: 1.5m detachable usb-c cable included<br>
-                        compatibility: macos 10.15+, windows 10+<br>
-                    </span>
-                </div>
-                <div class="column gap-m box-xs">
-                    <h5>environmental specifications</h5>
-                    <span class="text-m">
-                        operating temperature: 0°c to 40°c (32°f to 104°f)<br>
-                        storage temperature: -20°c to 60°c (-4°f to 140°f)<br>
-                        humidity: 10% to 90% non-condensing<br>
-                    </span>
-                </div>
-                <div class="column gap-m box-xs">
-                    <h5>power</h5>
-                    <span class="text-m">
-                        power source: usb-c (bus-powered)<br>
-                        power consumption: 2.5w typical, 4w max<br>
-                    </span>
+                <div class="raw justify-stretch">
+                    <div class="column gap-m box-xs">
+                        <h5>connectivity</h5>
+                        <span class="text-m">
+                            interface: usb-c 3.1 gen 2 (10 gbps)<br>
+                            cable: 1.5m detachable usb-c cable included<br>
+                            compatibility: macos 10.15+, windows 10+<br>
+                        </span>
+                    </div>
+                    <div class="column gap-m box-xs">
+                        <h5>environmental specifications</h5>
+                        <span class="text-m">
+                            operating temperature: 0°c to 40°c (32°f to 104°f)<br>
+                            storage temperature: -20°c to 60°c (-4°f to 140°f)<br>
+                            humidity: 10% to 90% non-condensing<br>
+                        </span>
+                    </div>
+                    <div class="column gap-m box-xs">
+                        <h5>power</h5>
+                        <span class="text-m">
+                            power source: usb-c (bus-powered)<br>
+                            power consumption: 2.5w typical, 4w max<br>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -247,12 +239,12 @@
                 something entirely new. handy is not just a </br> product, it's a movement. handy you're invited to the
                 party.
             </h5>
-            <span class="box-s white padding-m align-center gap-s radius-m text-m text-center"
+            <span class="box-xs white padding-s align-center gap-s radius-m text-m text-center"
                 style="background-color: #F4492B;">
                 join the hendi revolution on github
             </span>
             <div class="box-l justify-stretch gap-xl" style="flex-wrap: nowrap;">
-                <div class="box-s column gap-m">
+                <div class="box-xs column">
                     <p>speak handy: gestures.handy playground</p>
                     <span class="text-m">ever wished you could high-five your computer? now you can. meet gestures.handy
                         - our
@@ -263,22 +255,23 @@
                     <span class="text-m" style="color: #F4492B; text-decoration: underline;">explore
                         gestures.handy</span>
                 </div>
-                <div class="box-s column align-end padding-l gap-xl" style="border: 1px solid #846642;">
-                    <img src="./images/hand10.svg">
-                    <div class="box-l column align-start" style="color: #846642;">
-                        {
-                        <br>&nbsp;&nbsp;&nbsp;"gestures": {
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"custom": [
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"name": "HighFive",
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"code": "function highFive(){
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;launchPartyMode();
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
-                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
-                        <br>&nbsp;&nbsp;&nbsp;}
-                        }
+                <div class="box-m column align-start padding-l gap-xl" style="border: 1px solid #846642;">
+                    <div class="box-l justify-end row">
+                        <img src="./images/hand10.svg">
                     </div>
+                    <code style="color: #846642;">
+                        {</br>
+                        &nbsp;"gestures": { <br>
+                        &nbsp;&nbsp;"custom": [ <br>
+                        &nbsp;&nbsp;{ <br>
+                        &nbsp;&nbsp;&nbsp;"name": "highfive", <br>
+                        &nbsp;&nbsp;&nbsp;"code": "function highfive() { <br> 
+                        launchpartymode(); }" <br>
+                        &nbsp;&nbsp;&nbsp;} <br>
+                        &nbsp;&nbsp;] <br>
+                        &nbsp;} <br>
+                        }
+                    </code>
                 </div>
             </div>
         </div>
@@ -341,7 +334,7 @@
                         <h2>$99</h2>
                         <h3>pre-order</h3>
                     </div>
-                    <ul class="column text-m align-start" style="list-style-type: disc;">
+                    <ul class="column text-m align-start">
                         <li>gestures.handy framework</li>
                         <li>early sourcecode access</li>
                         <li>hendi app</li>
@@ -710,6 +703,8 @@
     <under-footer></under-footer>
     <script src="https://weareunder.design/js/circle.js"></script>
     <script src="./footer.js"></script>
+    <script src="./header.js"></script>
+    <script src="./navigation.js"></script>
     <script src="./pingpong.js"></script>
     <script src="https://weareunder.design/js/mobile_covers.js"></script>
     <script src="./slider_handy.js"></script>

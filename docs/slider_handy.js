@@ -5,13 +5,13 @@ function addSlider() {
             <div class="slides view">
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide1.png');"
-                    data-title="casual" data-subtitle="browse, scroll, and click without, well, clicking. it's computing, but make it comfy."></a>
+                    data-title="casual" data-subtitle="browse, scroll, and click <br> without, well, clicking. <br> it's computing, but make it comfy."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide2.png');"
-                    data-title="music" data-subtitle="conduct your digital orchestra. mix, loop, and create with a wave of your hand."></a>
+                    data-title="music" data-subtitle="conduct your digital orchestra. <br> mix, loop, and create <br> with a wave of your hand."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide3.png');"
-                    data-title="design" data-subtitle="sculpt your ideas in thin air. your creativity, now unbound by clunky interfaces."></a>
+                    data-title="design" data-subtitle="sculpt your ideas in thin air. <br> your creativity, now unbound <br> by clunky interfaces."></a>
             </div>
             <div class="sliderbuttons padding-xl">
                 <button class="arrow prev"><img src="https://weareunder.design/images/arrow_left.svg" /></button>
@@ -86,8 +86,8 @@ function addSlider() {
 
         const currentSlideIndex = Math.round(currentPosition / 100) % slide.length;
         const currentSlide = slide[currentSlideIndex];
-        slideTextTitle.textContent = currentSlide.dataset.title;
-        slideTextSubtitle.textContent = currentSlide.dataset.subtitle;
+        slideTextTitle.innerHTML = currentSlide.dataset.title; // Изменено на innerHTML
+        slideTextSubtitle.innerHTML = currentSlide.dataset.subtitle; // Изменено на innerHTML
     }
 
     function moveToSlide(index) {
