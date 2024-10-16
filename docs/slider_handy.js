@@ -5,10 +5,10 @@ function addSlider() {
             <div class="slides view">
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide1.png');"
-                    data-title="casual" data-subtitle="browse, scroll, and click <br> without, well, clicking. <br> it's computing, but make it comfy."></a>
+                    data-title="casual" data-subtitle="browse, scroll, and click <br> without, well, clicking. it's <br> computing, but make it comfy."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide2.png');"
-                    data-title="music" data-subtitle="conduct your digital orchestra. <br> mix, loop, and create <br> with a wave of your hand."></a>
+                    data-title="music" data-subtitle="conduct your digital orchestra. <br> mix, loop, and create with <br> a wave of your hand."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide3.png');"
                     data-title="design" data-subtitle="sculpt your ideas in thin air. <br> your creativity, now unbound <br> by clunky interfaces."></a>

@@ -48,7 +48,7 @@ window.addEventListener('load', preloadImages);
 
 function addSidebar() {
   const TEMPLATE = `
-  <nav class="row padding-xl gap-xl" style="
+  <div class="row padding-xl gap-m" style="
   position: fixed;
   right: 0;
   z-index: 999;
@@ -56,32 +56,32 @@ function addSidebar() {
 <a class="header-link" href="https://weareunder.design/brandsprint/" data-page="brandsprint">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/brandsprint.svg">
-<span class="text-l" style="text-decoration: none;">brandsprint</span>
+<span class="text-m" style="text-decoration: none;">brandsprint</span>
 </div>
 </a>
 <a class="header-link" target="_blank" href="https://rnbw.design/" data-page="rnbw">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/rnbw.svg">
-<span class="text-l" style="text-decoration: none;">rnbw</span>
+<span class="text-m" style="text-decoration: none;">rnbw</span>
 </div>
 </a>
 <a class="header-link" style="cursor: pointer" target="_blank" href="" data-page="handy">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/handy.svg">
-<span class="text-l" style="text-decoration: none;">handy</span>
+<span class="text-m" style="text-decoration: none;">handy</span>
 </div>
 </a>
 <a class="header-link" style="cursor: pointer" href="https://store.weareunder.design" data-page="store">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/store.svg">
-<span class="text-l" style="text-decoration: none;">store</span>
+<span class="text-m" style="text-decoration: none;">store</span>
 </div>
 </a>
 <div class="column align-center header-link gap-xs" style="cursor: pointer" id="nav-work" data-page="design">
 <img src="https://rnbw.design/images/under/design.svg">
-<span class="text-l" style="text-decoration: none;">design</span>
+<span class="text-m" style="text-decoration: none;">design</span>
 </div>
-</nav>
+</div>
 
 <div id="works-wrapper" class="hidden">
 <div class="view row show-project" style="position: relative; z-index: 100;" id="brand-sprints-section">
@@ -231,7 +231,6 @@ function addSidebar() {
     $("#body-content").css("display", "block");
   });
 
-  // ... existing code ...
   function setActiveNavItem() {
     const pageIdentifier = document.body.dataset.page;
     if (pageIdentifier) {
@@ -239,12 +238,11 @@ function addSidebar() {
       if (navItem.length) {
         const img = navItem.find("img");
         const originalSrc = img.attr("src");
-        img.attr("src", originalSrc.replace(".svg", "h.svg"));
+        img.attr("src", originalSrc.replace(".svg", "a.svg"));
         navItem.addClass('active');
       }
     }
   }
-  // ... existing code ...
 
   $(".header-link").on("mouseover", function () {
     if (!$(this).hasClass('active')) {

@@ -1,7 +1,9 @@
-.ticker-container {
+.ticker-containerr {
     width: 100%;
     overflow: hidden;
     position: relative;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 .ticker {
