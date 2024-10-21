@@ -28,7 +28,20 @@ class SurfaceAPI:
         self.closest_half = None
         self.rings = []
 
+        self.prev_finger_position = None
+        self.prev_palm_size = None
+        self.locked_half = None
+        self.locked_half_time = None
+        self.y_movement_threshold = 10
+        self.palm_size_stability_threshold = 0.1
+        self.lock_duration = 6.0  
+        self.got_it_time = None
+        self.crossed_ring = False
+
     def detect_surface(self, image):
+        if self.got_it_time and time.time() - self.got_it_time <= self.lock_duration:
+            return
+
         if self.is_surface_locked:
             return
 
@@ -61,7 +74,6 @@ class SurfaceAPI:
                             self.last_surface_update = current_time
                         elif current_time - self.last_surface_update >= self.surface_stability_threshold:
                             self.is_surface_locked = True
-                            print("Surface automatically locked")
                     else:
                         self.last_surface_update = None
 
@@ -104,7 +116,7 @@ class SurfaceAPI:
                 self.draw_inner_rings(image, self.surface_contour)
 
                 if self.is_surface_locked and self.center:
-                    self.highlight_closest_ring_half(image, self.center)
+                    self.highlight_closest_ring_half(image, self.center, None)
 
         self.draw_axes(image)
         
@@ -128,19 +140,53 @@ class SurfaceAPI:
             self.rings.append(scaled_contour)
             cv2.drawContours(image, [scaled_contour], 0, (0, 255, 0), 2)
 
-    def highlight_closest_ring_half(self, image, finger_position):
+    def highlight_closest_ring_half(self, image, finger_position, palm_size):
         if not self.rings:
             return
 
-        distances = [cv2.pointPolygonTest(ring, finger_position, True) for ring in self.rings]
-        self.closest_ring = np.argmin(np.abs(distances))
+        current_time = time.time()
+
+        if self.got_it_time and current_time - self.got_it_time <= self.lock_duration:
+            self.closest_half = self.locked_half
+        else:
+            if self.prev_finger_position is not None:
+                finger_movement = abs(finger_position[1] - self.prev_finger_position[1])
+                
+                palm_size_change = 0
+                if self.prev_palm_size is not None and palm_size is not None and self.prev_palm_size != 0:
+                    palm_size_change = abs(palm_size - self.prev_palm_size) / self.prev_palm_size
+
+                if (finger_movement > self.y_movement_threshold and 
+                    palm_size_change < self.palm_size_stability_threshold):
+                    if self.locked_half is None:
+                        self.locked_half = self.closest_half
+                        self.locked_half_time = current_time
+                        self.got_it_time = current_time 
+                        ring_contour = self.rings[self.closest_ring]
+                        self.crossed_ring = cv2.pointPolygonTest(ring_contour, finger_position, False) >= 0
+                else:
+                    if not self.got_it_time or current_time - self.got_it_time > self.lock_duration:
+                        self.locked_half = None
+                        self.locked_half_time = None
+                        self.got_it_time = None
+                        self.crossed_ring = False
+
+            if self.locked_half is None:
+                distances = [cv2.pointPolygonTest(ring, finger_position, True) for ring in self.rings]
+                self.closest_ring = np.argmin(np.abs(distances))
+
+                ring = self.rings[self.closest_ring]
+                M = cv2.moments(ring)
+                if M["m00"] != 0:
+                    cX = int(M["m10"] / M["m00"])
+                    cY = int(M["m01"] / M["m00"])
+                    self.closest_half = "upper" if finger_position[1] < cY else "lower"
 
         ring = self.rings[self.closest_ring]
         M = cv2.moments(ring)
         if M["m00"] != 0:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
-            self.closest_half = "upper" if finger_position[1] < cY else "lower"
 
         mask = np.zeros(image.shape[:2], dtype=np.uint8)
         cv2.drawContours(mask, [ring], 0, 255, -1)
@@ -155,7 +201,27 @@ class SurfaceAPI:
         cv2.addWeighted(image, 1, red_overlay, 0.5, 0, image)
 
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(image, contours, -1, (0, 0, 255), 2)  
+        cv2.drawContours(image, contours, -1, (0, 0, 255), 2)
+
+        if self.got_it_time and current_time - self.got_it_time <= self.lock_duration:
+            text = "got it!"
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 1
+            thickness = 2
+            text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+            text_x = (image.shape[1] - text_size[0]) // 2
+            text_y = (image.shape[0] + text_size[1]) // 2
+            cv2.putText(image, text, (text_x, text_y), font, font_scale, (0, 0, 255), thickness)
+
+            if self.crossed_ring:
+                aga_text = "AGA!!!!"
+                aga_text_size = cv2.getTextSize(aga_text, font, font_scale, thickness)[0]
+                aga_text_x = (image.shape[1] - aga_text_size[0]) // 2
+                aga_text_y = text_y + aga_text_size[1] + 10
+                cv2.putText(image, aga_text, (aga_text_x, aga_text_y), font, font_scale, (0, 255, 0), thickness)
+
+        self.prev_finger_position = finger_position
+        self.prev_palm_size = palm_size
 
     def draw_axes(self, image):
         if self.surface_contour is not None and self.is_surface_locked and self.center is not None:
@@ -201,7 +267,11 @@ class SurfaceAPI:
                 self.is_clicking = True
                 self.click_counter = self.click_cooldown
 
-    def update(self, image, finger_position):
+    def update(self, image, finger_position, palm_size):
+        if self.got_it_time and time.time() - self.got_it_time <= self.lock_duration:
+            self.highlight_closest_ring_half(image, finger_position, palm_size)
+            return
+
         if self.is_clicking:
             self.click_counter -= 1
             if self.click_counter <= 0:
@@ -213,10 +283,9 @@ class SurfaceAPI:
                 mean_diff = np.mean(diff)
                 if mean_diff > 30: 
                     self.is_surface_locked = False
-                    print("Surface automatically unlocked due to significant changes")
 
         if self.is_surface_locked and self.surface_contour is not None:
-            self.highlight_closest_ring_half(image, finger_position)
+            self.highlight_closest_ring_half(image, finger_position, palm_size)
         
         self.update_center(finger_position)
         self.prev_frame = image.copy()

@@ -111,3 +111,36 @@ function addSlider() {
 }
 
 addSlider();
+
+let removedBrTags = [];
+
+function handleBrTags() {
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile && removedBrTags.length === 0) {
+        // Находим все теги <br> на странице
+        const allBrTags = document.getElementsByTagName('br');
+        
+        // Преобразуем HTMLCollection в массив и обрабатываем каждый тег
+        Array.from(allBrTags).forEach(brTag => {
+            // Проверяем, не находится ли тег <br> внутри элемента с data-subtitle
+            if (!brTag.closest('[data-subtitle]')) {
+                removedBrTags.push({
+                    element: brTag,
+                    parent: brTag.parentNode,
+                    nextSibling: brTag.nextSibling
+                });
+                brTag.parentNode.removeChild(brTag);
+            }
+        });
+    } else if (!isMobile && removedBrTags.length > 0) {
+        // Восстанавливаем удаленные теги <br>
+        removedBrTags.forEach(({ element, parent, nextSibling }) => {
+            parent.insertBefore(element, nextSibling);
+        });
+        removedBrTags = [];
+    }
+}
+
+document.addEventListener('DOMContentLoaded', handleBrTags);
+window.addEventListener('resize', handleBrTags);

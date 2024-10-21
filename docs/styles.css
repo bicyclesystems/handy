@@ -16,9 +16,11 @@
     0% {
         transform: translateX(5vw);
     }
+
     50% {
         transform: translateX(-25vw);
     }
+
     100% {
         transform: translateX(5vw);
     }
@@ -30,10 +32,27 @@
 
 .view1 {
     overflow: hidden;
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    pointer-events: none; 
-    z-index: 9999; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
     width: 100%;
-  }
+}
+
+@media (max-width: 768px) {
+    .preorder {
+        right: 0 !important;
+    }
+
+    .dollar {
+        left: 0 !important;
+    }
+
+    .hemi {
+        height: 100% !important;
+    }
+    .hand-image{
+        width: 85% !important;
+    }
+}

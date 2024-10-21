@@ -20,17 +20,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <under-header></under-header>
     <under-navigation></under-navigation>
-    <div class="view view1">
-        <a class="circle brand-sprint-circle circle4" style="
+    <!-- <div class="view view1 ping-pong">
+        <a class="circle brandsprintCircles circle4" style="
             bottom: 10vh;
             left: 10vw; pointer-events: auto; background-color: #F4492B;">
             <h4 class="white">preorder</h4>
         </a>
-    </div>
+    </div> -->
     <div class="view column justify-end">
         <video autoplay loop muted playsinline
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;">
-            <source src="./images/handy.webm">
+            <source src="./images/handy.mp4">
         </video>
         <img class="padding-xl" src="./images/logo.svg" style="mix-blend-mode: multiply;">
     </div>
@@ -168,7 +168,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="raw justify-stretch">
+                <div class="row justify-stretch">
                     <div class="column gap-m box-xs">
                         <h5>software integration</h5>
                         <span class="text-m">
@@ -194,7 +194,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="raw justify-stretch">
+                <div class="row justify-stretch">
                     <div class="column gap-m box-xs">
                         <h5>connectivity</h5>
                         <span class="text-m">
@@ -222,9 +222,9 @@
             </div>
         </div>
     </div>
-    <div class="view column align-center justify-end" style="position: relative; height: 165%;">
+    <div class="view column align-center justify-end hemi" style="position: relative; height: 165%;">
         <img class="box-s" style="position: absolute; top: -9.5vw;" src="./images/waves.svg" style="z-index: 2;">
-        <img style="width: 40%; margin-left: 5vw;" src="./images/second_background.png" style="z-index: 1;">
+        <img class="hand-image" style="width: 40%; margin-left: 5vw;" src="./images/second_background.png" style="z-index: 1;">
     </div>
     <div class="view column align-center" style="background-color: #EFEEEE;">
         <div class="page text-center" style="align-items: center;">
@@ -289,7 +289,7 @@
             <div class="align-center row gap-l" style="flex-wrap: nowrap;">
                 <div class="column gap-s">
                     <span class="text-m">days</span>
-                    <div class="row gap-xs" style="flex-wrap: nowrap;">
+                    <div class="row gap-xs" style="flex-wrap: nowrap; flex-direction: row;">
                         <div class="box-s padding-m align-center"
                             style="background-color: #F0F0EF; color:#F4492B; border: 1px solid #F4492B;" id="days-tens">
                             <h1>0</h1>
@@ -302,7 +302,7 @@
                 </div>
                 <div class="column gap-s">
                     <span class="text-m">hours</span>
-                    <div class="row gap-xs" style="flex-wrap: nowrap;">
+                    <div class="row gap-xs" style="flex-wrap: nowrap; flex-direction: row;">
                         <div class="box-s padding-m align-center" style="background-color: #F4492B; color: #F0F0EF;"
                             id="hours-tens">
                             <h1>2</h1>
@@ -315,7 +315,7 @@
                 </div>
                 <div class="column gap-s">
                     <span class="text-m">minutes</span>
-                    <div class="row gap-xs" style="flex-wrap: nowrap;">
+                    <div class="row gap-xs" style="flex-wrap: nowrap; flex-direction: row;">
                         <div class="box-s padding-m align-center" style="background-color: #F4492B; color: #F0F0EF;"
                             id="minutes-tens">
                             <h1>4</h1>
@@ -331,11 +331,11 @@
                 to open source, app launch and end of hemi presale
             </span>
             <div class="align-center box-l">
-                <div class="box-l" style="position: relative; right: -5%;">
+                <div class="box-l preorder" style="position: relative; right: -5%;">
                     <img src="./images/preorder.svg">
                 </div>
-                <div class="box-l column align-center gap-xl"
-                    style="flex-wrap: nowrap; background-color: #F4492B; border-radius: 500%; color:#F0F0EF; aspect-ratio: 1 / 1 !important; position: relative; left: -5%; z-index: 1;">
+                <div class="box-l column align-center gap-xl dollar"
+                    style="flex-wrap: nowrap; background-color: #F4492B; border-radius: 500%; color:#F0F0EF; aspect-ratio: 1 / 1 !important; position: relative; left: -5%; z-index: 1; align-items: center;">
                     <div class="column gap-xl">
                         <h2>$99</h2>
                         <h3>pre-order</h3>
