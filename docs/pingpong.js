@@ -19,7 +19,7 @@ function animationToClass(class_target) {
   let gsapTween = gsap.to(class_target, {
     x: "+=3000",
     y: "+=2000",
-    duration: 100,
+    duration: 50,
     repeat: -1,
     repeatRefresh: true,
     ease: "none",

@@ -76,18 +76,20 @@ function addSlider() {
     const slide = document.querySelectorAll('.slide');
     const slideTextTitle = document.querySelector('.slidertext p');
     const slideTextSubtitle = document.querySelector('.slidertext div.text-m');
-    const prevButton = document.querySelector('.prev');
-    const nextButton = document.querySelector('.next');
     
     let currentPosition = 0;
+    let isScrolling = false;
+    let lastScrollTime = 0;
+    let scrollDirection = null;
+    const scrollCooldown = 1000; 
 
     function updateSlider() {
         slides.style.transform = `translateX(${-currentPosition}%)`;
 
         const currentSlideIndex = Math.round(currentPosition / 100) % slide.length;
         const currentSlide = slide[currentSlideIndex];
-        slideTextTitle.innerHTML = currentSlide.dataset.title; // Изменено на innerHTML
-        slideTextSubtitle.innerHTML = currentSlide.dataset.subtitle; // Изменено на innerHTML
+        slideTextTitle.innerHTML = currentSlide.dataset.title;
+        slideTextSubtitle.innerHTML = currentSlide.dataset.subtitle;
     }
 
     function moveToSlide(index) {
@@ -95,19 +97,44 @@ function addSlider() {
         updateSlider();
     }
 
+    slider.addEventListener('wheel', (e) => {
+        const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+        
+        if (isHorizontal) {
+            e.preventDefault();
+            
+            const currentTime = Date.now();
+            const deltaX = Math.abs(e.deltaX);
+
+            if (currentTime - lastScrollTime < scrollCooldown) {
+                return;
+            }
+
+            if (!isScrolling && deltaX > 25) {
+                isScrolling = true;
+                scrollDirection = e.deltaX > 0 ? 1 : -1;
+
+                let index = Math.round(currentPosition / 100);
+                let newIndex = index + scrollDirection;
+
+                if (newIndex >= slide.length) {
+                    newIndex = 0;
+                } else if (newIndex < 0) {
+                    newIndex = slide.length - 1;
+                }
+
+                moveToSlide(newIndex);
+                lastScrollTime = currentTime;
+
+                setTimeout(() => {
+                    isScrolling = false;
+                    scrollDirection = null;
+                }, scrollCooldown);
+            }
+        }
+    }, { passive: false });
+
     updateSlider();
-
-    prevButton.addEventListener('click', () => {
-        let index = Math.round(currentPosition / 100);
-        index = (index - 1 + slide.length) % slide.length;
-        moveToSlide(index);
-    });
-
-    nextButton.addEventListener('click', () => {
-        let index = Math.round(currentPosition / 100);
-        index = (index + 1) % slide.length;
-        moveToSlide(index);
-    });
 }
 
 addSlider();
@@ -118,12 +145,9 @@ function handleBrTags() {
     const isMobile = window.innerWidth <= 768;
 
     if (isMobile && removedBrTags.length === 0) {
-        // Находим все теги <br> на странице
         const allBrTags = document.getElementsByTagName('br');
         
-        // Преобразуем HTMLCollection в массив и обрабатываем каждый тег
         Array.from(allBrTags).forEach(brTag => {
-            // Проверяем, не находится ли тег <br> внутри элемента с data-subtitle
             if (!brTag.closest('[data-subtitle]')) {
                 removedBrTags.push({
                     element: brTag,
@@ -134,7 +158,6 @@ function handleBrTags() {
             }
         });
     } else if (!isMobile && removedBrTags.length > 0) {
-        // Восстанавливаем удаленные теги <br>
         removedBrTags.forEach(({ element, parent, nextSibling }) => {
             parent.insertBefore(element, nextSibling);
         });

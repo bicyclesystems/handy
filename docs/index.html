@@ -6,8 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta property="og:title" content="Handy">
-    <title>Handy</title>
+    <title>handy - innovative tools for intuitive computer interaction</title>
+    <meta name="description" content="handy transforms your movements into digital commands for seamless interaction with your computer.">
+    <meta name="keywords"
+        content="gesture control, technology, intuitive interaction, computer management, ergonomics, innovation, open source, application development">
+    <meta property="og:title" content="handy - innovative tools for intuitive computer interaction">
+    <meta property="og:description" content="handy transforms your movements into digital commands for seamless interaction with your computer.">
+    <meta property="og:image" content="https://handy.vision/docs/images/cover.png">
+    <meta property="twitter:image" content="https://handy.vision/docs/images/cover.png">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="website">
     <script src="https://unpkg.com/@rnbws/svg-icon.js/dist/svg-icon.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@rnbws/renecss/dist/rene.min.css" />
     <link rel="stylesheet" href="https://weareunder.design/css/styles.css">
@@ -19,14 +27,13 @@
 <body data-page="handy">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <under-header></under-header>
-    <under-navigation></under-navigation>
-    <!-- <div class="view view1 ping-pong">
-        <a class="circle brandsprintCircles circle4" style="
-            bottom: 10vh;
-            left: 10vw; pointer-events: auto; background-color: #F4492B;">
-            <h4 class="white">preorder</h4>
+    <!-- <under-navigation></under-navigation> -->
+    <div class="view view1 ping-pong align-center">
+        <a href="https://weareunder.design/brandsprint/" class="circle circle-brandsprint clickable"
+          id="cta-animation" style="cursor: pointer; background-color: #F4492B;">
+          <h4>preorder</h4>
         </a>
-    </div> -->
+      </div>
     <div class="view column justify-end">
         <video autoplay loop muted playsinline
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;">
@@ -222,7 +229,7 @@
             </div>
         </div>
     </div>
-    <div class="view column align-center justify-end hemi" style="position: relative; height: 165%;">
+    <div class="view column align-center justify-end hemi" style="position: relative; height: 185%;">
         <img class="box-s" style="position: absolute; top: -9.5vw;" src="./images/waves.svg" style="z-index: 2;">
         <img class="hand-image" style="width: 40%; margin-left: 5vw;" src="./images/second_background.png" style="z-index: 1;">
     </div>
@@ -350,6 +357,7 @@
         </div>
     </div>
     <div class="view column align-center">
+        <div class="padding-xl box-l"></div>
         <div class="ticker-containerr padding-xl text-center">
             <div class="ticker justify-stretch">
                 <div class="ticker-item box-xs column gap-m">
@@ -368,6 +376,7 @@
                 </div>
             </div>
         </div>
+        <div class="padding-xl box-l"></div>
         <div class="page">
             <h3 class="text-center">curious minds want to know</h3>
             <div class="column align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
@@ -713,6 +722,7 @@
     <script src="https://weareunder.design/js/mobile_covers.js"></script>
     <script src="./slider_handy.js"></script>
     <script src="./timer_handy.js"></script>
+    <script src="./removebr.js"></script>
 
 </body>
 

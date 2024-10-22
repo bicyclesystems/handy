@@ -1,9 +1,11 @@
 function addHeader() {
   const TEMPLATE = `
-      <a href="https://weareunder.design/" class="logo padding-xl mix-diff" href="/" style="display: flex; position: fixed; z-index: 99; width: 100%; justify-content: space-between;">
-        <img src="https://rnbw.design/images/under/under.svg" class="desktop"/>
-        <img src="https://weareunder.design/images/under-header-logo-small.svg" class="mobile"/>
-      </a>
+      <div class="padding-xl" href="/" style="display: flex; flex-direction: row; position: fixed; z-index: 99; width: 100%;">
+        <a href="https://weareunder.design/" target="_blank">
+        <img src="./images/under_logo.svg">
+        </a>
+        <img src="https://rnbw.design/images/under/handy.svg">
+      </div>
     `;
 
   class UnderHeader extends HTMLElement {
@@ -17,20 +19,4 @@ function addHeader() {
 
 addHeader();
 
-const mediaQuery = window.matchMedia("(max-width: 992px)");
-mediaQuery.addEventListener("change", handleMediaQueryChange);
-handleMediaQueryChange(mediaQuery);
-
-function handleMediaQueryChange(mediaQuery) {
-  const mobileImg = document.querySelector("under-header img.mobile");
-  const desktopImg = document.querySelector("under-header img.desktop");
-
-  if (mediaQuery.matches) {
-    mobileImg.style.display = "block";
-    desktopImg.style.display = "none";
-  } else {
-    mobileImg.style.display = "none";
-    desktopImg.style.display = "block";
-  }
-}
 

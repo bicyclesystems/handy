@@ -21,11 +21,25 @@ function updateDigit(id, value, isLeftZero) {
 }
 
 function startTimer(days, hours, minutes) {
-    let totalMinutes = days * 1440 + hours * 60 + minutes;
+    let startTime = localStorage.getItem('timerStartTime');
+    let totalMinutesInitial = days * 1440 + hours * 60 + minutes;
+    
+    if (!startTime) {
+        startTime = Date.now();
+        localStorage.setItem('timerStartTime', startTime);
+        localStorage.setItem('totalMinutesInitial', totalMinutesInitial);
+    } else {
+        totalMinutesInitial = parseInt(localStorage.getItem('totalMinutesInitial'));
+    }
 
     function updateTimer() {
+        const elapsedMinutes = Math.floor((Date.now() - startTime) / 60000);
+        let totalMinutes = totalMinutesInitial - elapsedMinutes;
+
         if (totalMinutes <= 0) {
             clearInterval(timerInterval);
+            localStorage.removeItem('timerStartTime');
+            localStorage.removeItem('totalMinutesInitial');
             updateDisplay('days', 0, true);
             updateDisplay('hours', 0, true);
             updateDisplay('minutes', 0, true);
@@ -39,45 +53,10 @@ function startTimer(days, hours, minutes) {
         updateDisplay('days', d, true);
         updateDisplay('hours', h, d === 0);
         updateDisplay('minutes', m, d === 0 && h === 0);
-
-        totalMinutes--;
     }
 
     updateTimer();
     const timerInterval = setInterval(updateTimer, 60000);
 }
-
-let removedBrTags = [];
-
-function handleBrTags() {
-    const isMobile = window.innerWidth <= 768;
-
-    if (isMobile && removedBrTags.length === 0) {
-        // Находим все теги <br> на странице
-        const allBrTags = document.getElementsByTagName('br');
-        
-        // Преобразуем HTMLCollection в массив и обрабатываем каждый тег
-        Array.from(allBrTags).forEach(brTag => {
-            // Проверяем, не находится ли тег <br> внутри элемента с data-subtitle
-            if (!brTag.closest('[data-subtitle]')) {
-                removedBrTags.push({
-                    element: brTag,
-                    parent: brTag.parentNode,
-                    nextSibling: brTag.nextSibling
-                });
-                brTag.parentNode.removeChild(brTag);
-            }
-        });
-    } else if (!isMobile && removedBrTags.length > 0) {
-        // Восстанавливаем удаленные теги <br>
-        removedBrTags.forEach(({ element, parent, nextSibling }) => {
-            parent.insertBefore(element, nextSibling);
-        });
-        removedBrTags = [];
-    }
-}
-
-document.addEventListener('DOMContentLoaded', handleBrTags);
-window.addEventListener('resize', handleBrTags);
 
 startTimer(5, 23, 45);
