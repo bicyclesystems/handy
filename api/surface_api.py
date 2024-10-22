@@ -27,6 +27,7 @@ class SurfaceAPI:
         self.closest_ring = None
         self.closest_half = None
         self.rings = []
+        self.ring_halves = {}  
 
         self.prev_finger_position = None
         self.prev_palm_size = None
@@ -34,7 +35,7 @@ class SurfaceAPI:
         self.locked_half_time = None
         self.y_movement_threshold = 10
         self.palm_size_stability_threshold = 0.1
-        self.lock_duration = 6.0  
+        self.lock_duration = 3 
         self.got_it_time = None
         self.crossed_ring = False
 
@@ -90,6 +91,7 @@ class SurfaceAPI:
         self.previous_surface_contour = None
         self.last_surface_update = None
         self.rings = []
+        self.ring_halves = {}
 
     def update_center(self, finger_position):
         if self.is_surface_locked and self.surface_contour is not None:
@@ -133,12 +135,31 @@ class SurfaceAPI:
         max_dist = max([cv2.pointPolygonTest(contour, (cX, cY), True) for point in contour[:, 0]])
 
         self.rings = []
+        self.ring_halves = {}
         for i in range(self.num_rings + 1):
             scale = 1 - (i / (self.num_rings + 1))
             scaled_contour = np.array([[(p[0][0] - cX) * scale + cX, (p[0][1] - cY) * scale + cY] for p in contour])
             scaled_contour = scaled_contour.astype(np.int32)
             self.rings.append(scaled_contour)
             cv2.drawContours(image, [scaled_contour], 0, (0, 255, 0), 2)
+
+            upper_half = f"{i+1}U"
+            lower_half = f"{i+1}L"
+            self.ring_halves[upper_half] = (scaled_contour, "upper")
+            self.ring_halves[lower_half] = (scaled_contour, "lower")
+
+            cv2.putText(image, upper_half, (cX - 20, cY - int(max_dist * scale) - 10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            cv2.putText(image, lower_half, (cX - 20, cY + int(max_dist * scale) + 20), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+            
+            
+            
+            
+            
+            
+            
+            
 
     def highlight_closest_ring_half(self, image, finger_position, palm_size):
         if not self.rings:
@@ -151,7 +172,7 @@ class SurfaceAPI:
         else:
             if self.prev_finger_position is not None:
                 finger_movement = abs(finger_position[1] - self.prev_finger_position[1])
-                
+            
                 palm_size_change = 0
                 if self.prev_palm_size is not None and palm_size is not None and self.prev_palm_size != 0:
                     palm_size_change = abs(palm_size - self.prev_palm_size) / self.prev_palm_size
@@ -180,49 +201,69 @@ class SurfaceAPI:
                 if M["m00"] != 0:
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
-                    self.closest_half = "upper" if finger_position[1] < cY else "lower"
+                    half = "upper" if finger_position[1] < cY else "lower"
+                    self.closest_half = f"{self.closest_ring + 1}{'U' if half == 'upper' else 'L'}"
 
-        ring = self.rings[self.closest_ring]
-        M = cv2.moments(ring)
-        if M["m00"] != 0:
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
+                is_inside = cv2.pointPolygonTest(ring, finger_position, False) >= 0
+                ring_number, half_type = int(self.closest_half[:-1]), self.closest_half[-1]
 
-        mask = np.zeros(image.shape[:2], dtype=np.uint8)
-        cv2.drawContours(mask, [ring], 0, 255, -1)
-        if self.closest_half == "upper":
-            mask[cY:, :] = 0
-        else:
-            mask[:cY, :] = 0
+                if is_inside and half_type == 'L':
+                    new_ring_number = min(self.num_rings + 1, ring_number + 1)
+                    self.closest_half = f"{new_ring_number}L"
+                elif not is_inside and half_type == 'U':
+                    new_ring_number = max(1, ring_number - 1)
+                    self.closest_half = f"{new_ring_number}U"
+
+        if self.closest_half:
+            ring, half = self.ring_halves[self.closest_half]
+            M = cv2.moments(ring)
+            if M["m00"] != 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+
+            mask = np.zeros(image.shape[:2], dtype=np.uint8)
+            cv2.drawContours(mask, [ring], 0, 255, -1)
+            if half == "upper":
+                mask[cY:, :] = 0
+            else:
+                mask[:cY, :] = 0
         
-        red_overlay = np.zeros_like(image)
-        red_overlay[mask == 255] = (0, 0, 255)
+            red_overlay = np.zeros_like(image)
+            red_overlay[mask == 255] = (0, 0, 255)
         
-        cv2.addWeighted(image, 1, red_overlay, 0.5, 0, image)
+            cv2.addWeighted(image, 1, red_overlay, 0.5, 0, image)
 
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(image, contours, -1, (0, 0, 255), 2)
+            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cv2.drawContours(image, contours, -1, (0, 0, 255), 2)
 
-        if self.got_it_time and current_time - self.got_it_time <= self.lock_duration:
-            text = "got it!"
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 1
-            thickness = 2
-            text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
-            text_x = (image.shape[1] - text_size[0]) // 2
-            text_y = (image.shape[0] + text_size[1]) // 2
-            cv2.putText(image, text, (text_x, text_y), font, font_scale, (0, 0, 255), thickness)
+            if self.got_it_time and current_time - self.got_it_time <= self.lock_duration:
+                text = f"moove! {self.closest_half}"
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                font_scale = 3
+                thickness = 2
+                text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+                text_x = (image.shape[1] - text_size[0]) // 2
+                text_y = (image.shape[0] + text_size[1]) // 2
+                cv2.putText(image, text, (text_x, text_y), font, font_scale, (0, 0, 255), thickness)
 
-            if self.crossed_ring:
-                aga_text = "AGA!!!!"
-                aga_text_size = cv2.getTextSize(aga_text, font, font_scale, thickness)[0]
-                aga_text_x = (image.shape[1] - aga_text_size[0]) // 2
-                aga_text_y = text_y + aga_text_size[1] + 10
-                cv2.putText(image, aga_text, (aga_text_x, aga_text_y), font, font_scale, (0, 255, 0), thickness)
+                if self.crossed_ring:
+                    aga_text = "finger off surface"
+                    aga_text_size = cv2.getTextSize(aga_text, font, font_scale, thickness)[0]
+                    aga_text_x = (image.shape[1] - aga_text_size[0]) // 2
+                    aga_text_y = text_y + aga_text_size[1] + 10
+                    cv2.putText(image, aga_text, (aga_text_x, aga_text_y), font, font_scale, (0, 0, 25), thickness)
 
         self.prev_finger_position = finger_position
         self.prev_palm_size = palm_size
 
+   
+    
+    
+    
+    
+    
+    
+    
     def draw_axes(self, image):
         if self.surface_contour is not None and self.is_surface_locked and self.center is not None:
             cX, cY = self.center
