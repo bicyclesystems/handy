@@ -42,7 +42,7 @@ class HandAPI:
         self.perpendicular_adjustment = 2.5
         self.finger_length_threshold = 0.08
 
-        self.smoothing_factor = 0.2 
+        self.smoothing_factor = 0.25
 
     def preprocess_image(self, image):
         lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)

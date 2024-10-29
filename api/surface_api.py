@@ -38,6 +38,11 @@ class SurfaceAPI:
         self.lock_duration = 3 
         self.got_it_time = None
         self.crossed_ring = False
+        self.initial_lock_duration = 0.5
+        self.extended_lock_duration = 4.5  
+        self.extended_lock_active = False  
+        self.return_message_time = None
+        self.return_message_duration = 1.5
 
     def detect_surface(self, image):
         if self.got_it_time and time.time() - self.got_it_time <= self.lock_duration:
@@ -152,45 +157,77 @@ class SurfaceAPI:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
             cv2.putText(image, lower_half, (cX - 20, cY + int(max_dist * scale) + 20), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-            
-            
-            
-            
-            
-            
-            
-            
-
+                     
     def highlight_closest_ring_half(self, image, finger_position, palm_size):
         if not self.rings:
             return
 
         current_time = time.time()
 
-        if self.got_it_time and current_time - self.got_it_time <= self.lock_duration:
-            self.closest_half = self.locked_half
-        else:
+        if self.return_message_time is not None:
+            if current_time - self.return_message_time <= self.return_message_duration:
+                text = "finger returned to the surface"
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                font_scale = 1
+                thickness = 2
+                text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+                text_x = image.shape[1] - text_size[0] - 20
+                text_y = text_size[1] + 30
+                cv2.putText(image, text, (text_x, text_y), font, font_scale, (0, 255, 0), thickness)
+            else:
+                self.return_message_time = None
+
+        if self.extended_lock_active:
             if self.prev_finger_position is not None:
-                finger_movement = abs(finger_position[1] - self.prev_finger_position[1])
+                finger_movement_down = finger_position[1] - self.prev_finger_position[1]
             
                 palm_size_change = 0
                 if self.prev_palm_size is not None and palm_size is not None and self.prev_palm_size != 0:
                     palm_size_change = abs(palm_size - self.prev_palm_size) / self.prev_palm_size
 
-                if (finger_movement > self.y_movement_threshold and 
+                if (finger_movement_down > self.y_movement_threshold and 
+                    palm_size_change < self.palm_size_stability_threshold):
+                    for ring in self.rings:
+                        if cv2.pointPolygonTest(ring, finger_position, False) >= 0:
+                            self.got_it_time = None
+                            self.locked_half = None
+                            self.crossed_ring = False
+                            self.extended_lock_active = False
+                            self.return_message_time = current_time
+                            break
+
+        if self.got_it_time:
+            if self.crossed_ring and not self.extended_lock_active and current_time - self.got_it_time <= self.initial_lock_duration:
+                self.extended_lock_active = True
+                self.got_it_time = current_time
+
+            if not self.extended_lock_active:
+                if current_time - self.got_it_time <= self.initial_lock_duration:
+                    self.closest_half = self.locked_half
+                else:
+                    self.got_it_time = None
+                    self.locked_half = None
+                    self.crossed_ring = False
+            else:
+                self.closest_half = self.locked_half
+        else:
+            if self.prev_finger_position is not None:
+                finger_movement_up = self.prev_finger_position[1] - finger_position[1]
+            
+                palm_size_change = 0
+                if self.prev_palm_size is not None and palm_size is not None and self.prev_palm_size != 0:
+                    palm_size_change = abs(palm_size - self.prev_palm_size) / self.prev_palm_size
+
+                if (finger_movement_up > self.y_movement_threshold and 
                     palm_size_change < self.palm_size_stability_threshold):
                     if self.locked_half is None:
-                        self.locked_half = self.closest_half
-                        self.locked_half_time = current_time
-                        self.got_it_time = current_time 
-                        ring_contour = self.rings[self.closest_ring]
-                        self.crossed_ring = cv2.pointPolygonTest(ring_contour, finger_position, False) >= 0
-                else:
-                    if not self.got_it_time or current_time - self.got_it_time > self.lock_duration:
-                        self.locked_half = None
-                        self.locked_half_time = None
-                        self.got_it_time = None
-                        self.crossed_ring = False
+                        for ring in self.rings:
+                            if cv2.pointPolygonTest(ring, finger_position, False) >= 0:
+                                self.locked_half = self.closest_half
+                                self.locked_half_time = current_time
+                                self.got_it_time = current_time 
+                                self.crossed_ring = True
+                                break
 
             if self.locked_half is None:
                 distances = [cv2.pointPolygonTest(ring, finger_position, True) for ring in self.rings]
@@ -227,42 +264,34 @@ class SurfaceAPI:
                 mask[cY:, :] = 0
             else:
                 mask[:cY, :] = 0
-        
+
             red_overlay = np.zeros_like(image)
             red_overlay[mask == 255] = (0, 0, 255)
-        
+
             cv2.addWeighted(image, 1, red_overlay, 0.5, 0, image)
 
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             cv2.drawContours(image, contours, -1, (0, 0, 255), 2)
 
-            if self.got_it_time and current_time - self.got_it_time <= self.lock_duration:
+            if self.got_it_time:
                 text = f"moove! {self.closest_half}"
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                font_scale = 3
+                font_scale = 1
                 thickness = 2
                 text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
-                text_x = (image.shape[1] - text_size[0]) // 2
-                text_y = (image.shape[0] + text_size[1]) // 2
+                text_x = image.shape[1] - text_size[0] - 20
+                text_y = text_size[1] + 30
                 cv2.putText(image, text, (text_x, text_y), font, font_scale, (0, 0, 255), thickness)
 
                 if self.crossed_ring:
                     aga_text = "finger off surface"
                     aga_text_size = cv2.getTextSize(aga_text, font, font_scale, thickness)[0]
-                    aga_text_x = (image.shape[1] - aga_text_size[0]) // 2
-                    aga_text_y = text_y + aga_text_size[1] + 10
+                    aga_text_x = image.shape[1] - aga_text_size[0] - 20
+                    aga_text_y = text_size[1] + 70
                     cv2.putText(image, aga_text, (aga_text_x, aga_text_y), font, font_scale, (0, 0, 25), thickness)
 
         self.prev_finger_position = finger_position
         self.prev_palm_size = palm_size
-
-   
-    
-    
-    
-    
-    
-    
     
     def draw_axes(self, image):
         if self.surface_contour is not None and self.is_surface_locked and self.center is not None:
