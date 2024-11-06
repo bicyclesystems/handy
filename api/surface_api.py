@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+from .surface_calibration import SurfaceCalibration
 
 class SurfaceAPI:
     def __init__(self, highlight_color=(0, 255, 0, 0.05)):
@@ -43,8 +44,16 @@ class SurfaceAPI:
         self.extended_lock_active = False  
         self.return_message_time = None
         self.return_message_duration = 1.5
+        
+        self.calibration = SurfaceCalibration()
+        self.calibration.calibration_complete_callback = self.on_calibration_complete
+        self.calibration.start_calibration()
 
     def detect_surface(self, image):
+    # Если калибровка не завершена, не делаем обычное определение поверхности
+        if not self.calibration.is_calibrated:
+            return
+
         if self.got_it_time and time.time() - self.got_it_time <= self.lock_duration:
             return
 
@@ -59,9 +68,9 @@ class SurfaceAPI:
         gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
         _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        
+    
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        
+    
         if contours:
             largest_contour = max(contours, key=cv2.contourArea)
             area = cv2.contourArea(largest_contour)
@@ -90,6 +99,106 @@ class SurfaceAPI:
         else:
             self.reset_surface()
 
+    def highlight_surface(self, image):
+        if not self.calibration.is_calibrated:
+            status = self.calibration.get_calibration_status()
+        # Отображаем статус калибровки
+            cv2.putText(
+                image,
+                f"Calibration: {status['points_collected']}/{status['points_needed']} points",
+                (10, 570),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 255, 0),
+                2
+            )
+        # Добавляем более подробные инструкции
+            instructions = [
+                "Point at the surface with your index finger",
+                "Touch 4 different points on the surface:",
+                "- Top left corner",
+                "- Top right corner",
+                "- Bottom left corner",
+                "- Bottom right corner"
+            ]
+        
+            for i, line in enumerate(instructions):
+                cv2.putText(
+                    image,
+                    line,
+                    (10, 600 + i * 30),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.7,
+                    (0, 255, 0),
+                    2
+                )
+        
+            return image
+
+        height, width = image.shape[:2]
+    
+        if self.surface_color is not None:
+            gray_color = int(self.surface_color)
+            cv2.rectangle(image, (width-50, height-50), (width-10, height-10), 
+                        (gray_color, gray_color, gray_color), -1)
+        
+            if self.surface_contour is not None:
+                overlay = image.copy()
+                cv2.drawContours(overlay, [self.surface_contour], 0, (0, 255, 0), -1)
+                cv2.addWeighted(overlay, 0.3, image, 0.7, 0, image)
+                cv2.drawContours(image, [self.surface_contour], 0, (0, 255, 0), 2)
+
+                self.draw_inner_rings(image, self.surface_contour)
+
+                if self.is_surface_locked and self.center:
+                    self.highlight_closest_ring_half(image, self.center, None)
+
+        self.draw_axes(image)
+    
+        return image
+
+    def update(self, image, finger_position, palm_size):
+    # Если калибровка не завершена и есть касание пальца
+        if not self.calibration.is_calibrated:
+            if finger_position is not None and palm_size is not None:  # Проверяем что палец определён
+            # Здесь можно добавить проверку, что палец действительно касается поверхности
+            # Например, используя размер ладони (palm_size) как индикатор близости к поверхности
+                if palm_size > 0.1:  # Этот порог нужно подстроить под ваши условия
+                # Проверяем, достаточно ли далека новая точка от существующих
+                    min_distance = float('inf')
+                    for point in self.calibration.calibration_points:
+                        dist = np.sqrt((point[0] - finger_position[0])**2 + 
+                                    (point[1] - finger_position[1])**2)
+                        min_distance = min(min_distance, dist)
+            
+                # Добавляем точку только если она достаточно далека от существующих
+                    if min_distance > 50 or not self.calibration.calibration_points:
+                        print(f"Добавлена точка калибровки: {finger_position}")  # Отладочный вывод
+                        self.calibration.add_calibration_point(finger_position)
+            return
+
+        if self.got_it_time and time.time() - self.got_it_time <= self.lock_duration:
+            self.highlight_closest_ring_half(image, finger_position, palm_size)
+            return
+
+        if self.is_clicking:
+            self.click_counter -= 1
+            if self.click_counter <= 0:
+                self.is_clicking = False
+
+        if not self.is_clicking and self.is_surface_locked:
+            if self.prev_frame is not None:
+                diff = cv2.absdiff(image, self.prev_frame)
+                mean_diff = np.mean(diff)
+                if mean_diff > 30: 
+                    self.is_surface_locked = False
+
+        if self.is_surface_locked and self.surface_contour is not None:
+            self.highlight_closest_ring_half(image, finger_position, palm_size)
+    
+        self.update_center(finger_position)
+        self.prev_frame = image.copy()
+
     def reset_surface(self):
         self.surface_color = None
         self.surface_contour = None
@@ -106,29 +215,11 @@ class SurfaceAPI:
                 M = cv2.moments(self.surface_contour)
                 if M["m00"] != 0:
                     self.center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-
-    def highlight_surface(self, image):
-        height, width = image.shape[:2]
+    
+    def on_calibration_complete(self, calibration_points):
+        print("Калибровка поверхности завершена!")
+        print(f"Калибровочные точки: {calibration_points}")
         
-        if self.surface_color is not None:
-            gray_color = int(self.surface_color)
-            cv2.rectangle(image, (width-50, height-50), (width-10, height-10), (gray_color, gray_color, gray_color), -1)
-            
-            if self.surface_contour is not None:
-                overlay = image.copy()
-                cv2.drawContours(overlay, [self.surface_contour], 0, (0, 255, 0), -1)
-                cv2.addWeighted(overlay, 0.3, image, 0.7, 0, image)
-                cv2.drawContours(image, [self.surface_contour], 0, (0, 255, 0), 2)
-
-                self.draw_inner_rings(image, self.surface_contour)
-
-                if self.is_surface_locked and self.center:
-                    self.highlight_closest_ring_half(image, self.center, None)
-
-        self.draw_axes(image)
-        
-        return image
-
     def draw_inner_rings(self, image, contour):
         M = cv2.moments(contour)
         if M["m00"] != 0:
@@ -336,26 +427,3 @@ class SurfaceAPI:
             if self.is_point_inside_contour((x, y)):
                 self.is_clicking = True
                 self.click_counter = self.click_cooldown
-
-    def update(self, image, finger_position, palm_size):
-        if self.got_it_time and time.time() - self.got_it_time <= self.lock_duration:
-            self.highlight_closest_ring_half(image, finger_position, palm_size)
-            return
-
-        if self.is_clicking:
-            self.click_counter -= 1
-            if self.click_counter <= 0:
-                self.is_clicking = False
-
-        if not self.is_clicking and self.is_surface_locked:
-            if self.prev_frame is not None:
-                diff = cv2.absdiff(image, self.prev_frame)
-                mean_diff = np.mean(diff)
-                if mean_diff > 30: 
-                    self.is_surface_locked = False
-
-        if self.is_surface_locked and self.surface_contour is not None:
-            self.highlight_closest_ring_half(image, finger_position, palm_size)
-        
-        self.update_center(finger_position)
-        self.prev_frame = image.copy()
