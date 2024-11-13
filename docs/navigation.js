@@ -52,35 +52,38 @@ function addSidebar() {
   position: fixed;
   right: 0;
   z-index: 999;
+  mix-blend-mode: difference;
 " id="under-nav">
 <a class="header-link" href="https://weareunder.design/brandsprint/" data-page="brandsprint">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/brandsprint.svg">
-<span class="text-m" style="text-decoration: none;">brandsprint</span>
+<span class="text-m white" style="text-decoration: none; display: none;">brandsprint</span> <!-- Скрыть текст -->
 </div>
 </a>
 <a class="header-link" target="_blank" href="https://rnbw.design/" data-page="rnbw">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/rnbw.svg">
-<span class="text-m" style="text-decoration: none;">rnbw</span>
+<span class="text-m white" style="text-decoration: none; display: none;">rnbw</span> <!-- Скрыть текст -->
 </div>
 </a>
-<a class="header-link" style="cursor: pointer" target="_blank" href="" data-page="handy">
+<a class="header-link" style="cursor: pointer" target="_blank" href="https://handy.vision" data-page="handy">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/handy.svg">
-<span class="text-m" style="text-decoration: none;">handy</span>
+<span class="text-m white" style="text-decoration: none; display: none;">handy</span> <!-- Скрыть текст -->
 </div>
 </a>
 <a class="header-link" style="cursor: pointer" href="https://store.weareunder.design" data-page="store">
 <div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/store.svg">
-<span class="text-m" style="text-decoration: none;">store</span>
+<span class="text-m white" style="text-decoration: none; display: none;">store</span> <!-- Скрыть текст -->
 </div>
 </a>
-<div class="column align-center header-link gap-xs" style="cursor: pointer" id="nav-work" data-page="design">
+<a class="header-link" style="cursor: pointer" id="nav-work" data-page="design">
+<div class="column align-center gap-xs">
 <img src="https://rnbw.design/images/under/design.svg">
-<span class="text-m" style="text-decoration: none;">design</span>
+<span class="text-m white" style="text-decoration: none; display: none;">design</span>
 </div>
+</a>
 </div>
 
 <div id="works-wrapper" class="hidden">
@@ -238,23 +241,32 @@ function addSidebar() {
       if (navItem.length) {
         const img = navItem.find("img");
         const originalSrc = img.attr("src");
-        img.attr("src", originalSrc.replace(".svg", "a.svg"));
+        img.attr("src", originalSrc.replace(".svg", "h.svg")); 
         navItem.addClass('active');
+        navItem.find(".text-m").css("display", "none"); 
       }
     }
   }
 
   $(".header-link").on("mouseover", function () {
+    const img = $(this).find("img");
+    const originalSrc = img.attr("src");
+    
     if (!$(this).hasClass('active')) {
-      const img = $(this).find("img");
-      const originalSrc = img.attr("src");
       img.attr("src", originalSrc.replace(".svg", "h.svg"));
+      $(this).find(".text-m").css("display", "block"); 
+    } else {
+      $(this).find(".text-m").css("display", "block"); 
     }
   }).on("mouseout", function () {
+    const img = $(this).find("img");
+    const originalSrc = img.attr("src");
+    
     if (!$(this).hasClass('active')) {
-      const img = $(this).find("img");
-      const originalSrc = img.attr("src");
       img.attr("src", originalSrc.replace("h.svg", ".svg"));
+      $(this).find(".text-m").css("display", "none"); 
+    } else {
+      $(this).find(".text-m").css("display", "none"); 
     }
   });
 

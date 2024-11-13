@@ -7,6 +7,15 @@ function handleBrTags() {
             br.style.display = ''; 
         }
     });
+
+    const videoElement = document.getElementById('motion-video');
+    if (videoElement) {
+        if (isMobile) {
+            videoElement.style.transform = 'scale(1.3)'; 
+        } else {
+            videoElement.style.transform = ''; 
+        }
+    }
 }
 
 handleBrTags();

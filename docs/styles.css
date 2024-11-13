@@ -26,6 +26,27 @@
     }
 }
 
+@media (max-width: 768px) {
+    .ticker {
+        width: 220vw;
+        animation: ticker-mobile 15s linear infinite; 
+    }
+}
+
+@keyframes ticker-mobile {
+    0% {
+        transform: translateX(5%);
+    }
+
+    50% {
+        transform: translateX(-60%); 
+    }
+
+    100% {
+        transform: translateX(5%);
+    }
+}
+
 .ticker:hover {
     animation-play-state: paused;
 }
@@ -35,7 +56,6 @@
     position: fixed;
     top: 0;
     left: 0;
-    pointer-events: none;
     z-index: 9999;
     width: 100%;
 }
@@ -50,7 +70,7 @@
     }
 
     .hemi {
-        height: 110% !important;
+        height: 140% !important;
     }
     .hand-image{
         width: 85% !important;

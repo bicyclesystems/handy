@@ -1,17 +1,17 @@
 function addSlider() {
     const TEMPLATE = `
-    <div class="box-l view row product" id="body-content">
-        <div class="slider view">
+    <div class="box-l view row product" id="body-content" id="slider-container">
+        <div class="slider view"> 
             <div class="slides view">
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide1.png');"
-                    data-title="casual" data-subtitle="browse, scroll, and click <br> without, well, clicking. it's <br> computing, but make it comfy."></a>
+                    data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide2.png');"
-                    data-title="music" data-subtitle="conduct your digital orchestra. <br> mix, loop, and create with <br> a wave of your hand."></a>
+                    data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide3.png');"
-                    data-title="design" data-subtitle="sculpt your ideas in thin air. <br> your creativity, now unbound <br> by clunky interfaces."></a>
+                    data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces."></a>
             </div>
             <div class="sliderbuttons padding-xl">
                 <button class="arrow prev"><img src="https://weareunder.design/images/arrow_left.svg" /></button>
@@ -64,6 +64,10 @@ function addSlider() {
                     bottom: 20px;
                     right: 20px;
                     z-index: 99;
+                }
+                rr {
+                    display: block;
+                    content: '';
                 }
             `;
             this.appendChild(style);
@@ -133,6 +137,24 @@ function addSlider() {
             }
         }
     }, { passive: false });
+
+    const sliderButtons = document.querySelectorAll('.sliderbuttons .arrow');
+
+    sliderButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const direction = e.currentTarget.classList.contains('next') ? 1 : -1;
+            let index = Math.round(currentPosition / 100);
+            let newIndex = index + direction;
+
+            if (newIndex >= slide.length) {
+                newIndex = 0;
+            } else if (newIndex < 0) {
+                newIndex = slide.length - 1;
+            }
+
+            moveToSlide(newIndex);
+        });
+    });
 
     updateSlider();
 }

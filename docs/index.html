@@ -27,13 +27,13 @@
 <body data-page="handy">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <under-header></under-header>
-    <!-- <under-navigation></under-navigation> -->
-    <div class="view view1 ping-pong align-center">
-        <a href="https://weareunder.design/brandsprint/" class="circle circle-brandsprint clickable"
-          id="cta-animation" style="cursor: pointer; background-color: #F4492B;">
+    <under-navigation></under-navigation>
+    <div class="view view1 ping-pong  align-center" style="pointer-events: none;">
+        <a href="" class="circle circle-brandsprint clickable"
+          id="cta-animation" style="cursor: pointer; z-index: 1000; background-color: #F4492B;">
           <h4>preorder</h4>
         </a>
-      </div>
+    </div>
     <div class="view column justify-end">
         <video autoplay loop muted playsinline
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;">
@@ -142,7 +142,7 @@
         <div class="page row justify-stretch" style="flex-wrap: nowrap;">
             <h3 class="">tech spec</h3>
             <div class="column gap-xl">
-                <div class="row justify-stretch">
+                <div class="row justify-stretch gap-m">
                     <div class="column gap-m box-xs">
                         <h5>physical characteristics</h5>
                         <span class="text-m">
@@ -175,7 +175,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="row justify-stretch">
+                <div class="row justify-stretch gap-m">
                     <div class="column gap-m box-xs">
                         <h5>software integration</h5>
                         <span class="text-m">
@@ -201,7 +201,7 @@
                         </span>
                     </div>
                 </div>
-                <div class="row justify-stretch">
+                <div class="row justify-stretch gap-m">
                     <div class="column gap-m box-xs">
                         <h5>connectivity</h5>
                         <span class="text-m">
@@ -239,7 +239,7 @@
             <h5>ever wished your computer could read your mind? well,<br> we're getting close. handy turns your
                 movements
                 into<br> digital commands. it's like magic, but real.</h5>
-            <video class="box-m padding-l" src="images/Fingers_motion.webm" autoplay loop muted playsinline></video>
+            <video id="motion-video" class="box-m padding-l" src="images/Fingers_motion.webm" autoplay loop muted playsinline></video>
         </div>
     </div>
     <div class="view align-center column" style="background-color: #E3DFD9;">
@@ -360,23 +360,22 @@
         <div class="padding-xl box-l"></div>
         <div class="ticker-containerr padding-xl text-center">
             <div class="ticker justify-stretch">
-                <div class="ticker-item box-xs column gap-m">
-                    <h4>"as a developer with rsi, hendi has been a game-changer. it's not just cool, it's
+                <div class="ticker-item box-xs column gap-m text-center">
+                    <h4 class="box-l text-center">"as a developer with rsi, hendi has been a game-changer. it's not just cool, it's
                         life-changing."</h4>
-                    <p>- sam, software engineer</p>
+                    <p class="box-l align-center">- sam, software engineer</p>
+                </div>
+                <div class="ticker-item box-xs column gap-m text-center">
+                    <h4 class="box-l text-center">"hendi turned my desk into a sci-fi command center. i'm never going back."</h4>
+                    <p class="box-l align-center">- alex, vfx artist</p>
                 </div>
                 <div class="ticker-item box-xs column gap-m">
-                    <h4>"hendi turned my desk into a sci-fi command center. i'm never going back."</h4>
-                    <p>- alex, vfx artist</p>
-                </div>
-                <div class="ticker-item box-xs column gap-m">
-                    <h4>"as a developer with rsi, hendi has been a game-changer. it's not just cool, it's
+                    <h4 class="box-l text-center">"as a developer with rsi, hendi has been a game-changer. it's not just cool, it's
                         life-changing."</h4>
-                    <p>- sam, software engineer</p>
+                    <p class="box-l align-center">- sam, software engineer</p>
                 </div>
             </div>
         </div>
-        <div class="padding-xl box-l"></div>
         <div class="page">
             <h3 class="text-center">curious minds want to know</h3>
             <div class="column align-start" style="border-bottom: 1px solid black; padding-bottom: 1rem;">
@@ -716,7 +715,7 @@
     <under-footer></under-footer>
     <script src="https://weareunder.design/js/circle.js"></script>
     <script src="./footer.js"></script>
-    <script src="./header.js"></script>
+    <script src="https://weareunder.design/js/header.js"></script>
     <script src="./navigation.js"></script>
     <script src="./pingpong.js"></script>
     <script src="https://weareunder.design/js/mobile_covers.js"></script>
