@@ -8,10 +8,10 @@ function addSlider() {
                     data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide2.png');"
-                    data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand."></a>
+                    data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces."></a>
                 <a href="#" class="slide view"
                     style="background-image: url('./images/slide3.png');"
-                    data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces."></a>
+                    data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand."></a>
             </div>
             <div class="sliderbuttons padding-xl">
                 <button class="arrow prev"><img src="https://weareunder.design/images/arrow_left.svg" /></button>
