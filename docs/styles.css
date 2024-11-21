@@ -75,4 +75,24 @@
     .hand-image{
         width: 85% !important;
     }
+    .hand-image-box{
+        width: 180% !important;
+        height: 100% !important;
+        display: flex;
+        align-items: flex-end;
+    }
+}
+
+
+.square-container {
+    width: auto;
+}
+
+
+@media screen and (max-width: 480px) {
+    .square-container {
+        aspect-ratio: 1/1;
+        align-items: flex-start
+    }
+    
 }
