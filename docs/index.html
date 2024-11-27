@@ -20,18 +20,17 @@
     <meta property="og:type" content="website">
     <script src="https://unpkg.com/@rnbws/svg-icon.js/dist/svg-icon.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@rnbws/renecss/dist/rene.min.css" />
-    <link rel="stylesheet" href="https://weareunder.design/css/styles.css">
     <script src="https://weareunder.design/js/lottie_scroll.js"></script>
-    <link rel="icon" href="./images/favicon.svg">
+    <link rel="icon" href="./images/faviconhandy.svg">
 </head>
 
 <body data-page="handy" data-theme="light">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <under-header></under-header>
     <under-navigation></under-navigation>
-    <div class="view view2 ping-pong align-center" style="pointer-events: none;">
-        <a href="" class="circle circle-brandsprint clickable" id="cta-animation"
-            style="cursor: pointer; z-index: 1000; background-color: #F4492B; pointer-events: auto;">
+    <div class="view ping-pong align-center" style="pointer-events: none; overflow: hidden; position: fixed; top: 0; left: 0; z-index: 9999; width: 100%;">
+        <a href="" class="align-center text-center circle circle-brandsprint" id="cta-animation"
+            style="cursor: pointer; z-index: 1000; background-color: #F4492B; color:white; pointer-events: auto; border-radius: 100%; position: absolute; z-index: 2; height: 170px; width: 170px;">
             <h4>preorder</h4>
         </a>
     </div>
@@ -605,7 +604,7 @@
 
         </div>
     </div>
-    <div class="view product mobile_cover" data-desktop-image="./images/fourth_background.png"
+    <div class="view mobile_cover" style="background: no-repeat center/cover; position: relative;" data-desktop-image="./images/fourth_background.png"
         data-mobile-image="./images/fourth_background_mobile.png"></div>
     <under-footer></under-footer>
     <script src="https://weareunder.design/js/circle.js"></script>

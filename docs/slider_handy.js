@@ -1,23 +1,24 @@
 function addSlider() {
     const TEMPLATE = `
-    <div class="box-l view row product" id="body-content" id="slider-container">
-        <div class="slider view"> 
-            <div class="slides view">
+    <div class="view row box-l" id="body-content" id="slider-container" style="background: no-repeat center/cover; position: relative;">
+        <div class="slider view" style="position: relative; width: 100%; height: 61.8vw; overflow: hidden;"> 
+            <div class="slides view" style="width: 100%; height: 61.8vw; display: flex; transition: transform 0.5s ease-in-out;">
                 <a href="#" class="slide view"
-                    style="background-image: url('./images/slide1.png');"
+                    style="background-image: url('./images/slide1.png'); min-width: 100%; height: 100%; background-size: cover; background-position: center;"
                     data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy."></a>
                 <a href="#" class="slide view"
-                    style="background-image: url('./images/slide2.png');"
+                    style="background-image: url('./images/slide2.png'); min-width: 100%; height: 100%; background-size: cover; background-position: center;"
                     data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces."></a>
                 <a href="#" class="slide view"
-                    style="background-image: url('./images/slide3.png');"
+                    style="background-image: url('./images/slide3.png'); min-width: 100%; height: 100%; background-size: cover; background-position: center;"
                     data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand."></a>
             </div>
             <div class="sliderbuttons padding-xl">
-                <button class="arrow prev"><img src="https://weareunder.design/images/arrow_left.svg" /></button>
-                <button class="arrow next"><img src="https://weareunder.design/images/arrow_right.svg" /></button>
+                <button class="arrow prev" style="border: none; background: none; cursor: pointer; width: 1.75rem; height: 1.75rem;">
+                <img src="https://weareunder.design/images/arrow_left.svg" /></button>
+                <button class="arrow next" style="border: none; background: none; cursor: pointer; width: 1.75rem; height: 1.75rem;"><img src="https://weareunder.design/images/arrow_right.svg" /></button>
             </div>
-            <div class="slidertext box-xs white padding-xl column gap-xs">
+            <div class="slidertext box-xs padding-xl column gap-xs" style="position: absolute; bottom: 0px; left: 0%; white-space: nowrap; margin: 0.5rem, 0, 0.5rem, 0 !important; line-height: 1.35 !important; color: white;">
                 <p></p>
                 <div class="text-m"></div>
             </div>
