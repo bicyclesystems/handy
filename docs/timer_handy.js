@@ -59,8 +59,8 @@ function startTimer(days, hours, minutes) {
     const timerInterval = setInterval(updateTimer, 60000);
 }
 
-// to update (one time)
+
 // localStorage.removeItem('timerStartTime');
 // localStorage.removeItem('totalMinutesInitial');
 
-startTimer(70, 3, 23);
+startTimer(70, 2, 23);
