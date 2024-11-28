@@ -39,7 +39,7 @@ function handleBrTags() {
         });
         
         document.querySelectorAll('.hand-image').forEach(element => {
-            element.style.width = '';
+            element.style.width = '40%';
         });
     }
 }
