@@ -33,6 +33,11 @@ function handleBrTags() {
         document.querySelectorAll('.hand-image').forEach(element => {
             element.style.width = '85%';
         });
+
+        document.querySelectorAll('.pre-order').forEach(element => {
+            element.classList.remove('gap-xl');
+            element.classList.add('gap-m');
+        });
     } else {
         document.querySelectorAll('.hemi').forEach(element => {
             element.style.height = '';
@@ -40,6 +45,11 @@ function handleBrTags() {
         
         document.querySelectorAll('.hand-image').forEach(element => {
             element.style.width = '40%';
+        });
+
+        document.querySelectorAll('.pre-order').forEach(element => {
+            element.classList.remove('gap-m');
+            element.classList.add('gap-xl');
         });
     }
 }
