@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>handy - innovative tools for intuitive computer interaction</title>
+    <meta name="description"
+        content="handy transforms your movements into digital commands for seamless interaction with your computer.">
+    <meta name="keywords"
+        content="gesture control, technology, intuitive interaction, computer management, ergonomics, innovation, open source, application development">
+    <meta property="og:title" content="handy - innovative tools for intuitive computer interaction">
+    <meta property="og:description"
+        content="handy transforms your movements into digital commands for seamless interaction with your computer.">
+    <meta property="og:image" content="https://handy.vision/docs/images/cover.png">
+    <meta property="twitter:image" content="https://handy.vision/docs/images/cover.png">
+    <meta property="og:type" content="website">
+    <script src="https://unpkg.com/@rnbws/svg-icon.js/dist/svg-icon.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@rnbws/renecss/dist/rene.min.css" />
+    <link rel="icon" href="./images/faviconhandy.svg">
+    <script defer data-domain="handy.vision"
+        src="https://plausible.io/js/script.file-downloads.hash.outbound-links.js"></script>
+    <script>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.3/marked.min.js"></script>
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <under-navigation></under-navigation>
+    <div class="row" style="flex-wrap: nowrap;">
+        <div>
+            <aside class="column justify-stretch sticky padding-l" style="width: 15rem; display: inline-block;">
+            </aside>
+        </div>
+        <div class="view column align-top">
+            <div class="page" id="markdown-content"></div>
+        </div>
+    </div>
+    <under-footer></under-footer>
+</body>
+
+<script>
+async function loadMarkdownContent() {
+    try {
+        const response = await fetch('docs.md');
+        const markdownText = await response.text();
+        
+        marked.setOptions({
+            headerIds: false,
+            mangle: false
+        });
+
+        const renderer = new marked.Renderer();
+        
+        renderer.heading = function(text, level) {
+            if (level === 3) {
+                return `<h${level}>${text}</h${level}>`;
+            }
+            if (level === 5) {
+                return `<h${level}>${text}</h${level}>`;
+            }
+            if (level === 6) {
+                return `<h${level}>${text}</h${level}>`;
+            }
+            return `<h${level}>${text}</h${level}>`;
+        };
+
+        renderer.paragraph = function(text) {
+            return `<p>${text}</p>`;
+        };
+
+        renderer.table = function(header, body) {
+            return `
+                <table class="border radius-s">
+                    <thead>${header}</thead>
+                    <tbody>${body}</tbody>
+                </table>
+            `;
+        };
+
+        renderer.tablerow = function(content) {
+            return `<tr>${content}</tr>`;
+        };
+
+        renderer.tablecell = function(content, flags) {
+            const type = flags.header ? 'th' : 'td';
+            const classes = flags.header ? 'padding-m background-secondary' : 'padding-m';
+            return `<${type} class="${classes}">${content}</${type}>`;
+        };
+
+        marked.setOptions({ renderer });
+
+        const htmlContent = marked(markdownText);
+        document.getElementById('markdown-content').innerHTML = htmlContent;
+
+        // Create a new script element
+        const tocScript = document.createElement('script');
+        tocScript.src = 'https://rnbw.design/table-of-contents.js';
+        document.body.appendChild(tocScript);
+
+    } catch (error) {
+        console.error('Error loading markdown:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadMarkdownContent);
+</script>
+
+<script src="https://weareunder.design/js/footer.js"></script>
+<script src="https://weareunder.design/js/navigation.js"></script>
+</html>
