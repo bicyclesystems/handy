@@ -24,22 +24,37 @@
     <script defer data-domain="handy.vision"
         src="https://plausible.io/js/script.file-downloads.hash.outbound-links.js"></script>
     <script>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
 
 <body data-page="handy" data-theme="light" style="background-color: #FFFFFF;">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <under-header></under-header>
     <under-navigation></under-navigation>
-    <div class="view ping-pong align-center"
-        style="pointer-events: none; overflow: hidden; position: fixed; top: 0; left: 0; z-index: 9999; width: 100%;">
-        <a href="https://" class="align-center text-center circle circle-brandsprint" id="cta-animation" style="cursor: pointer; z-index: 1000; background-color: #F4492B; color:white; pointer-events: auto; border-radius: 100%; position: absolute; z-index: 2; height: 127.5px; width: 127.5px;">
-            <h5>preorder</h5>
+    <div class="ping-pong" style="pointer-events: none; overflow: hidden; position: fixed; top: 0; left: 0; z-index: 9999; width: 100vw; height: 100vh;">
+        <a href="https://store.weareunder.design/products/hemi" id="cta-animation" class="circle" style="
+            cursor: pointer;
+            background-color: #F4492B;
+            color: white;
+            pointer-events: auto;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            width: 127.5px;
+            height: 127.5px;
+            border-radius: 50%;
+            z-index: 1000;
+            transform: translate(0, 0);
+        ">
+            <h5 style="margin: 0;">preorder</h5>
         </a>
     </div>
     <div class="view column align-center">
         <video autoplay loop muted playsinline
             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;">
-            <source src="./images/handy.webm">
+            <source src="./videos/handy.webm">
         </video>
         <img class="box-xs padding-l" src="./images/logo.svg">
     </div>
@@ -432,6 +447,85 @@
             </div>
         </div>
     </div>
+        <!-- Testimonials Section -->
+        <style>
+            .scroll {
+                animation: scroll 24s linear infinite;
+                flex-wrap: nowrap;
+                display: flex;
+                gap: 5rem;
+            }
+    
+            @keyframes scroll {
+                0% {
+                    transform: translateX(0);
+                }
+                100% {
+                    transform: translateX(-100vw);
+                }
+            }
+    
+            .quote {
+                width: 400px;
+                flex: 0 0 auto;
+            }
+    
+            .infinite-wrapper {
+                width: 100vw;
+                overflow-x: hidden;
+                margin-left: calc(-50vw + 50%);
+                padding: 5rem 0;
+            }
+
+        </style>
+    
+        <div class="view column align-center gap-xl text-center">
+            <div class="infinite-wrapper">
+                <div class="scroll align-center">
+                    <div class="quote">
+                        <h4>"The future of computer interaction is here. handy makes everything feel natural and intuitive."</h4>
+                        <p>Sarah Chen, UX Designer</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"Game-changing for digital artists. The gesture controls are incredibly precise."</h4>
+                        <p>Michael Rodriguez, Digital Artist</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"Finally, ergonomic control that doesn't compromise on functionality."</h4>
+                        <p>Dr. Emma Thompson, Ergonomics Researcher</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"handy transformed how I interact with my music software. It's like having an extra set of hands."</h4>
+                        <p>James Wilson, Music Producer</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"The open-source approach means it just keeps getting better. The community is incredible."</h4>
+                        <p>Alex Kumar, Software Developer</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"Perfect for presentations. My audience is always amazed by the seamless control."</h4>
+                        <p>Lisa Park, Public Speaker</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"As a 3D artist, handy has revolutionized my workflow. It's incredibly intuitive."</h4>
+                        <p>David Martinez, 3D Artist</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"The customization options are endless. It adapts to how you work, not the other way around."</h4>
+                        <p>Rachel Foster, Product Designer</p>
+                    </div>
+                    <!-- Duplicate first few quotes to ensure smooth infinite scroll -->
+                    <div class="quote">
+                        <h4>"The future of computer interaction is here. handy makes everything feel natural and intuitive."</h4>
+                        <p>Sarah Chen, UX Designer</p>
+                    </div>
+                    <div class="quote">
+                        <h4>"Game-changing for digital artists. The gesture controls are incredibly precise."</h4>
+                        <p>Michael Rodriguez, Digital Artist</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     <div class="view column align-center">
 
 
@@ -635,15 +729,186 @@
     <div class="view mobile_cover" style="background: no-repeat center/cover; position: relative;"
         data-desktop-image="./images/fourth_background.png" data-mobile-image="./images/fourth_background_mobile.png">
     </div>
+
+
+
     <under-footer></under-footer>
     <script src="https://weareunder.design/js/circle.js"></script>
     <script src="https://weareunder.design/js/footer.js"></script>
     <script src="https://weareunder.design/js/navigation.js"></script>
     <script src="./pingpong.js"></script>
-    <script src="https://weareunder.design/js/mobile_covers.js"></script>
-    <script src="./slider_handy.js"></script>
     <script src="./timer_handy.js"></script>
-    <script src="./removebr.js"></script>
+
+    <script>
+    function addSlider() {
+        const TEMPLATE = `
+        <div class="slider-container">
+            <div class="slider"> 
+                <div class="slides">
+                    <div class="slide" data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy.">
+                        <video autoplay loop muted playsinline>
+                            <source src="./videos/figma.webm" type="video/webm">
+                        </video>
+                    </div>
+                    <div class="slide" data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces.">
+                        <video autoplay loop muted playsinline>
+                            <source src="./videos/blender.webm" type="video/webm">
+                        </video>
+                    </div>
+                    <div class="slide" data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand.">
+                        <video autoplay loop muted playsinline>
+                            <source src="./videos/music.webm" type="video/webm">
+                        </video>
+                    </div>
+                </div>
+                <div class="slider-text">
+                    <p></p>
+                    <div class="text-m"></div>
+                </div>
+                <div class="slider-buttons">
+                    <button class="prev">
+                        <img src="https://weareunder.design/images/arrow_left.svg" />
+                    </button>
+                    <button class="next">
+                        <img src="https://weareunder.design/images/arrow_right.svg" />
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+
+        class HandySlider extends HTMLElement {
+            constructor() {
+                super();
+                this.innerHTML = TEMPLATE;
+                this.addStyles();
+                this.initializeSlider();
+                this.initializeVideos();
+            }
+
+            initializeVideos() {
+                const videos = this.querySelectorAll('video');
+                videos.forEach(video => {
+                    video.play().catch(error => {
+                        console.log("Video autoplay failed:", error);
+                    });
+                });
+            }
+
+            addStyles() {
+                const style = document.createElement('style');
+                style.textContent = `
+                    .slider-container {
+                        width: 100%;
+                        height: 61.8vw;
+                        position: relative;
+                    }
+                    .slider {
+                        width: 100%;
+                        height: 100%;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .slides {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        transition: transform 0.5s ease;
+                    }
+                    .slide {
+                        min-width: 100%;
+                        height: 100%;
+                        position: relative;
+                    }
+                    .slide video {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    .slider-text {
+                        position: absolute;
+                        bottom: 2rem;
+                        left: 2rem;
+                        color: white;
+                        mix-blend-mode: difference;
+                        z-index: 2;
+                    }
+                    .slider-buttons {
+                        position: absolute;
+                        bottom: 2rem;
+                        right: 2rem;
+                        display: flex;
+                        gap: 1rem;
+                        z-index: 2;
+                    }
+                    .slider-buttons button {
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        padding: 0;
+                        mix-blend-mode: difference;
+                        opacity: 0.7;
+                        transition: opacity 0.3s ease;
+                    }
+                    .slider-buttons button:hover {
+                        opacity: 1;
+                    }
+                    .slider-buttons img {
+                        width: 28px;
+                        height: 28px;
+                    }
+                    rr {
+                        display: block;
+                        content: '';
+                    }
+                `;
+                this.appendChild(style);
+            }
+
+            initializeSlider() {
+                const slides = this.querySelector('.slides');
+                const slideElements = this.querySelectorAll('.slide');
+                const textTitle = this.querySelector('.slider-text p');
+                const textSubtitle = this.querySelector('.slider-text div');
+                const prevButton = this.querySelector('.prev');
+                const nextButton = this.querySelector('.next');
+                
+                let currentPosition = 0;
+
+                const updateSlider = () => {
+                    slides.style.transform = `translateX(${-currentPosition}%)`;
+                    const currentSlideIndex = Math.round(currentPosition / 100) % slideElements.length;
+                    const currentSlide = slideElements[currentSlideIndex];
+                    textTitle.innerHTML = currentSlide.dataset.title;
+                    textSubtitle.innerHTML = currentSlide.dataset.subtitle;
+                };
+
+                const moveToSlide = (direction) => {
+                    let index = Math.round(currentPosition / 100);
+                    let newIndex = index + direction;
+
+                    if (newIndex >= slideElements.length) {
+                        newIndex = 0;
+                    } else if (newIndex < 0) {
+                        newIndex = slideElements.length - 1;
+                    }
+
+                    currentPosition = newIndex * 100;
+                    updateSlider();
+                };
+
+                prevButton.addEventListener('click', () => moveToSlide(-1));
+                nextButton.addEventListener('click', () => moveToSlide(1));
+
+                updateSlider();
+            }
+        }
+
+        customElements.define('handy-slider', HandySlider);
+    }
+
+    document.addEventListener('DOMContentLoaded', addSlider);
+    </script>
 
 </body>
 

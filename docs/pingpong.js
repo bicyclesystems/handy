@@ -3,180 +3,238 @@ let circle1, circle2, brandsprintElement, circle3, circle4, circle5;
 
 var dot, container, containerBounds, xMax, xMin, yMax, yMin;
 
-function updatePlayground(class_target) {
-  dot = document.querySelector(class_target);
-  if (!dot) return;
-  container = document.querySelector(".ping-pong");
-  dotBounds = dot.getBoundingClientRect();
-  containerBounds = container.getBoundingClientRect();
-  xMax = containerBounds.right - dotBounds.right;
-  xMin = containerBounds.left - dotBounds.left;
-  yMax = containerBounds.bottom - dotBounds.bottom;
-  yMin = containerBounds.top - dotBounds.top;
+// Single animation instance for the preorder ball
+let bouncingAnimation;
+
+// Global state object
+window.pingPongVars = window.pingPongVars || {
+    dot: null,
+    container: null,
+    containerBounds: null,
+    xMax: null,
+    xMin: null,
+    yMax: null,
+    yMin: null,
+    tweens: {}
+};
+
+function updatePlayground(element) {
+    const vars = window.pingPongVars;
+    vars.dot = element;
+    if (!vars.dot) return;
+    vars.container = document.querySelector(".ping-pong");
+    const dotBounds = vars.dot.getBoundingClientRect();
+    vars.containerBounds = vars.container.getBoundingClientRect();
+    vars.xMax = vars.containerBounds.right - dotBounds.right;
+    vars.xMin = vars.containerBounds.left - dotBounds.left;
+    vars.yMax = vars.containerBounds.bottom - dotBounds.bottom;
+    vars.yMin = vars.containerBounds.top - dotBounds.top;
 }
 
-function animationToClass(class_target) {
-  let gsapTween = gsap.to(class_target, {
-    x: "+=3000",
-    y: "+=2000",
-    duration: 50,
-    repeat: -1,
-    repeatRefresh: true,
-    ease: "none",
-    modifiers: {
-      x: bounceModifier(xMin, xMax),
-      y: bounceModifier(yMin, yMax),
-    },
-  });
-
-  let targetElement = document.querySelector(class_target);
-  if (!!targetElement) {
-    targetElement.addEventListener("mouseenter", () => {
-      gsapTween.pause();
-    });
-    targetElement.addEventListener("mouseleave", () => {
-      gsapTween.resume();
-    });
-  }
-  return gsapTween;
+function ensureInsideContainer(ball) {
+    const container = window.pingPongVars.container || document.querySelector('.ping-pong');
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const ballRect = ball.getBoundingClientRect();
+    let deltaX = 0, deltaY = 0;
+    
+    if (ballRect.left < containerRect.left) {
+        deltaX = containerRect.left - ballRect.left;
+    } else if (ballRect.right > containerRect.right) {
+        deltaX = containerRect.right - ballRect.right;
+    }
+    
+    if (ballRect.top < containerRect.top) {
+        deltaY = containerRect.top - ballRect.top;
+    } else if (ballRect.bottom > containerRect.bottom) {
+        deltaY = containerRect.bottom - ballRect.bottom;
+    }
+    
+    let currentX = 0, currentY = 0;
+    const transform = ball.style.transform;
+    if (transform) {
+        const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        if (match) {
+            currentX = parseFloat(match[1]);
+            currentY = parseFloat(match[2]);
+        }
+    }
+    ball.style.transform = `translate(${currentX + deltaX}px, ${currentY + deltaY}px)`;
 }
-function ping(class_target) {
-  try {
-    updatePlayground(class_target);
-    if (containerBounds && containerBounds.bottom > 0) {
-      if (class_target === ".circle-brandsprint") {
-        tweenBrandsprint = animationToClass(class_target);
-        clearInterval(intervalId3);
-      }
-      if (class_target === ".circle1") {
-        tween1 = animationToClass(class_target);
-        clearInterval(interval1);
-      }
-      if (class_target === ".circle2") {
-        tween2 = animationToClass(class_target);
-        clearInterval(interval2);
-      }
-      if (class_target === ".circle3") {
-        tween3 = animationToClass(class_target);
-        clearInterval(interval3);
-      }
-      if (class_target === ".circle4") {
-        tween4 = animationToClass(class_target);
-        clearInterval(interval4);
-      }
-      if (class_target === ".circle5") {
-        tween5 = animationToClass(class_target);
-        clearInterval(interval5);
-      }
+
+function animationToElement(element) {
+    let tween = gsap.to(element, {
+        duration: 80,
+        repeat: -1,
+        ease: "none",
+        onUpdate: () => {
+            updateBallPosition(element);
+            resolveCollision(element);
+        }
+    });
+
+    element.addEventListener("mouseenter", () => tween.pause());
+    element.addEventListener("mouseleave", () => tween.resume());
+    
+    return tween;
+}
+
+function initializeCircles() {
+    try {
+        const circles = document.querySelectorAll('[class*="circle"]');
+        circles.forEach(circle => {
+            updatePlayground(circle);
+            ensureInsideContainer(circle);
+            // Reduced initial velocity for slower movement
+            circle.velocity = { x: 1, y: 1 };
+        });
+        if (window.pingPongVars.containerBounds && window.pingPongVars.containerBounds.bottom > 0) {
+            circles.forEach(circle => {
+                const id = circle.className;
+                window.pingPongVars.tweens[id] = animationToElement(circle);
+            });
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+function updateBallPosition(ball) {
+    let currentX = 0, currentY = 0;
+    const transform = ball.style.transform;
+    if (transform) {
+        const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        if (match) {
+            currentX = parseFloat(match[1]);
+            currentY = parseFloat(match[2]);
+        }
     }
 
-    //make x and y go as high (or low) as you want, and the modifier will always keep it within the xMin/xMax and yMin/yMax ranges.
-  } catch (err) {
-    console.log(err);
-  }
-}
-//this function spits back a modifier function that'll keep the value within a range, bouncing off the min/max boundaries.
-function bounceModifier(min, max) {
-  var range = max - min;
-  return function (value) {
-    value = parseFloat(value); // comes in as px, like "10px"
-    var cycle, clippedValue;
-    if (value > max) {
-      cycle = (value - max) / range;
-      clippedValue = (cycle % 1) * range;
-      value = (cycle | 0) & (1 !== 0) ? min + clippedValue : max - clippedValue; //on even cycles, go backwards.
-    } else if (value < min) {
-      cycle = (min - value) / range;
-      clippedValue = (cycle % 1) * range;
-      value = (cycle | 0) & (1 !== 0) ? max - clippedValue : min + clippedValue; //on even cycles, go backwards.
-    }
-    return value + "px";
-  };
-}
-var intervalId3 = setInterval(() => ping(".circle-brandsprint"), 1000);
-var interval1 = setInterval(() => ping(".circle1"), 1000);
-var interval2 = setInterval(() => ping(".circle2"), 1000);
-var interval3 = setInterval(() => ping(".circle3"), 1000);
-var interval4 = setInterval(() => ping(".circle4"), 1000);
-var interval5 = setInterval(() => ping(".circle5"), 1000);
+    const container = window.pingPongVars.container;
+    const containerBounds = container.getBoundingClientRect();
+    const ballRect = ball.getBoundingClientRect();
 
-//Setting the circles to their initial position
+    // Bounce off left/right boundaries
+    if ((ballRect.left + ball.velocity.x <= containerBounds.left) || 
+        (ballRect.right + ball.velocity.x >= containerBounds.right)) {
+        ball.velocity.x *= -1;
+    }
+    // Bounce off top/bottom boundaries
+    if ((ballRect.top + ball.velocity.y <= containerBounds.top) || 
+        (ballRect.bottom + ball.velocity.y >= containerBounds.bottom)) {
+        ball.velocity.y *= -1;
+    }
+
+    currentX += ball.velocity.x;
+    currentY += ball.velocity.y;
+    ball.style.transform = `translate(${currentX}px, ${currentY}px)`;
+}
+
+function resolveCollision(ball) {
+    const balls = document.querySelectorAll('[class*="circle"]');
+    const ballRect = ball.getBoundingClientRect();
+    const ballCenter = {
+        x: ballRect.left + ballRect.width / 2,
+        y: ballRect.top + ballRect.height / 2
+    };
+
+    balls.forEach(otherBall => {
+        if (otherBall === ball) return;
+        const otherRect = otherBall.getBoundingClientRect();
+        const otherCenter = {
+            x: otherRect.left + otherRect.width / 2,
+            y: otherRect.top + otherRect.height / 2
+        };
+
+        const dx = ballCenter.x - otherCenter.x;
+        const dy = ballCenter.y - otherCenter.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const minDist = (ballRect.width / 2) + (otherRect.width / 2);
+
+        if (distance < minDist) {
+            const tempVelocity = { ...ball.velocity };
+            ball.velocity = { ...otherBall.velocity };
+            otherBall.velocity = tempVelocity;
+        }
+    });
+}
+
 function bringCircleToInitialPosition() {
-  let circle1 = document.querySelector(".circle1");
-  let circle2 = document.querySelector(".circle2");
-  let circle3 = document.querySelector(".circle3");
-  let circle4 = document.querySelector(".circle4");
-  let circle5 = document.querySelector(".circle5");
-  let brandsprintElement = document.querySelector(".circle-brandsprint");
-
-  if (circle1) circle1.style.transform = "none";
-  if (circle2) circle2.style.transform = "none";
-  if (circle3) circle3.style.transform = "none";
-  if (circle4) circle4.style.transform = "none";
-  if (circle5) circle5.style.transform = "none";
-
-  if (brandsprintElement) brandsprintElement.style.transform = "none";
+    const circles = document.querySelectorAll('[class*="circle"]');
+    circles.forEach(circle => {
+        // Instead of resetting to "none", ensure they are well positioned inside the container
+        ensureInsideContainer(circle);
+    });
 }
 
-//Pause Bouncing Animation
 function pauseBouncingAnimation() {
-  try {
-    tweenBrandsprint?.pause();
-    tween1?.pause();
-    tween2?.pause();
-    tween3?.pause();
-    tween4?.pause();
-    tween5?.pause();
-  } catch (err) {
-    console.log(err);
-  }
+    try {
+        Object.values(window.pingPongVars.tweens).forEach(tween => tween?.pause());
+    } catch (err) {
+        console.log(err);
+    }
 }
 
-//Restart Bouncing Animation
 function restartBouncingAnimation() {
-  try {
-    tweenBrandsprint?.restart();
-    tween1?.restart();
-    tween2?.restart();
-    tween3?.restart();
-    tween4?.restart();
-    tween5?.restart();
-  } catch (err) {
-    console.log(err);
-  }
+    try {
+        Object.values(window.pingPongVars.tweens).forEach(tween => tween?.restart());
+    } catch (err) {
+        console.log(err);
+    }
 }
 
-const pingPongMediaQuery = window.matchMedia("(max-width: 992px)");
-pingPongMediaQuery.addEventListener("change", handlePingPongMediaQueryChange);
-handlePingPongMediaQueryChange(pingPongMediaQuery);
+// Handle responsive behavior
+const mediaQuery = window.matchMedia("(max-width: 992px)");
 
-function handlePingPongMediaQueryChange(mediaQuery) {
-  const cta = document.getElementById("cta-animation");
-  const brandsprintCircles = document.querySelectorAll(".brand-sprint-circle");
-  let circlesArray = Array.from(brandsprintCircles);
-  if (mediaQuery.matches) {
-    bringCircleToInitialPosition();
-    pauseBouncingAnimation();
-
-    if (!!cta) {
-      cta.style.display = "none";
+function handleResponsive(e) {
+    const cta = document.getElementById("cta-animation");
+    const brandsprintCircles = document.querySelectorAll(".brand-sprint-circle");
+    let circlesArray = Array.from(brandsprintCircles);
+    
+    if (e.matches) {
+        bringCircleToInitialPosition();
+        pauseBouncingAnimation();
+        if (cta) cta.style.display = "none";
+        if (brandsprintCircles) {
+            circlesArray.forEach(circle => circle.style.display = "none");
+        }
+    } else {
+        bringCircleToInitialPosition();
+        restartBouncingAnimation();
+        if (cta) cta.style.display = "flex";
+        if (brandsprintCircles) {
+            circlesArray.forEach(circle => circle.style.display = "flex");
+        }
     }
-    if (!!brandsprintCircles) {
-      circlesArray.forEach((circle) => {
-        circle.style.display = "none";
-      });
-    }
-  } else {
-    bringCircleToInitialPosition();
-    restartBouncingAnimation();
-
-    if (!!cta) {
-      cta.style.display = "flex";
-    }
-    if (!!brandsprintCircles) {
-      circlesArray.forEach((circle) => {
-        circle.style.display = "flex";
-      });
-    }
-  }
 }
+
+// Initialize
+mediaQuery.addEventListener("change", handleResponsive);
+handleResponsive(mediaQuery);
+
+// Start animation on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Ensure the ping-pong container exists and is properly positioned
+    const container = document.querySelector('.ping-pong');
+    if (container) {
+        container.style.pointerEvents = 'none';
+        container.style.overflow = 'hidden';
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.zIndex = '9999';
+    }
+    
+    // Initialize the preorder button
+    const preorderBtn = document.getElementById('cta-animation');
+    if (preorderBtn) {
+        preorderBtn.style.cursor = 'pointer';
+        preorderBtn.style.zIndex = '1000';
+        preorderBtn.style.pointerEvents = 'auto';
+        preorderBtn.classList.add('circle');
+    }
+    
+    initializeCircles();
+});
