@@ -45,6 +45,10 @@
             height: 100vh;
         }
 
+        .ping-pong-container:has(~ .slider-container:hover) {
+            display: none !important;
+        }
+
         .ping-pong-circle {
             cursor: pointer;
             pointer-events: auto;
@@ -217,6 +221,21 @@
             position: relative;
         }
 
+        .slider-container,
+        .slider-container > a,
+        .slider {
+            cursor: url('./images/play.svg'), pointer;
+        }
+
+        .slider-container > a {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
         .slider {
             width: 100%;
             height: 100%;
@@ -245,10 +264,9 @@
 
         .slider-text {
             position: absolute;
-            bottom: 2rem;
-            left: 2rem;
+            bottom: 0;
+            left: 0;
             color: white;
-            mix-blend-mode: difference;
             z-index: 2;
         }
 
@@ -294,6 +312,54 @@
             height: 100%;
             object-fit: cover;
             z-index: -1;
+        }
+
+        /* Add waves container styles */
+        .waves-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin: 4rem 0;
+            background: transparent;
+        }
+
+        .waves-svg {
+            position: absolute;
+            z-index: 1;
+            width: 80%;
+            height: auto;
+            max-width: 1472px;
+        }
+
+        .hemi-svg {
+            position: relative;
+            z-index: 2;
+            width: 80%;
+            height: auto;
+            max-width: 1472px;
+        }
+
+        .ripple-circle {
+            position: absolute;
+            border: 1px solid #CDC5B6;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0;
+        }
+
+        @keyframes ripple {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
         }
     </style>
 </head>
@@ -587,7 +653,10 @@
                 </div>
 
 
-            </div><img class="" src="./images/waves.svg">
+            </div><div class="waves-container">
+                <div class="ripple-circles"></div>
+                <img class="hemi-svg" src="./images/hemi.svg">
+            </div>
         </div>
     </div>
     <div class="view column align-center justify-end hemi gap-xs">
@@ -751,212 +820,6 @@
                 <div class="quote">
                     <h4>"Game-changing for digital artists. The gesture controls are incredibly precise."</h4>
                     <p>Michael Rodriguez, Digital Artist</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="view column align-center">
-        <div class="page">
-            <div class="column gap-m mobile-stack">
-                <div class="column align-start mobile-center">
-                    <h5>will hendi work with my potato computer?</h5>
-                    <p>if it can run a modern browser, you're golden. no supercomputer required</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i still use my mouse/trackpad?</h5>
-                    <p>absolutely! hendi plays nice with others. mix and match to your heart's content</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>i'm not tech-savvy. will i be able to use hendi?</h5>
-                    <p>if you can wave hello, you can use hendi. it's that simple</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>what operating systems does handy support?</h5>
-                    <p>handy loves all: windows, macos, and modern linux distributions are all welcome to the party.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>do i need the hemi device to use handy?</h5>
-                    <p>while handy can show its potential without hemi, the full magic happens when they're together.
-                        think
-                        of hemi as handy's dance partner - together, they create something spectacular!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how accurate is handy's gesture recognition?</h5>
-                    <p>precise enough to make you wonder if it's reading your mind. we're constantly improving it, too!
-                    </p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i customize gestures?</h5>
-                    <p>you bet! handy is like modeling clay for your gestures. shape it to fit your workflow.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is there a learning curve?</h5>
-                    <p>it's more of a learning slide - smooth, fun, and before you know it, you're a pro!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>will handy work with my favorite software?</h5>
-                    <p>if it runs on your computer, handy can dance with it. we play well with others.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy handle multiple monitors?</h5>
-                    <p>like a pro juggler - smooth, seamless, and impressive to watch.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is handy suitable for gaming?</h5>
-                    <p>we're not aiming to replace your gaming mouse, but for casual gaming? it's a whole new level of
-                        fun!
-                    </p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i use handy for drawing or design work?</h5>
-                    <p>absolutely! many creatives find handy brings a new dimension to their digital artistry.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy handle precision tasks?</h5>
-                    <p>with the grace of a surgeon. zoom in, slow down, and nail those pixel-perfect adjustments.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>will hemi work in low light conditions?</h5>
-                    <p>hemi sees in the dark like a cat. late-night work sessions are no problem.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can multiple users share one hemi device?</h5>
-                    <p>yep! hemi adapts to different users faster than you can say "hot desk".</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how often do i need to calibrate handy with hemi?</h5>
-                    <p>rarely. they're like old friends - they just get each other, right from the start.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is my data safe with handy?</h5>
-                    <p>safer than fort knox. we don't store or transmit your personal data.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>what kind of support do you offer?</h5>
-                    <p>the kind that makes you feel warm and fuzzy inside. our team's always here to help.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i take handy and hemi on the go?</h5>
-                    <p>hemi's more portable than your coffee mug. take the duo anywhere your laptop goes.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy compare to other gesture-control devices?</h5>
-                    <p>we don't like to brag, but... okay, we do. we think handy's the bee's knees of gesture control.
-                    </p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>will handy make me more productive?</h5>
-                    <p>like rocket fuel for your workflow. get ready for takeoff!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is there a trial period?</h5>
-                    <p>yes! take handy for a spin. if you don't love it, we'll be shocked (but we'll still give you a
-                        refund).</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how often do you release updates?</h5>
-                    <p>we're always cooking up improvements. expect regular servings of awesome.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i use handy for presentations?</h5>
-                    <p>it's like having a magic wand for your slides. presenters, prepare to dazzle!</p>
-                </div>
-                <div class="column">
-                    <h5>is handy suitable for people with mobility issues?</h5>
-                    <p>we've designed handy with accessibility in mind. it's all about expanding possibilities.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how durable is the hemi device?</h5>
-                    <p>tough as nails, but we still don't recommend using it as a hockey puck.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>what's the battery life of hemi?</h5>
-                    <p>what battery? hemi is usb-powered. no charging, no fuss.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i develop my own apps or plugins for handy?</h5>
-                    <p>absolutely! we've got an api that's more open than a 24-hour diner.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy handle different languages and scripts?</h5>
-                    <p>handy speaks the universal language of gestures. no translation needed!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is there a community forum for handy users?</h5>
-                    <p>you bet! join the handy family and share your cool discoveries.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can handy replace my keyboard for typing?</h5>
-                    <p>for short bits, sure! for your next novel? stick to the keyboard for now.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy handle palm rejection when using a touchscreen?</h5>
-                    <p>like a bouncer at an exclusive club - it knows who to let in and who to keep out.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i use handy with virtual reality or augmented reality setups?</h5>
-                    <p>now you're thinking with portals! we're exploring these exciting possibilities.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is there a limit to how many gestures i can create?</h5>
-                    <p>only your imagination (and maybe your memory). go wild!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy impact my computer's performance?</h5>
-                    <p>like a gentle breeze - you'll barely notice it's there.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i use handy for video editing?</h5>
-                    <p>it's like having an extra pair of hands in the editing room. snip, cut, and transition with
-                        flair!
-                    </p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does hemi handle different desk surfaces?</h5>
-                    <p>whether it's wood, glass, or your lucky mousepad, hemi adapts like a chameleon.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is there a mobile app for handy?</h5>
-                    <p>not yet, but we're cooking up some mobile magic. stay tuned!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy handle security for gesture-based logins?</h5>
-                    <p>fort knox level. your secret gestures are safe with us.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i use handy in my company's secure environment?</h5>
-                    <p>handy plays by the rules. we're committed to meeting enterprise-level security standards.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy impact battery life on laptops?</h5>
-                    <p>like a sip of water - barely noticeable. we've optimized for efficiency.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>how does handy handle multi-touch gestures?</h5>
-                    <p>like a symphony conductor - coordinating multiple inputs with graceful precision.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>is there a way to share my custom gestures with other handy users?</h5>
-                    <p>coming soon! we're building a gesture marketplace that'll knock your socks off.</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>what's the difference between using handy with and without hemi?</h5>
-                    <p>think of it like the difference between a preview and a blockbuster movie. handy without hemi
-                        gives
-                        you a taste of the magic, but handy with hemi? that's the full cinematic experience!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>can i start with just handy and add hemi later?</h5>
-                    <p>absolutely! it's like starting with a bicycle and upgrading to a motorcycle. begin your journey
-                        with
-                        handy, and when you're ready for the full experience, bring hemi into the mix.remember, at
-                        handy,
-                        we're all about making tech more human. got more questions? we're all ears (and hands)!</p>
-                </div>
-                <div class="column align-start mobile-center">
-                    <h5>what happens if there's no production?</h5>
-                    <p>we understand that unexpected situations may arise. if there's no production, we'll make a
-                        hassle-free refund to ensure your peace of mind.</p>
                 </div>
             </div>
         </div>
@@ -1250,6 +1113,50 @@
 
             initializeCircles();
 
+            // Initialize waves animation
+            const wavesContainer = document.querySelector('.waves-container');
+            const rippleCircles = document.querySelector('.ripple-circles');
+            
+            // Create ripple circles
+            const numCircles = 7;
+            const sizes = [268, 295, 341, 406, 489, 586, 735];
+            const baseOpacities = [1, 1, 1, 0.8, 0.6, 0.4, 0.2];
+            
+            sizes.forEach((size, index) => {
+                const circle = document.createElement('div');
+                circle.className = 'ripple-circle';
+                circle.style.width = size + 'px';
+                circle.style.height = size + 'px';
+                rippleCircles.appendChild(circle);
+            });
+
+            // Animate ripples
+            const circles = document.querySelectorAll('.ripple-circle');
+            const tl = gsap.timeline({repeat: -1});
+            
+            circles.forEach((circle, index) => {
+                const delay = index * 0.3;
+                const baseOpacity = baseOpacities[index];
+                
+                tl.fromTo(circle, 
+                    {
+                        scale: 0.95,
+                        opacity: 0
+                    },
+                    {
+                        scale: 1.05,
+                        opacity: baseOpacity,
+                        duration: 2,
+                        ease: "sine.inOut"
+                    }, delay)
+                .to(circle, {
+                    scale: 0.95,
+                    opacity: 0,
+                    duration: 2,
+                    ease: "sine.inOut"
+                }, `>-0.5`);
+            });
+
             // Initialize responsive behavior
             mediaQuery.addEventListener("change", handleResponsive);
             handleResponsive(mediaQuery);
@@ -1259,36 +1166,38 @@
         function addSlider() {
             const TEMPLATE = `
         <div class="slider-container">
-            <div class="slider"> 
-                <div class="slides">
-                    <div class="slide" data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy.">
-                        <video autoplay loop muted playsinline>
-                            <source src="./videos/figma.webm" type="video/webm">
-                        </video>
-                    </div>
-                    <div class="slide" data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces.">
-                        <video autoplay loop muted playsinline>
-                            <source src="./videos/blender.webm" type="video/webm">
-                        </video>
-                    </div>
-                    <div class="slide" data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand.">
-                        <video autoplay loop muted playsinline>
-                            <source src="./videos/music.webm" type="video/webm">
-                        </video>
+            <a href="https://youtube.com/your_video_id_here" target="_blank">
+                <div class="slider"> 
+                    <div class="slides">
+                        <div class="slide" data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy.">
+                            <video autoplay loop muted playsinline>
+                                <source src="./videos/figma.webm" type="video/webm">
+                            </video>
+                        </div>
+                        <div class="slide" data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces.">
+                            <video autoplay loop muted playsinline>
+                                <source src="./videos/blender.webm" type="video/webm">
+                            </video>
+                        </div>
+                        <div class="slide" data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand.">
+                            <video autoplay loop muted playsinline>
+                                <source src="./videos/music.webm" type="video/webm">
+                            </video>
+                        </div>
                     </div>
                 </div>
-                <div class="slider-text">
-                    <p></p>
-                    <div class="text-m"></div>
-                </div>
-                <div class="slider-buttons">
-                    <button class="prev">
-                        <img src="https://weareunder.design/images/arrow_left.svg" />
-                    </button>
-                    <button class="next">
-                        <img src="https://weareunder.design/images/arrow_right.svg" />
-                    </button>
-                </div>
+            </a>
+            <div class="slider-text padding-xl">
+                <p></p>
+                <div class="text-m"></div>
+            </div>
+            <div class="slider-buttons">
+                <button class="prev">
+                    <img src="https://weareunder.design/images/arrow_left.svg" />
+                </button>
+                <button class="next">
+                    <img src="https://weareunder.design/images/arrow_right.svg" />
+                </button>
             </div>
         </div>
         `;
@@ -1353,6 +1262,21 @@
         }
 
         document.addEventListener('DOMContentLoaded', addSlider);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sliderContainer = document.querySelector('.slider-container');
+            const pingPongContainer = document.querySelector('.ping-pong-container');
+            
+            if (sliderContainer && pingPongContainer) {
+                sliderContainer.addEventListener('mouseenter', () => {
+                    pingPongContainer.style.display = 'none';
+                });
+                
+                sliderContainer.addEventListener('mouseleave', () => {
+                    pingPongContainer.style.display = '';
+                });
+            }
+        });
     </script>
 
 </body>
