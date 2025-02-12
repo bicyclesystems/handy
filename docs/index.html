@@ -26,7 +26,7 @@
     <style>
         /* Global styles */
         .nowrap {
-            flex-wrap: nowrap;
+            flex-wrap: nowrap !important;
         }
 
         .center-page {
@@ -71,7 +71,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transform: none !important; /* Prevent animation transforms */
+            transform: none !important;
+            /* Prevent animation transforms */
             pointer-events: auto;
         }
 
@@ -164,10 +165,45 @@
             --code: #846642;
         }
 
-        /* Responsive styles */
+        /* Infinite Wrapper Fix */
+        .infinite-wrapper {
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+            padding: 5rem 0;
+        }
+
+        /* Countdown Styles */
+        .row:has(.box-s.padding-m) {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: center !important;
+        }
+
+        .row:has(.box-s.padding-m) .column {
+            flex: 0 0 auto !important;
+        }
+
+        .box-s.padding-m {
+            width: auto;
+            min-width: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         @media (max-width: 768px) {
+            .preorder-circle {
+                top: -80px
+        }
+
             .mobile-stack {
                 flex-direction: column;
+            }
+
+            .box-s.padding-m h1 {
+                font-size: var(--text-l);
             }
 
             .mobile-full {
@@ -182,12 +218,28 @@
             .mobile-hide {
                 display: none;
             }
+
+            /* Stack preorder circles vertically */
+            .preorder-section {
+                flex-direction: column;
+            }
+
+            .preorder-image {
+                right: 0;
+                width: 80%;
+                max-width: 300px;
+            }
+
+            .preorder-price {
+                left: 0;
+                width: 80%;
+                max-width: 300px;
+            }
         }
 
         /* Animation styles */
         .scroll {
             animation: scroll 24s linear infinite;
-            flex-wrap: nowrap;
             display: flex;
             gap: 5rem;
         }
@@ -207,13 +259,6 @@
             flex: 0 0 auto;
         }
 
-        .infinite-wrapper {
-            width: 100vw;
-            overflow-x: hidden;
-            margin-left: calc(-50vw + 50%);
-            padding: 5rem 0;
-        }
-
         /* Slider Styles */
         .slider-container {
             width: 100%;
@@ -222,12 +267,12 @@
         }
 
         .slider-container,
-        .slider-container > a,
+        .slider-container>a,
         .slider {
             cursor: url('./images/play.svg'), pointer;
         }
 
-        .slider-container > a {
+        .slider-container>a {
             position: absolute;
             top: 0;
             left: 0;
@@ -314,33 +359,26 @@
             z-index: -1;
         }
 
-        /* Add waves container styles */
-        .waves-container {
+        /* Ripple Circles Container */
+        .ripple-container {
             position: relative;
             width: 100%;
-            height: 100vh;
+            height: 600px;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            margin: 4rem 0;
             background: transparent;
+            overflow: hidden;
         }
 
-        .waves-svg {
-            position: absolute;
-            z-index: 1;
-            width: 80%;
-            height: auto;
-            max-width: 1472px;
-        }
-
-        .hemi-svg {
+        .ripple-circles {
             position: relative;
-            z-index: 2;
-            width: 80%;
-            height: auto;
-            max-width: 1472px;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center;
         }
 
         .ripple-circle {
@@ -351,15 +389,31 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(1);
             opacity: 0;
+            pointer-events: none;
+            transform-origin: center center;
+            will-change: transform, opacity;
         }
 
-        @keyframes ripple {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
+        .ripple-image {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Custom brand color */
+        .handy-orange-bg {
+            background-color: #F4492B;
+            color: var(--light);
+        }
+
+        .handy-orange-text {
+            color: #F4492B;
+        }
+
+        .handy-orange-border {
+            border: 1px solid #F4492B;
         }
     </style>
 </head>
@@ -369,8 +423,8 @@
     <under-header></under-header>
     <under-navigation></under-navigation>
     <div class="ping-pong ping-pong-container">
-        <a href="https://store.weareunder.design/products/hemi" id="cta-animation"
-            class="ping-pong-circle bg-orange text-light align-center justify-center">
+        <a href="https://store.weareunder.design/products/hemi" id="cta-animation" target="_blank"
+            class="ping-pong-circle handy-orange-bg text-light align-center justify-center">
             <h5>preorder</h5>
         </a>
     </div>
@@ -381,16 +435,16 @@
         <img class="box-xs padding-l" src="./images/logo.svg">
     </div>
     <div class="view column align-center">
-        <div class="page column text-center center-page">
+        <div class="page text-center align-center">
             <h1>wave hello to the </br> future of computing</h1>
-            <h4 class="box-m">handy turns your everyday spaces into an intuitive, ergonomic platform for interacting
+            <h4>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting
                 seamlessly with your computer.</h4>
         </div>
     </div>
     <handy-slider></handy-slider>
     <div class="view column align-center">
         <div class="page">
-            <h3 class="text-center"> from jaw-dropping design to jam sessions,<br />your hand is the only thing you need
+            <h3 class="text-center">from jaw-dropping design to jam sessions,<br />your hand is the only thing you need
             </h3>
             <p class="text-center">handy leverages advanced technology to convert your hand gestures into digital
                 commands.<br>from casual browsing to professional applications like animation and music software.</p>
@@ -528,7 +582,7 @@
                         <h6>software integration</h6>
                         <span class="text-m">
                             sdk <br />
-                            open-source hendi framework for custom gesture development
+                            open-source handy framework for custom gesture development
                         </span>
                         <span class="text-m">
                             drivers <br />
@@ -536,7 +590,7 @@
                         </span>
                         <span class="text-m">
                             firmware <br />
-                            field-upgradable via hendi app
+                            field-upgradable via handy app
                         </span>
                     </div>
                     <div class="column gap-s">
@@ -565,7 +619,7 @@
                         <h6>package contents</h6>
                         <span class="text-m"> 1x hemi-3 device1x 1.5m usb-c cable </span>
                         <span class="text-m"> quick start guide </span>
-                        <span class="text-m"> access code for hendi software download </span>
+                        <span class="text-m"> access code for handy software download </span>
                     </div>
                     <div class="column gap-s">
                         <h6>connectivity</h6>
@@ -653,9 +707,11 @@
                 </div>
 
 
-            </div><div class="waves-container">
-                <div class="ripple-circles"></div>
-                <img class="hemi-svg" src="./images/hemi.svg">
+            </div>
+            <div class="ripple-container">
+                <div class="ripple-circles">
+                    <img src="./images/hemi.svg" class="ripple-image">
+                </div>
             </div>
         </div>
     </div>
@@ -686,7 +742,7 @@
                         email? you got it.
                         dive in. your hands have stories - let's make your computer listen.</p>
                     <a href="https://github.com/orgs/weareunderdesign/discussions" target="_blank"
-                        class="white padding-s align-center gap-s radius-m text-l github-link">
+                        class="handy-orange-bg text-light padding-s align-center gap-s radius-m text-l">
                         <svg-icon src="./images/github.svg" class="icon-s"></svg-icon>gestures.handy</a>
                 </div>
                 <div class="code-container padding-l gap-xl mobile-hide">
@@ -711,18 +767,18 @@
         </div>
     </div>
     <div class="view column align-center bg-warm-gray">
-        <div class="page text-center center-page">
+        <div class="page text-center">
             <h3>get your hands on the future</h3>
-            <h5>level up your handy game with hemi to make your <br class="mobile-hide"> gestures smoother, faster, and
+            <h5>level up your handy game with hemi to make your <br class="hide-mobile"> gestures smoother, faster, and
                 way cooler.</h5>
-            <div class="align-center row gap-l nowrap mobile-stack">
+            <div class="align-center row gap-l flex-nowrap mobile-stack">
                 <div class="column gap-s">
                     <span class="text-m">days</span>
                     <div class="row gap-xs nowrap">
-                        <div class="box-s padding-m align-center text-orange border-orange" id="days-tens">
+                        <div class="box-s padding-m align-center handy-orange-border text-light" id="days-tens">
                             <h1>7</h1>
                         </div>
-                        <div class="box-s padding-m align-center bg-orange text-light" id="days-ones">
+                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="days-ones">
                             <h1>0</h1>
                         </div>
                     </div>
@@ -730,10 +786,10 @@
                 <div class="column gap-s">
                     <span class="text-m">hours</span>
                     <div class="row gap-xs nowrap">
-                        <div class="box-s padding-m align-center bg-orange text-light" id="hours-tens">
+                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="hours-tens">
                             <h1>0</h1>
                         </div>
-                        <div class="box-s padding-m align-center bg-orange text-light" id="hours-ones">
+                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="hours-ones">
                             <h1>3</h1>
                         </div>
                     </div>
@@ -741,10 +797,10 @@
                 <div class="column gap-s">
                     <span class="text-m">minutes</span>
                     <div class="row gap-xs nowrap">
-                        <div class="box-s padding-m align-center bg-orange text-light" id="minutes-tens">
+                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="minutes-tens">
                             <h1>2</h1>
                         </div>
-                        <div class="box-s padding-m align-center bg-orange text-light" id="minutes-ones">
+                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="minutes-ones">
                             <h1>3</h1>
                         </div>
                     </div>
@@ -757,8 +813,8 @@
                 <div class="preorder-image box-m">
                     <img src="./images/preorder.svg">
                 </div>
-                <div
-                    class="preorder-circle box-m column align-center gap-xl bg-orange radius-full text-light preorder-price">
+                <a href="https://store.weareunder.design/products/hemi" target="_blank"
+                    class="preorder-circle box-m column align-center gap-xl handy-orange-bg radius-full text-light preorder-price"">
                     <div class="column gap-xl">
                         <h2>$99</h2>
                         <h3>pre-order</h3>
@@ -766,9 +822,9 @@
                     <div class="column align-center gap-s">
                         <span class="text-l">gestures.handy framework</span>
                         <span class="text-l">early source code access</span>
-                        <span class="text-l">hendi app</span>
+                        <span class="text-l">handy app</span>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
@@ -824,10 +880,211 @@
             </div>
         </div>
     </div>
-    <div class="view mobile-cover" data-desktop-image="./images/fourth_background.png"
-        data-mobile-image="./images/fourth_background_mobile.png">
+    <div class="view">
+        <video class="box-l" src="./videos/handy_profile.webm" autoplay loop muted playsinline></video>
     </div>
 
+    <div class="view column align-center">
+
+
+        <div class="page">
+            <div class="column align-start">
+                <h5>will handy work with my potato computer?</h5>
+                <p>if it can run a modern browser, you're golden. no supercomputer required</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i still use my mouse/trackpad?</h5>
+                <p>absolutely! handy plays nice with others. mix and match to your heart's content</p>
+            </div>
+            <div class="column align-start">
+                <h5>i'm not tech-savvy. will i be able to use handy?</h5>
+                <p>if you can wave hello, you can use handy. it's that simple</p>
+            </div>
+            <div class="column align-start">
+                <h5>what operating systems does handy support?</h5>
+                <p>handy loves all: windows, macos, and modern linux distributions are all welcome to the party.</p>
+            </div>
+            <div class="column align-start">
+                <h5>do i need the hemi device to use handy?</h5>
+                <p>while handy can show its potential without hemi, the full magic happens when they're together. think
+                    of hemi as handy's dance partner - together, they create something spectacular!</p>
+            </div>
+            <div class="column align-start">
+                <h5>how accurate is handy's gesture recognition?</h5>
+                <p>precise enough to make you wonder if it's reading your mind. we're constantly improving it, too!</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i customize gestures?</h5>
+                <p>you bet! handy is like modeling clay for your gestures. shape it to fit your workflow.</p>
+            </div>
+            <div class="column align-start">
+                <h5>is there a learning curve?</h5>
+                <p>it's more of a learning slide - smooth, fun, and before you know it, you're a pro!</p>
+            </div>
+            <div class="column align-start">
+                <h5>will handy work with my favorite software?</h5>
+                <p>if it runs on your computer, handy can dance with it. we play well with others.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy handle multiple monitors?</h5>
+                <p>like a pro juggler - smooth, seamless, and impressive to watch.</p>
+            </div>
+            <div class="column align-start">
+                <h5>is handy suitable for gaming?</h5>
+                <p>we're not aiming to replace your gaming mouse, but for casual gaming? it's a whole new level of fun!
+                </p>
+            </div>
+            <div class="column align-start">
+                <h5>can i use handy for drawing or design work?</h5>
+                <p>absolutely! many creatives find handy brings a new dimension to their digital artistry.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy handle precision tasks?</h5>
+                <p>with the grace of a surgeon. zoom in, slow down, and nail those pixel-perfect adjustments.</p>
+            </div>
+            <div class="column align-start">
+                <h5>will hemi work in low light conditions?</h5>
+                <p>hemi sees in the dark like a cat. late-night work sessions are no problem.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can multiple users share one hemi device?</h5>
+                <p>yep! hemi adapts to different users faster than you can say "hot desk".</p>
+            </div>
+            <div class="column align-start">
+                <h5>how often do i need to calibrate handy with hemi?</h5>
+                <p>rarely. they're like old friends - they just get each other, right from the start.</p>
+            </div>
+            <div class="column align-start">
+                <h5>is my data safe with handy?</h5>
+                <p>safer than fort knox. we don't store or transmit your personal data.</p>
+            </div>
+            <div class="column align-start">
+                <h5>what kind of support do you offer?</h5>
+                <p>the kind that makes you feel warm and fuzzy inside. our team's always here to help.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i take handy and hemi on the go?</h5>
+                <p>hemi's more portable than your coffee mug. take the duo anywhere your laptop goes.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy compare to other gesture-control devices?</h5>
+                <p>we don't like to brag, but... okay, we do. we think handy's the bee's knees of gesture control.</p>
+            </div>
+            <div class="column align-start">
+                <h5>will handy make me more productive?</h5>
+                <p>like rocket fuel for your workflow. get ready for takeoff!</p>
+            </div>
+            <div class="column align-start">
+                <h5>is there a trial period?</h5>
+                <p>yes! take handy for a spin. if you don't love it, we'll be shocked (but we'll still give you a
+                    refund).</p>
+            </div>
+            <div class="column align-start">
+                <h5>how often do you release updates?</h5>
+                <p>we're always cooking up improvements. expect regular servings of awesome.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i use handy for presentations?</h5>
+                <p>it's like having a magic wand for your slides. presenters, prepare to dazzle!</p>
+            </div>
+            <div class="column">
+                <h5>is handy suitable for people with mobility issues?</h5>
+                <p>we've designed handy with accessibility in mind. it's all about expanding possibilities.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how durable is the hemi device?</h5>
+                <p>tough as nails, but we still don't recommend using it as a hockey puck.</p>
+            </div>
+            <div class="column align-start">
+                <h5>what's the battery life of hemi?</h5>
+                <p>what battery? hemi is usb-powered. no charging, no fuss.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i develop my own apps or plugins for handy?</h5>
+                <p>absolutely! we've got an api that's more open than a 24-hour diner.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy handle different languages and scripts?</h5>
+                <p>handy speaks the universal language of gestures. no translation needed!</p>
+            </div>
+            <div class="column align-start">
+                <h5>is there a community forum for handy users?</h5>
+                <p>you bet! join the handy family and share your cool discoveries.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can handy replace my keyboard for typing?</h5>
+                <p>for short bits, sure! for your next novel? stick to the keyboard for now.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy handle palm rejection when using a touchscreen?</h5>
+                <p>like a bouncer at an exclusive club - it knows who to let in and who to keep out.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i use handy with virtual reality or augmented reality setups?</h5>
+                <p>now you're thinking with portals! we're exploring these exciting possibilities.</p>
+            </div>
+            <div class="column align-start">
+                <h5>is there a limit to how many gestures i can create?</h5>
+                <p>only your imagination (and maybe your memory). go wild!</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy impact my computer's performance?</h5>
+                <p>like a gentle breeze - you'll barely notice it's there.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i use handy for video editing?</h5>
+                <p>it's like having an extra pair of hands in the editing room. snip, cut, and transition with flair!
+                </p>
+            </div>
+            <div class="column align-start">
+                <h5>how does hemi handle different desk surfaces?</h5>
+                <p>whether it's wood, glass, or your lucky mousepad, hemi adapts like a chameleon.</p>
+            </div>
+            <div class="column align-start">
+                <h5>is there a mobile app for handy?</h5>
+                <p>not yet, but we're cooking up some mobile magic. stay tuned!</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy handle security for gesture-based logins?</h5>
+                <p>fort knox level. your secret gestures are safe with us.</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i use handy in my company's secure environment?</h5>
+                <p>handy plays by the rules. we're committed to meeting enterprise-level security standards.</p>
+            </div>
+            <div class="column align-start">
+                <h5>how does handy impact battery life on laptops?</h5>
+                <p>like a sip of water - barely noticeable. we've optimized for efficiency.</p>
+            </div>
+
+            <div class="column align-start">
+                <h5>how does handy handle multi-touch gestures?</h5>
+                <p>like a symphony conductor - coordinating multiple inputs with graceful precision.</p>
+            </div>
+            <div class="column align-start">
+                <h5>is there a way to share my custom gestures with other handy users?</h5>
+                <p>coming soon! we're building a gesture marketplace that'll knock your socks off.</p>
+            </div>
+            <div class="column align-start">
+                <h5>what's the difference between using handy with and without hemi?</h5>
+                <p>think of it like the difference between a preview and a blockbuster movie. handy without hemi gives
+                    you a taste of the magic, but handy with hemi? that's the full cinematic experience!</p>
+            </div>
+            <div class="column align-start">
+                <h5>can i start with just handy and add hemi later?</h5>
+                <p>absolutely! it's like starting with a bicycle and upgrading to a motorcycle. begin your journey with
+                    handy, and when you're ready for the full experience, bring hemi into the mix.remember, at handy,
+                    we're all about making tech more human. got more questions? we're all ears (and hands)!</p>
+            </div>
+            <div class="column align-start">
+                <h5>what happens if there's no production?</h5>
+                <p>we understand that unexpected situations may arise. if there's no production, we'll make a
+                    hassle-free refund to ensure your peace of mind.</p>
+            </div>
+
+
+        </div>
+    </div>
 
 
     <under-footer></under-footer>
@@ -1113,53 +1370,70 @@
 
             initializeCircles();
 
-            // Initialize waves animation
-            const wavesContainer = document.querySelector('.waves-container');
-            const rippleCircles = document.querySelector('.ripple-circles');
-            
-            // Create ripple circles
-            const numCircles = 7;
-            const sizes = [268, 295, 341, 406, 489, 586, 735];
-            const baseOpacities = [1, 1, 1, 0.8, 0.6, 0.4, 0.2];
-            
-            sizes.forEach((size, index) => {
-                const circle = document.createElement('div');
-                circle.className = 'ripple-circle';
-                circle.style.width = size + 'px';
-                circle.style.height = size + 'px';
-                rippleCircles.appendChild(circle);
-            });
-
-            // Animate ripples
-            const circles = document.querySelectorAll('.ripple-circle');
-            const tl = gsap.timeline({repeat: -1});
-            
-            circles.forEach((circle, index) => {
-                const delay = index * 0.3;
-                const baseOpacity = baseOpacities[index];
+            // Initialize ripple animation
+            function initializeRipples() {
+                const rippleCircles = document.querySelector('.ripple-circles');
+                if (!rippleCircles) return;
                 
-                tl.fromTo(circle, 
-                    {
-                        scale: 0.95,
-                        opacity: 0
-                    },
-                    {
-                        scale: 1.05,
-                        opacity: baseOpacity,
-                        duration: 2,
-                        ease: "sine.inOut"
-                    }, delay)
-                .to(circle, {
-                    scale: 0.95,
-                    opacity: 0,
-                    duration: 2,
-                    ease: "sine.inOut"
-                }, `>-0.5`);
-            });
+                // Clear existing circles
+                const existingCircles = rippleCircles.querySelectorAll('.ripple-circle');
+                existingCircles.forEach(circle => circle.remove());
+                
+                // Create ripple circles with progressively increasing sizes
+                const sizes = [420, 500, 600, 720, 860, 1020, 1200];
+                const baseOpacities = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2];
+                
+                sizes.forEach((size, index) => {
+                    const circle = document.createElement('div');
+                    circle.className = 'ripple-circle';
+                    circle.style.width = size + 'px';
+                    circle.style.height = size + 'px';
+                    rippleCircles.appendChild(circle);
+                });
 
-            // Initialize responsive behavior
-            mediaQuery.addEventListener("change", handleResponsive);
-            handleResponsive(mediaQuery);
+                // Animate ripples
+                const circles = rippleCircles.querySelectorAll('.ripple-circle');
+                if (circles.length === 0) return;
+
+                const tl = gsap.timeline({ 
+                    repeat: -1,
+                    defaults: {
+                        ease: "sine.inOut",
+                        duration: 2
+                    }
+                });
+                
+                circles.forEach((circle, index) => {
+                    const baseOpacity = baseOpacities[index];
+                    
+                    tl.fromTo(circle, 
+                        {
+                            scale: 0.95,
+                            opacity: 0
+                        },
+                        {
+                            scale: 1.05,
+                            opacity: baseOpacity,
+                        }, 
+                        index * 0.2 // Start time offset
+                    );
+                });
+
+                // Add the fade out animations
+                circles.forEach((circle, index) => {
+                    tl.to(circle, {
+                        scale: 0.95,
+                        opacity: 0,
+                    }, `>-1.5`); // Overlap with the previous animation
+                });
+            }
+
+            initializeRipples();
+            
+            // Re-initialize on window resize to maintain proper positioning
+            window.addEventListener('resize', () => {
+                initializeRipples();
+            });
         });
 
         // Initialize slider
@@ -1266,12 +1540,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const sliderContainer = document.querySelector('.slider-container');
             const pingPongContainer = document.querySelector('.ping-pong-container');
-            
+
             if (sliderContainer && pingPongContainer) {
                 sliderContainer.addEventListener('mouseenter', () => {
                     pingPongContainer.style.display = 'none';
                 });
-                
+
                 sliderContainer.addEventListener('mouseleave', () => {
                     pingPongContainer.style.display = '';
                 });
