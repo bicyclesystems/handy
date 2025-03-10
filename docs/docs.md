@@ -1,19 +1,18 @@
-# handy
+![handy](./images/handy.svg)
 
-## introduction
+## intro
 
 handy is a revolutionary tool that turns your everyday spaces into an intuitive, ergonomic platform for interacting seamlessly with your computer. instead of relying on a traditional desktop mouse or trackpad, it leverages advanced technology to convert your hand gestures into digital commands, redefining the way you engage with your digital world.
-
 handy was developed with the vision of making computers more accessible, intuitive, and enjoyable. it aims to provide a more natural and ergonomic alternative to traditional input devices.
 
-### core features and benefits
+### features
 
 - advanced gesture recognition technology
 - adaptable to different surfaces
 - open-source api for customization and integration
 - versatile for various user needs, from casual browsing to professional applications
 
-### target audience
+### users
 
 handy is designed for creative people such as:
 
@@ -21,11 +20,11 @@ handy is designed for creative people such as:
 - musicians
 - casual users and anyone looking for a more natural and ergonomic alternative to the traditional mouse
 
-### system overview
+### system
 
 handy's system consists of hardware and software components working together to capture hand movements and translate them into digital commands. the core of this system is the advanced algorithms that adapt to different surfaces for consistent performance.
 
-### handy app
+### app
 
 the handy app provides a simple, intuitive user interface to configure settings. it includes:
 
@@ -36,7 +35,7 @@ the handy app provides a simple, intuitive user interface to configure settings.
 
 supported platforms: macos and windows
 
-### handy framework
+### framework
 
 the handy framework is an open-source platform that allows users to:
 
@@ -55,19 +54,19 @@ key features:
 - infrared or depth-sensing capabilities for better performance and adaptability
 - sleek, modern design that blends well with various desk setups
 
-## handy app
+## app
 
-### system requirements
+### requirements
 
 (specific hardware requirements, software dependencies, and os compatibility would be listed here)
 
-### installation
+### install
 
 - download the handy application installer for your operating system (macos or windows).
 - run the installer and follow the on-screen instructions.
 - once installed, launch the handy application.
 
-### initial configuration
+### setup
 
 - open the handy application.
 - follow the on-screen calibration process.
@@ -77,35 +76,35 @@ key features:
     (information on available preset categories and how to activate/switch presets would be provided here)
     
 
-### using pre-defined gesture sets
+### gestures
 
 handy includes a virtual trackpad driver that interfaces with the operating system's trackpad apis. this driver is responsible for passing the translated gesture events to the operating system. it implements a mechanism to map the recognized gestures into trackpad events, such as taps, swipes, and pinches, compatible with the trackpad apis of macos and windows.
 
 | gesture name | description |
 | --- | --- |
-| move ✅ | finger touch and moves. |
-| single tap ✅ | a quick tap with one finger on the table surface, equivalent to a left-click on a traditional mouse. |
-| double tap ✅ | two quick taps with one finger on the table surface, used to open files or applications, and access context menus. |
-| two-finger tap ✅ | a simultaneous tap with two fingers on the table surface, equivalent to a right-click on a traditional mouse. |
-| tap and hold ✅ | tapping and holding one finger on the table surface, equivalent to clicking and holding the left mouse button. |
-| two-finger scroll ✅ | placing two fingers on the table surface and moving them up or down to scroll vertically or left and right to scroll horizontally. |
-| pinch-to-zoom ✅ | placing two fingers on the table surface and moving them closer together or further apart to zoom in or out of content. |
-| rotate ✅ | placing two fingers on the table surface and moving them in a circular motion to rotate objects or content. |
-| three-finger swipe ✅ | swiping three fingers across the table surface to switch between applications, desktops, or browser tabs. |
-| four-finger swipe ✅ | swiping four fingers across the table surface to show the desktop or reveal all open windows (similar to exposé or task view on macos and windows). |
+| move | finger touch and moves. |
+| single tap | a quick tap with one finger on the table surface, equivalent to a left-click on a traditional mouse. |
+| double tap | two quick taps with one finger on the table surface, used to open files or applications, and access context menus. |
+| two-finger tap | a simultaneous tap with two fingers on the table surface, equivalent to a right-click on a traditional mouse. |
+| tap and hold | tapping and holding one finger on the table surface, equivalent to clicking and holding the left mouse button. |
+| two-finger scroll | placing two fingers on the table surface and moving them up or down to scroll vertically or left and right to scroll horizontally. |
+| pinch-to-zoom | placing two fingers on the table surface and moving them closer together or further apart to zoom in or out of content. |
+| rotate | placing two fingers on the table surface and moving them in a circular motion to rotate objects or content. |
+| three-finger swipe | swiping three fingers across the table surface to switch between applications, desktops, or browser tabs. |
+| four-finger swipe | swiping four fingers across the table surface to show the desktop or reveal all open windows (similar to exposé or task view on macos and windows). |
 | keyboard events |  |
 
-### user interface guide
+### ui
 
 (detailed description of the app's dashboard, menu structure, and customization options would be provided here)
 
-### basic operations
+### basics
 
 - starting/stopping gesture recognition
 - switching between gesture sets
 - viewing active gestures
 
-### settings and configurations
+### settings
 
 the handy app includes options for:
 
@@ -115,15 +114,15 @@ the handy app includes options for:
 - updating device firmware
 - integration with other software
 
-### calibration process
+### calibration
 
 (step-by-step calibration guide and information on when to recalibrate would be included here)
 
-### updating the software
+### updates
 
 (instructions for checking for updates, the update process, and rollback procedures would be detailed here)
 
-### status bar indicator
+### status
 
 the handy app includes a small desktop indicator application that displays the current status of the motion capturing:
 
@@ -134,33 +133,33 @@ the handy app includes a small desktop indicator application that displays the c
 
 this indicator replaces the need for a physical led indicator on the device itself. handy automatically looks for active software that works with its active gestures. if it finds any, it connects the gestures to that software.
 
-## handy framework
+## framework
 
-### sensor technology
+### sensors
 
 - gesture recognition: advanced computer vision algorithms
 - motion tracking: 6-axis motion tracking (accelerometer + gyroscope)
 - surface adaptation: ai-driven surface recognition for consistent performance
 
-### creating custom gestures
+### custom gestures
 
 (instructions for the gesture recording process, defining gesture parameters, and testing/refining gestures would be provided here)
 
-### best practices for reliable detection
+### best practices
 
 (tips for optimal lighting, hand positioning, and gesture complexity would be detailed here)
 
-### troubleshooting recognition issues
+### troubleshooting
 
 (common recognition errors, calibration tips, and guidelines for when to retrain gestures would be listed here)
 
-### creating and editing gestures presets
+### presets
 
 (information on authoring tools and the validation process for gesture presets would be provided here)
 
 (workflow for creating presets, adding/removing gestures, and setting default presets would be detailed here)
 
-### gestures.handy framework
+### gestures.handy
 
 the gestures.handy file uses a json format. here's an example structure:
 
@@ -198,23 +197,23 @@ the gestures.handy file uses a json format. here's an example structure:
 }
 ```
 
-### mapping gestures to system actions
+### mapping
 
 (available system actions and instructions for creating basic mappings would be listed here)
 
-### creating custom mappings
+### custom mapping
 
 (guidelines for defining custom actions and using macros/scripts would be provided here)
 
-### context-sensitive gestures
+### context
 
 (instructions for setting up application-specific gestures and using gestures based on system state would be detailed here)
 
-### advanced mapping techniques
+### advanced
 
 (information on chaining multiple actions, using modifiers with gestures, and creating adaptive gesture responses would be provided here)
 
-### version control and compatibility
+### versions
 
 (details on the versioning scheme and backward compatibility considerations would be included here)
 
@@ -224,7 +223,7 @@ hemi, the sensor that powers handy, captures the magic of your gestures. this sl
 
 the device has a half-spherical shape with a flat base, allowing it to sit stably on the table surface. this design provides an elegant, modern appearance while ensuring a wide field of view for capturing gestures.
 
-### physical characteristics
+### specs
 
 - dimensions:
     - height: 2.5 cm
@@ -252,13 +251,13 @@ the device has a half-spherical shape with a flat base, allowing it to sit stabl
 - integration: seamlessly integrates with the existing gesture recognition system for enhanced depth perception and accuracy
 
 
-### processing
+### processor
 
 - onboard processor: custom-designed image processing chip
 - ram: 1gb lpddr4 for fast data processing
 - storage: 4gb emmc for firmware and configuration data
 
-### connectivity
+### ports
 
 - interface: usb-c 3.1 gen 2 (10 gbps)
 - cable: 1m usb-c cable included
@@ -269,42 +268,42 @@ the device has a half-spherical shape with a flat base, allowing it to sit stabl
 - power source: usb-c (bus-powered)
 - power consumption: 2.5w typical, 4w max
 
-### environmental specifications
+### environment
 
 - operating temperature: 0°c to 40°c (32°f to 104°f)
 - storage temperature: -20°c to 60°c (-4°f to 140°f)
 - humidity: 10% to 90% non-condensing
 
-### software integration
+### software
 
 - firmware: field-upgradable via handy app
 
-### additional features
+### extras
 
 - mounting: non-slip base with twist-lock system for easy attachment/detachment
 
-### package contents
+### contents
 
 - 1x hemi device
 - 1x 1m usb-c cable
 - quick start guide
 - access code for handy software download
 
-### setup and installation
+### setup
 
 (detailed unboxing instructions, positioning guidelines, and connection instructions would be provided here)
 
-### maintenance and care
+### care
 
 - clean the device regularly with a soft, dry cloth
 - avoid exposing the device to extreme temperatures or humidity
 - store in a cool, dry place when not in use
 
-### troubleshooting
+### issues
 
 (common hardware issues and their solutions would be listed here)
 
-## troubleshooting and support
+## support
 
 (this section would include common issues and solutions, instructions for reporting bugs, contact information for support, and community forum guidelines)
 
@@ -316,18 +315,18 @@ the device has a half-spherical shape with a flat base, allowing it to sit stabl
 
 since the device captures images of the user's environment, addressing potential security and privacy concerns is essential. the data transmitted between the device and the computer is encrypted, and privacy settings allow users to control what information is shared.
 
-## release notes
+## releases
 
 (would include version history, changelog, known issues, and the product roadmap)
 
-## community and resources
+## community
 
 (information on contributing to handy, showcases of community projects, educational resources, and the handy blog would be provided here)
 
-### community preset library
+### presets
 
 (information on accessing, rating, and sharing community presets would be detailed here)
 
-### community guidelines and contribution process
+### guidelines
 
 (code of conduct, submission and review process, and licensing information would be detailed here)

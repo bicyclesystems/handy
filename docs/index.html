@@ -15,6 +15,7 @@
         content="handy transforms your movements into digital commands for seamless interaction with your computer.">
     <meta property="og:image" content="https://handy.vision/images/cover.png">
     <meta property="twitter:image" content="https://handy.vision/images/cover.png">
+    <meta name="twitter:card" content="summary_large_image" />
     <meta property="og:url" content="https://handy.vision">
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="https://unpkg.com/@rnbws/renecss/dist/rene.min.css" />
@@ -24,7 +25,18 @@
     <script>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
-        /* Global styles */
+        /* Common Properties */
+        :root {
+            --primary: #F4492B;
+            --secondary: #EFEEEE;
+            --tertiary: #E3DFD9;
+            --light: #F0F0EF;
+            --code: #846642;
+            --circle-size: 127.5px;
+            --max-width: 400px;
+        }
+
+        /* Base Styles */
         .nowrap {
             flex-wrap: nowrap !important;
         }
@@ -33,49 +45,58 @@
             align-items: center;
         }
 
-        /* Ping Pong Animation Styles */
+        /* Container Styles */
+        .ping-pong-container,
+        .infinite-wrapper {
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+        }
+
         .ping-pong-container {
             pointer-events: none;
-            overflow: hidden;
-            position: fixed;
             top: 0;
             left: 0;
             z-index: 9999;
-            width: 100vw;
             height: 100vh;
         }
 
-        .ping-pong-container:has(~ .slider-container:hover) {
-            display: none !important;
+        .infinite-wrapper {
+            position: relative;
+            padding: 5rem 0;
+        }
+
+        /* Circle Styles */
+        .ping-pong-circle,
+        .preorder-circle {
+            border-radius: 100%;
+            pointer-events: auto;
         }
 
         .ping-pong-circle {
             cursor: pointer;
-            pointer-events: auto;
-            position: absolute;
-            width: 127.5px;
-            height: 127.5px;
-            transform: translate(0, 0);
+            position: fixed;
+            width: var(--circle-size);
+            height: var(--circle-size);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 1000;
-            border-radius: 100%;
         }
 
-        /* Preorder Styles */
         .preorder-circle {
             aspect-ratio: 1 / 1 !important;
             width: 100%;
             height: 100%;
-            border-radius: 100%;
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             transform: none !important;
-            /* Prevent animation transforms */
-            pointer-events: auto;
         }
 
+        /* Section Styles */
         .preorder-section {
             position: relative;
             width: 100%;
@@ -86,23 +107,25 @@
             pointer-events: auto;
         }
 
-        .preorder-image {
+        /* Image and Price Styles */
+        .preorder-image,
+        .preorder-price {
+            width: 50%;
+            max-width: var(--max-width);
             position: relative;
+        }
+
+        .preorder-image {
             right: -5%;
             z-index: 0;
-            width: 50%;
-            max-width: 400px;
         }
 
         .preorder-price {
-            position: relative;
             left: -5%;
             z-index: 1;
-            width: 50%;
-            max-width: 400px;
         }
 
-        /* Replace color styles with René CSS utility classes */
+        /* Color Utility Classes */
         .bg-orange {
             background-color: var(--primary);
             color: var(--light);
@@ -129,6 +152,7 @@
             color: var(--light);
         }
 
+        /* Code Container Styles */
         .code-container {
             border: 1px solid var(--code);
             flex-wrap: nowrap;
@@ -139,38 +163,24 @@
             color: var(--code);
         }
 
-        .mobile-cover {
-            background: no-repeat center/cover;
-            position: relative;
-        }
-
+        /* Link Styles */
         .github-link {
             background-color: var(--primary);
             color: var(--light);
             text-decoration: none;
         }
 
-        .motion-video {
+        /* Video Styles */
+        .motion-video,
+        .mobile-cover {
             width: 100%;
             max-width: 800px;
             margin: 2rem auto;
         }
 
-        /* Add René CSS custom properties for colors */
-        :root {
-            --primary: #F4492B;
-            --secondary: #EFEEEE;
-            --tertiary: #E3DFD9;
-            --light: #F0F0EF;
-            --code: #846642;
-        }
-
-        /* Infinite Wrapper Fix */
-        .infinite-wrapper {
-            width: 100%;
-            overflow-x: hidden;
+        .mobile-cover {
+            background: no-repeat center/cover;
             position: relative;
-            padding: 5rem 0;
         }
 
         /* Countdown Styles */
@@ -196,7 +206,7 @@
         @media (max-width: 768px) {
             .preorder-circle {
                 top: -80px
-        }
+            }
 
             .mobile-stack {
                 flex-direction: column;
@@ -435,7 +445,7 @@
         <img class="box-xs padding-l" src="./images/logo.svg">
     </div>
     <div class="view column align-center">
-        <div class="page text-center align-center">
+        <div class="page gap-xl text-center align-center">
             <h1>wave hello to the </br> future of computing</h1>
             <h4>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting
                 seamlessly with your computer.</h4>
@@ -443,7 +453,7 @@
     </div>
     <handy-slider></handy-slider>
     <div class="view column align-center">
-        <div class="page">
+        <div class="page gap-xl">
             <h3 class="text-center">from jaw-dropping design to jam sessions,<br />your hand is the only thing you need
             </h3>
             <p class="text-center">handy leverages advanced technology to convert your hand gestures into digital
@@ -478,7 +488,7 @@
         </div>
     </div>
     <div class="view align-center column">
-        <div class="page">
+        <div class="page gap-xl">
             <h3 class="text-center">your gateway to gestural goodness</h3>
             <div class="row gap-column-xl">
                 <div class="box column">
@@ -494,7 +504,7 @@
         </div>
     </div>
     <div class="view column align-center">
-        <div class="page">
+        <div class="page gap-xl">
             <h3 class="text-center">meet hemi, it's like a tiny<br> moon, but way cooler</h3>
             <h5 class="text-center">this small, hemisphere-shaped device captures movement in<br> the higher
                 performance. hemi enhances the handy experience <br> and elevating its gesture control technology.</h5>
@@ -523,7 +533,7 @@
         </div>
     </div>
     <div class="view row align-center">
-        <div class="page row justify-stretch nowrap">
+        <div class="page gap-xl row justify-stretch nowrap">
             <h3 class="">tech spec</h3>
             <div class="row gap-xl nowrap">
                 <div class="column gap-m box-s">
@@ -720,7 +730,7 @@
 
     </div>
     <div class="view column align-center bg-light-gray">
-        <div class="page center-page">
+        <div class="page gap-xl center-page">
             <h3 class="text-center">the magic behind the moves</h3>
             <h5 class="text-center">ever wished your computer could read your mind? well,<br class="mobile-hide"> we're
                 getting close. handy turns your movements into<br class="mobile-hide"> digital commands. it's like
@@ -730,7 +740,7 @@
         </div>
     </div>
     <div class="view column align-center">
-        <div class="page align-center">
+        <div class="page gap-xl align-center">
             <h3 class="text-center">join the handy hive mind</h3>
             <h5 class="text-center">meet gestures.handy - open-source gesture wonderland.<br class="mobile-hide">
                 define custom moves, map them to actions,<br class="mobile-hide">
@@ -741,7 +751,7 @@
                         peace sign to scroll? salute to
                         email? you got it.
                         dive in. your hands have stories - let's make your computer listen.</p>
-                    <a href="https://github.com/orgs/weareunderdesign/discussions" target="_blank"
+                    <a href="https://github.com/weareunderdesign/handy" target="_blank"
                         class="handy-orange-bg text-light padding-s align-center gap-s radius-m text-l">
                         <svg-icon src="./images/github.svg" class="icon-s"></svg-icon>gestures.handy</a>
                 </div>
@@ -767,7 +777,7 @@
         </div>
     </div>
     <div class="view column align-center bg-warm-gray">
-        <div class="page text-center">
+        <div class="page gap-xl text-center">
             <h3>get your hands on the future</h3>
             <h5>level up your handy game with hemi to make your <br class="hide-mobile"> gestures smoother, faster, and
                 way cooler.</h5>
@@ -776,7 +786,7 @@
                     <span class="text-m">days</span>
                     <div class="row gap-xs nowrap">
                         <div class="box-s padding-m align-center handy-orange-border text-light" id="days-tens">
-                            <h1>7</h1>
+                            <h1>0</h1>
                         </div>
                         <div class="box-s padding-m align-center handy-orange-bg text-light" id="days-ones">
                             <h1>0</h1>
@@ -790,7 +800,7 @@
                             <h1>0</h1>
                         </div>
                         <div class="box-s padding-m align-center handy-orange-bg text-light" id="hours-ones">
-                            <h1>3</h1>
+                            <h1>0</h1>
                         </div>
                     </div>
                 </div>
@@ -798,10 +808,10 @@
                     <span class="text-m">minutes</span>
                     <div class="row gap-xs nowrap">
                         <div class="box-s padding-m align-center handy-orange-bg text-light" id="minutes-tens">
-                            <h1>2</h1>
+                            <h1>0</h1>
                         </div>
                         <div class="box-s padding-m align-center handy-orange-bg text-light" id="minutes-ones">
-                            <h1>3</h1>
+                            <h1>0</h1>
                         </div>
                     </div>
                 </div>
@@ -815,18 +825,18 @@
                 </div>
                 <a href="https://store.weareunder.design/products/hemi" target="_blank"
                     class="preorder-circle box-m column align-center gap-xl handy-orange-bg radius-full text-light preorder-price"">
-                    <div class="column gap-xl">
-                        <h2>$99</h2>
-                        <h3>pre-order</h3>
-                    </div>
-                    <div class="column align-center gap-s">
-                        <span class="text-l">gestures.handy framework</span>
-                        <span class="text-l">early source code access</span>
-                        <span class="text-l">handy app</span>
-                    </div>
-                </a>
+                    <div class=" column gap-xl">
+                    <h2>$99</h2>
+                    <h3>pre-order</h3>
             </div>
+            <div class="column align-center gap-s">
+                <span class="text-l">gestures.handy framework</span>
+                <span class="text-l">early source code access</span>
+                <span class="text-l">handy app</span>
+            </div>
+            </a>
         </div>
+    </div>
     </div>
     <!-- Testimonials Section -->
     <div class="view column align-center gap-xl text-center">
@@ -887,7 +897,7 @@
     <div class="view column align-center">
 
 
-        <div class="page">
+        <div class="page gap-xl">
             <div class="column align-start">
                 <h5>will handy work with my potato computer?</h5>
                 <p>if it can run a modern browser, you're golden. no supercomputer required</p>
@@ -1092,270 +1102,261 @@
     <script src="https://weareunder.design/js/footer.js"></script>
     <script src="https://weareunder.design/js/navigation.js"></script>
     <script>
-        // Timer functionality
-        function updateDisplay(id, value, isLeftZero) {
-            const tens = Math.floor(value / 10);
-            const ones = value % 10;
-            updateDigit(`${id}-tens`, tens, isLeftZero);
-            updateDigit(`${id}-ones`, ones, isLeftZero && tens === 0);
-        }
-
-        function updateDigit(id, value, isLeftZero) {
-            const element = document.querySelector(`#${id}`);
-            element.querySelector('h1').textContent = value;
-
-            if (value === 0 && isLeftZero) {
-                element.classList.remove('bg-orange', 'text-light');
-                element.classList.add('text-orange', 'border-orange');
-            } else {
-                element.classList.remove('text-orange', 'border-orange');
-                element.classList.add('bg-orange', 'text-light');
-            }
-        }
-
-        function startTimer(days, hours, minutes) {
-            let startTime = localStorage.getItem('timerStartTime');
-            let totalMinutesInitial = days * 1440 + hours * 60 + minutes;
-
-            if (!startTime) {
-                startTime = Date.now();
-                localStorage.setItem('timerStartTime', startTime);
-                localStorage.setItem('totalMinutesInitial', totalMinutesInitial);
-            } else {
-                totalMinutesInitial = parseInt(localStorage.getItem('totalMinutesInitial'));
-            }
-
-            function updateTimer() {
-                const elapsedMinutes = Math.floor((Date.now() - startTime) / 60000);
-                let totalMinutes = totalMinutesInitial - elapsedMinutes;
-
-                if (totalMinutes <= 0) {
-                    clearInterval(timerInterval);
-                    localStorage.removeItem('timerStartTime');
-                    localStorage.removeItem('totalMinutesInitial');
-                    updateDisplay('days', 0, true);
-                    updateDisplay('hours', 0, true);
-                    updateDisplay('minutes', 0, true);
-                    return;
-                }
-
-                const d = Math.floor(totalMinutes / 1440);
-                const h = Math.floor((totalMinutes % 1440) / 60);
-                const m = totalMinutes % 60;
-
-                updateDisplay('days', d, true);
-                updateDisplay('hours', h, d === 0);
-                updateDisplay('minutes', m, d === 0 && h === 0);
-            }
-
-            updateTimer();
-            const timerInterval = setInterval(updateTimer, 60000);
-        }
-
-        // Ping Pong Animation functionality
-        window.pingPongVars = {
-            dot: null,
-            container: null,
-            containerBounds: null,
-            xMax: null,
-            xMin: null,
-            yMax: null,
-            yMin: null,
-            tweens: {}
-        };
-
-        function updatePlayground(element) {
-            const vars = window.pingPongVars;
-            vars.dot = element;
-            if (!vars.dot) return;
-            vars.container = document.querySelector(".ping-pong");
-            const dotBounds = vars.dot.getBoundingClientRect();
-            vars.containerBounds = vars.container.getBoundingClientRect();
-            vars.xMax = vars.containerBounds.right - dotBounds.right;
-            vars.xMin = vars.containerBounds.left - dotBounds.left;
-            vars.yMax = vars.containerBounds.bottom - dotBounds.bottom;
-            vars.yMin = vars.containerBounds.top - dotBounds.top;
-        }
-
-        function ensureInsideContainer(ball) {
-            const container = window.pingPongVars.container || document.querySelector('.ping-pong');
-            if (!container) return;
-            const containerRect = container.getBoundingClientRect();
-            const ballRect = ball.getBoundingClientRect();
-            let deltaX = 0, deltaY = 0;
-
-            if (ballRect.left < containerRect.left) {
-                deltaX = containerRect.left - ballRect.left;
-            } else if (ballRect.right > containerRect.right) {
-                deltaX = containerRect.right - ballRect.right;
-            }
-
-            if (ballRect.top < containerRect.top) {
-                deltaY = containerRect.top - ballRect.top;
-            } else if (ballRect.bottom > containerRect.bottom) {
-                deltaY = containerRect.bottom - ballRect.bottom;
-            }
-
-            let currentX = 0, currentY = 0;
-            const transform = ball.style.transform;
-            if (transform) {
-                const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
-                if (match) {
-                    currentX = parseFloat(match[1]);
-                    currentY = parseFloat(match[2]);
-                }
-            }
-            ball.style.transform = `translate(${currentX + deltaX}px, ${currentY + deltaY}px)`;
-        }
-
-        function animationToElement(element) {
-            let tween = gsap.to(element, {
-                duration: 80,
-                repeat: -1,
-                ease: "none",
-                onUpdate: () => {
-                    updateBallPosition(element);
-                    resolveCollision(element);
-                }
-            });
-
-            element.addEventListener("mouseenter", () => tween.pause());
-            element.addEventListener("mouseleave", () => tween.resume());
-
-            return tween;
-        }
-
-        function initializeCircles() {
-            try {
-                // Only select the ping pong animation circle, not the static preorder circle
-                const circles = document.querySelectorAll('#cta-animation.ping-pong-circle');
-                circles.forEach(circle => {
-                    updatePlayground(circle);
-                    ensureInsideContainer(circle);
-                    circle.velocity = { x: 1, y: 1 };
-                });
-                if (window.pingPongVars.containerBounds && window.pingPongVars.containerBounds.bottom > 0) {
-                    circles.forEach(circle => {
-                        const id = circle.id || 'circle';
-                        window.pingPongVars.tweens[id] = animationToElement(circle);
-                    });
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        function updateBallPosition(ball) {
-            let currentX = 0, currentY = 0;
-            const transform = ball.style.transform;
-            if (transform) {
-                const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
-                if (match) {
-                    currentX = parseFloat(match[1]);
-                    currentY = parseFloat(match[2]);
-                }
-            }
-
-            const container = window.pingPongVars.container;
-            const containerBounds = container.getBoundingClientRect();
-            const ballRect = ball.getBoundingClientRect();
-
-            if ((ballRect.left + ball.velocity.x <= containerBounds.left) ||
-                (ballRect.right + ball.velocity.x >= containerBounds.right)) {
-                ball.velocity.x *= -1;
-            }
-            if ((ballRect.top + ball.velocity.y <= containerBounds.top) ||
-                (ballRect.bottom + ball.velocity.y >= containerBounds.bottom)) {
-                ball.velocity.y *= -1;
-            }
-
-            currentX += ball.velocity.x;
-            currentY += ball.velocity.y;
-            ball.style.transform = `translate(${currentX}px, ${currentY}px)`;
-        }
-
-        function resolveCollision(ball) {
-            // Only check collisions with other ping pong circles, not static elements
-            const balls = document.querySelectorAll('#cta-animation.ping-pong-circle');
-            const ballRect = ball.getBoundingClientRect();
-            const ballCenter = {
-                x: ballRect.left + ballRect.width / 2,
-                y: ballRect.top + ballRect.height / 2
-            };
-
-            balls.forEach(otherBall => {
-                if (otherBall === ball) return;
-                const otherRect = otherBall.getBoundingClientRect();
-                const otherCenter = {
-                    x: otherRect.left + otherRect.width / 2,
-                    y: otherRect.top + otherRect.height / 2
-                };
-
-                const dx = ballCenter.x - otherCenter.x;
-                const dy = ballCenter.y - otherCenter.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                const minDist = (ballRect.width / 2) + (otherRect.width / 2);
-
-                if (distance < minDist) {
-                    const tempVelocity = { ...ball.velocity };
-                    ball.velocity = { ...otherBall.velocity };
-                    otherBall.velocity = tempVelocity;
-                }
-            });
-        }
-
-        function bringCircleToInitialPosition() {
-            const circles = document.querySelectorAll('[class*="circle"]');
-            circles.forEach(circle => {
-                ensureInsideContainer(circle);
-            });
-        }
-
-        function pauseBouncingAnimation() {
-            try {
-                Object.values(window.pingPongVars.tweens).forEach(tween => tween?.pause());
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        function restartBouncingAnimation() {
-            try {
-                Object.values(window.pingPongVars.tweens).forEach(tween => tween?.restart());
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        // Handle responsive behavior
-        const mediaQuery = window.matchMedia("(max-width: 992px)");
-
-        function handleResponsive(e) {
-            const cta = document.getElementById("cta-animation");
-            const brandsprintCircles = document.querySelectorAll(".brand-sprint-circle");
-            let circlesArray = Array.from(brandsprintCircles);
-
-            if (e.matches) {
-                bringCircleToInitialPosition();
-                pauseBouncingAnimation();
-                if (cta) cta.style.display = "none";
-                if (brandsprintCircles) {
-                    circlesArray.forEach(circle => circle.style.display = "none");
-                }
-            } else {
-                bringCircleToInitialPosition();
-                restartBouncingAnimation();
-                if (cta) cta.style.display = "flex";
-                if (brandsprintCircles) {
-                    circlesArray.forEach(circle => circle.style.display = "flex");
-                }
-            }
-        }
-
         // Initialize everything when the DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize timer
-            startTimer(70, 2, 23);
+            // Initialize countdown timer
+            function updateDisplay(id, value, isLeftZero) {
+                const tens = Math.floor(value / 10);
+                const ones = value % 10;
+                updateDigit(`${id}-tens`, tens, isLeftZero);
+                updateDigit(`${id}-ones`, ones, isLeftZero && tens === 0);
+            }
+
+            function updateDigit(id, value, isLeftZero) {
+                const element = document.querySelector(`#${id}`);
+                element.querySelector('h1').textContent = value;
+
+                if (value === 0 && isLeftZero) {
+                    element.classList.remove('bg-orange', 'text-light');
+                    element.classList.add('text-orange', 'border-orange');
+                } else {
+                    element.classList.remove('text-orange', 'border-orange');
+                    element.classList.add('bg-orange', 'text-light');
+                }
+            }
+
+            function startCountdown() {
+                // Set target date to 3 months from now
+                const now = new Date();
+                const targetDate = new Date(now);
+                targetDate.setMonth(now.getMonth() + 3);
+
+                function updateCountdown() {
+                    const now = new Date();
+                    const diff = targetDate - now;
+
+                    if (diff <= 0) {
+                        clearInterval(countdownInterval);
+                        updateDisplay('days', 0, true);
+                        updateDisplay('hours', 0, true);
+                        updateDisplay('minutes', 0, true);
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                    updateDisplay('days', days, true);
+                    updateDisplay('hours', hours, days === 0);
+                    updateDisplay('minutes', minutes, days === 0 && hours === 0);
+                }
+
+                updateCountdown();
+                const countdownInterval = setInterval(updateCountdown, 60000); // Update every minute
+            }
+
+            startCountdown();
+
+            // Ping Pong Animation functionality
+            window.pingPongVars = {
+                dot: null,
+                container: null,
+                containerBounds: null,
+                xMax: null,
+                xMin: null,
+                yMax: null,
+                yMin: null,
+                tweens: {}
+            };
+
+            function updatePlayground(element) {
+                const vars = window.pingPongVars;
+                vars.dot = element;
+                if (!vars.dot) return;
+                vars.container = document.querySelector(".ping-pong");
+                const dotBounds = vars.dot.getBoundingClientRect();
+                vars.containerBounds = vars.container.getBoundingClientRect();
+                vars.xMax = vars.containerBounds.right - dotBounds.right;
+                vars.xMin = vars.containerBounds.left - dotBounds.left;
+                vars.yMax = vars.containerBounds.bottom - dotBounds.bottom;
+                vars.yMin = vars.containerBounds.top - dotBounds.top;
+            }
+
+            function ensureInsideContainer(ball) {
+                const container = window.pingPongVars.container || document.querySelector('.ping-pong');
+                if (!container) return;
+                const containerRect = container.getBoundingClientRect();
+                const ballRect = ball.getBoundingClientRect();
+                let deltaX = 0, deltaY = 0;
+
+                if (ballRect.left < containerRect.left) {
+                    deltaX = containerRect.left - ballRect.left;
+                } else if (ballRect.right > containerRect.right) {
+                    deltaX = containerRect.right - ballRect.right;
+                }
+
+                if (ballRect.top < containerRect.top) {
+                    deltaY = containerRect.top - ballRect.top;
+                } else if (ballRect.bottom > containerRect.bottom) {
+                    deltaY = containerRect.bottom - ballRect.bottom;
+                }
+
+                let currentX = 0, currentY = 0;
+                const transform = ball.style.transform;
+                if (transform) {
+                    const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+                    if (match) {
+                        currentX = parseFloat(match[1]);
+                        currentY = parseFloat(match[2]);
+                    }
+                }
+                ball.style.transform = `translate(${currentX + deltaX}px, ${currentY + deltaY}px)`;
+            }
+
+            function animationToElement(element) {
+                let tween = gsap.to(element, {
+                    duration: 80,
+                    repeat: -1,
+                    ease: "none",
+                    onUpdate: () => {
+                        updateBallPosition(element);
+                        resolveCollision(element);
+                    }
+                });
+
+                element.addEventListener("mouseenter", () => tween.pause());
+                element.addEventListener("mouseleave", () => tween.resume());
+
+                return tween;
+            }
+
+            function initializeCircles() {
+                try {
+                    // Only select the ping pong animation circle, not the static preorder circle
+                    const circles = document.querySelectorAll('#cta-animation.ping-pong-circle');
+                    circles.forEach(circle => {
+                        updatePlayground(circle);
+                        ensureInsideContainer(circle);
+                        circle.velocity = { x: 1, y: 1 };
+                    });
+                    if (window.pingPongVars.containerBounds && window.pingPongVars.containerBounds.bottom > 0) {
+                        circles.forEach(circle => {
+                            const id = circle.id || 'circle';
+                            window.pingPongVars.tweens[id] = animationToElement(circle);
+                        });
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+
+            function updateBallPosition(ball) {
+                let currentX = 0, currentY = 0;
+                const transform = ball.style.transform;
+                if (transform) {
+                    const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+                    if (match) {
+                        currentX = parseFloat(match[1]);
+                        currentY = parseFloat(match[2]);
+                    }
+                }
+
+                const container = window.pingPongVars.container;
+                const containerBounds = container.getBoundingClientRect();
+                const ballRect = ball.getBoundingClientRect();
+
+                if ((ballRect.left + ball.velocity.x <= containerBounds.left) ||
+                    (ballRect.right + ball.velocity.x >= containerBounds.right)) {
+                    ball.velocity.x *= -1;
+                }
+                if ((ballRect.top + ball.velocity.y <= containerBounds.top) ||
+                    (ballRect.bottom + ball.velocity.y >= containerBounds.bottom)) {
+                    ball.velocity.y *= -1;
+                }
+
+                currentX += ball.velocity.x;
+                currentY += ball.velocity.y;
+                ball.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+
+            function resolveCollision(ball) {
+                // Only check collisions with other ping pong circles, not static elements
+                const balls = document.querySelectorAll('#cta-animation.ping-pong-circle');
+                const ballRect = ball.getBoundingClientRect();
+                const ballCenter = {
+                    x: ballRect.left + ballRect.width / 2,
+                    y: ballRect.top + ballRect.height / 2
+                };
+
+                balls.forEach(otherBall => {
+                    if (otherBall === ball) return;
+                    const otherRect = otherBall.getBoundingClientRect();
+                    const otherCenter = {
+                        x: otherRect.left + otherRect.width / 2,
+                        y: otherRect.top + otherRect.height / 2
+                    };
+
+                    const dx = ballCenter.x - otherCenter.x;
+                    const dy = ballCenter.y - otherCenter.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const minDist = (ballRect.width / 2) + (otherRect.width / 2);
+
+                    if (distance < minDist) {
+                        const tempVelocity = { ...ball.velocity };
+                        ball.velocity = { ...otherBall.velocity };
+                        otherBall.velocity = tempVelocity;
+                    }
+                });
+            }
+
+            function bringCircleToInitialPosition() {
+                const circles = document.querySelectorAll('[class*="circle"]');
+                circles.forEach(circle => {
+                    ensureInsideContainer(circle);
+                });
+            }
+
+            function pauseBouncingAnimation() {
+                try {
+                    Object.values(window.pingPongVars.tweens).forEach(tween => tween?.pause());
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+
+            function restartBouncingAnimation() {
+                try {
+                    Object.values(window.pingPongVars.tweens).forEach(tween => tween?.restart());
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+
+            // Handle responsive behavior
+            const mediaQuery = window.matchMedia("(max-width: 992px)");
+
+            function handleResponsive(e) {
+                const cta = document.getElementById("cta-animation");
+                const brandsprintCircles = document.querySelectorAll(".brand-sprint-circle");
+                let circlesArray = Array.from(brandsprintCircles);
+
+                if (e.matches) {
+                    bringCircleToInitialPosition();
+                    pauseBouncingAnimation();
+                    if (cta) cta.style.display = "none";
+                    if (brandsprintCircles) {
+                        circlesArray.forEach(circle => circle.style.display = "none");
+                    }
+                } else {
+                    bringCircleToInitialPosition();
+                    restartBouncingAnimation();
+                    if (cta) cta.style.display = "flex";
+                    if (brandsprintCircles) {
+                        circlesArray.forEach(circle => circle.style.display = "flex");
+                    }
+                }
+            }
 
             // Initialize ping pong animation
             const container = document.querySelector('.ping-pong-container');
@@ -1374,15 +1375,15 @@
             function initializeRipples() {
                 const rippleCircles = document.querySelector('.ripple-circles');
                 if (!rippleCircles) return;
-                
+
                 // Clear existing circles
                 const existingCircles = rippleCircles.querySelectorAll('.ripple-circle');
                 existingCircles.forEach(circle => circle.remove());
-                
+
                 // Create ripple circles with progressively increasing sizes
                 const sizes = [420, 500, 600, 720, 860, 1020, 1200];
                 const baseOpacities = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2];
-                
+
                 sizes.forEach((size, index) => {
                     const circle = document.createElement('div');
                     circle.className = 'ripple-circle';
@@ -1395,18 +1396,18 @@
                 const circles = rippleCircles.querySelectorAll('.ripple-circle');
                 if (circles.length === 0) return;
 
-                const tl = gsap.timeline({ 
+                const tl = gsap.timeline({
                     repeat: -1,
                     defaults: {
                         ease: "sine.inOut",
                         duration: 2
                     }
                 });
-                
+
                 circles.forEach((circle, index) => {
                     const baseOpacity = baseOpacities[index];
-                    
-                    tl.fromTo(circle, 
+
+                    tl.fromTo(circle,
                         {
                             scale: 0.95,
                             opacity: 0
@@ -1414,7 +1415,7 @@
                         {
                             scale: 1.05,
                             opacity: baseOpacity,
-                        }, 
+                        },
                         index * 0.2 // Start time offset
                     );
                 });
@@ -1429,7 +1430,7 @@
             }
 
             initializeRipples();
-            
+
             // Re-initialize on window resize to maintain proper positioning
             window.addEventListener('resize', () => {
                 initializeRipples();
