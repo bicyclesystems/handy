@@ -352,12 +352,6 @@
             width: 28px;
             height: 28px;
         }
-
-        rr {
-            display: block;
-            content: '';
-        }
-
         /* Background Video */
         .background-video {
             position: absolute;
@@ -435,52 +429,60 @@
     <div class="ping-pong ping-pong-container">
         <a href="https://store.weareunder.design/products/hemi" id="cta-animation" target="_blank"
             class="ping-pong-circle handy-orange-bg text-light align-center justify-center">
-            <h5>preorder</h5>
+            <h5 style="margin: 0;">preorder</h5>
         </a>
     </div>
     <div class="view column align-center">
         <video autoplay loop muted playsinline class="background-video">
-            <source src="./videos/handy.webm">
+            <source src="./videos/handy.webm" type="video/webm" />
         </video>
-        <img class="box-xs padding-l" src="./images/logo.svg">
+        <img class="box-xs padding-l" src="./images/logo.svg" alt="Handy logo">
     </div>
     <div class="view column align-center">
         <div class="page gap-xl text-center align-center">
-            <h1>wave hello to the </br> future of computing</h1>
-            <h4>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting
-                seamlessly with your computer.</h4>
+            <div><h1>wave hello to the <br> future of computing</h1><h4>handy turns your everyday spaces into an intuitive, ergonomic platform for interacting
+                seamlessly with your computer.</h4></div>
+            
         </div>
     </div>
     <handy-slider></handy-slider>
     <div class="view column align-center">
         <div class="page gap-xl">
-            <h3 class="text-center">from jaw-dropping design to jam sessions,<br />your hand is the only thing you need
-            </h3>
-            <p class="text-center">handy leverages advanced technology to convert your hand gestures into digital
-                commands.<br>from casual browsing to professional applications like animation and music software.</p>
+            <div>
+              <h3 class="text-center">
+                from jaw-dropping design to jam sessions,<br />your hand is the only thing
+                you need
+              </h3>
+              <p class="text-center">
+                handy leverages advanced technology to convert your hand gestures into
+                digital commands.<br />from casual browsing to professional applications
+                like animation and music software.
+              </p>
+            </div>
+            
             <div class="row justify-stretch gap-m nowrap">
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand1.svg" />
+                    <img class="box-l" src="./images/hand1.svg" alt="Hand gesture illustration 1" />
                     <span class="text-m">plays well with others - mac, windows, linux - handy's down to party with all
                         of them</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand2.svg" />
+                    <img class="box-l" src="./images/hand2.svg" alt="Hand gesture illustration 2" />
                     <span class="text-m">gesture recognition that gets you - reads your moves like a best friend. no
                         awkward learning curve, just natural interaction</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand3.svg" />
+                    <img class="box-l" src="./images/hand3.svg" alt="Hand gesture illustration 3" />
                     <span class="text-m">open-source magic - we've thrown our code to the wolves (aka developers). watch
                         the community make handy even more awesome</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand4.svg" />
+                    <img class="box-l" src="./images/hand4.svg" alt="Hand gesture illustration 4" />
                     <span class="text-m">ergonomic af- designed to keep your hands happy. say goodbye to wrist
                         pain and hello to all-day comfort</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand5.svg" />
+                    <img class="box-l" src="./images/hand5.svg" alt="Hand gesture illustration 5" />
                     <span class="text-m">gestures as unique as you- craft your own moves. want to open spotify
                         with a rock on sign? you got it.</span>
                 </div>
@@ -500,32 +502,41 @@
                         professional applications like animation and music software.</p>
                 </div>
             </div>
-            <img src="./images/app.png">
+            <img src="./images/app.png" alt="Handy application interface">
         </div>
     </div>
     <div class="view column align-center">
         <div class="page gap-xl">
-            <h3 class="text-center">meet hemi, it's like a tiny<br> moon, but way cooler</h3>
-            <h5 class="text-center">this small, hemisphere-shaped device captures movement in<br> the higher
-                performance. hemi enhances the handy experience <br> and elevating its gesture control technology.</h5>
+            <div>
+              <h3 class="text-center">
+                meet hemi, it's like a tiny<br />
+                moon, but way cooler
+              </h3>
+              <h5 class="text-center">
+                this small, hemisphere-shaped device captures movement in<br />
+                the higher performance. hemi enhances the handy experience <br />
+                and elevating its gesture control technology.
+              </h5>
+            </div>
+            
             <div class="row justify-stretch gap-m nowrap">
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand6.svg">
+                    <img class="box-l" src="./images/hand6.svg" alt="USB connectivity illustration">
                     <span class="text-m">usb connectivity ensures compatibility with a wide range of devices and
                         operating systems.</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand7.svg">
+                    <img class="box-l" src="./images/hand7.svg" alt="Security illustration">
                     <span class="text-m">ensures security through encrypted data transmission. protects user privacy by
                         not storing or transmitting image elsewhere,</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand8.svg">
+                    <img class="box-l" src="./images/hand8.svg" alt="Eco-friendly design illustration">
                     <span class="text-m">eco-friendly design with durability. sustainable materials and recycled
                         plastics.</span>
                 </div>
                 <div class="box-l column gap-m">
-                    <img class="box-l" src="./images/hand9.svg">
+                    <img class="box-l" src="./images/hand9.svg" alt="Camera module illustration">
                     <span class="text-m">high-resolution camera module that captures hand movements and gestures in
                         real-time.</span>
                 </div>
@@ -620,7 +631,7 @@
                     </div>
                 </div>
                 <div class="column gap-m box-m">
-                    <img src="./images/hemi-1.svg">
+                    <img src="./images/hemi-1.svg" alt="Hemi device illustration">
                 </div>
                 <div class="column gap-m box-s text-right">
 
@@ -720,31 +731,46 @@
             </div>
             <div class="ripple-container">
                 <div class="ripple-circles">
-                    <img src="./images/hemi.svg" class="ripple-image">
+                    <img src="./images/hemi.svg" class="ripple-image" alt="Hemi device">
                 </div>
             </div>
         </div>
     </div>
     <div class="view column align-center justify-end hemi gap-xs">
-        <img class="box-s" src="./images/second_background.png">
+        <img class="box-s" src="./images/second_background.png" alt="Background image">
 
     </div>
     <div class="view column align-center bg-light-gray">
-        <div class="page gap-xl center-page">
-            <h3 class="text-center">the magic behind the moves</h3>
-            <h5 class="text-center">ever wished your computer could read your mind? well,<br class="mobile-hide"> we're
-                getting close. handy turns your movements into<br class="mobile-hide"> digital commands. it's like
-                magic, but real.</h5>
-            <video class="box-m padding-l motion-video" src="./videos/Fingers_motion.webm" autoplay loop muted
-                playsinline></video>
+        <div class="page center-page">
+            <div>
+              <h3 class="text-center">the magic behind the moves</h3>
+              <h5 class="text-center">
+                ever wished your computer could read your mind? well,<br
+                  class="mobile-hide"
+                />
+                we're getting close. handy turns your movements into<br
+                  class="mobile-hide"
+                />
+                digital commands. it's like magic, but real.
+              </h5>
+            </div>
+            
+            <video class="box-m motion-video" src="./videos/Fingers_motion.webm" autoplay loop muted playsinline></video>
         </div>
     </div>
     <div class="view column align-center">
         <div class="page gap-xl align-center">
-            <h3 class="text-center">join the handy hive mind</h3>
-            <h5 class="text-center">meet gestures.handy - open-source gesture wonderland.<br class="mobile-hide">
-                define custom moves, map them to actions,<br class="mobile-hide">
-                and watch your computer dance. </h5>
+            <div>
+              <h3 class="text-center">join the handy hive mind</h3>
+              <h5 class="text-center">
+                meet gestures.handy - open-source gesture wonderland.<br
+                  class="mobile-hide"
+                />
+                define custom moves, map them to actions,<br class="mobile-hide" />
+                and watch your computer dance.
+              </h5>
+            </div>
+            
             <div class="box-m justify-stretch gap-xl mobile-stack">
                 <div class="column align-start box-s gap-m mobile-center">
                     <p class="column justify-stretch">
@@ -757,7 +783,7 @@
                 </div>
                 <div class="code-container padding-l gap-xl mobile-hide">
                     <code class="code-text">
-                    {</br>
+                    {<br>
                     &nbsp;"gestures": { <br>
                     &nbsp;&nbsp;"custom": [ <br>
                     &nbsp;&nbsp;{ <br>
@@ -770,7 +796,7 @@
                     }
                     </code>
                     <div class="hand-image">
-                        <img src="./images/hand10.svg">
+                        <img src="./images/hand10.svg" alt="Hand gesture illustration">
                     </div>
                 </div>
             </div>
@@ -778,9 +804,14 @@
     </div>
     <div class="view column align-center bg-warm-gray">
         <div class="page gap-xl text-center">
-            <h3>get your hands on the future</h3>
-            <h5>level up your handy game with hemi to make your <br class="hide-mobile"> gestures smoother, faster, and
-                way cooler.</h5>
+            <div>
+              <h3>get your hands on the future</h3>
+              <h5>
+                level up your handy game with hemi to make your <br class="mobile-hide" />
+                gestures smoother, faster, and way cooler.
+              </h5>
+            </div>
+            
             <div class="align-center row gap-l flex-nowrap mobile-stack">
                 <div class="column gap-s">
                     <span class="text-m">days</span>
@@ -821,20 +852,21 @@
             </span>
             <div class="preorder-section box-m">
                 <div class="preorder-image box-m">
-                    <img src="./images/preorder.svg">
+                    <img src="./images/preorder.svg" alt="Hemi device preview">
                 </div>
                 <a href="https://store.weareunder.design/products/hemi" target="_blank"
-                    class="preorder-circle box-m column align-center gap-xl handy-orange-bg radius-full text-light preorder-price"">
-                    <div class=" column gap-xl">
-                    <h2>$99</h2>
-                    <h3>pre-order</h3>
+                    class="preorder-circle box-m column align-center gap-xl handy-orange-bg radius-full text-light preorder-price">
+                    <div class="column gap-xl">
+                        <h2>$99</h2>
+                        <h3 style="margin: 0;">pre-order</h3>
+                    </div>
+                    <div class="column align-center gap-s">
+                        <span class="text-l">gestures.handy framework</span>
+                        <span class="text-l">early source code access</span>
+                        <span class="text-l">handy app</span>
+                    </div>
+                </a>
             </div>
-            <div class="column align-center gap-s">
-                <span class="text-l">gestures.handy framework</span>
-                <span class="text-l">early source code access</span>
-                <span class="text-l">handy app</span>
-            </div>
-            </a>
         </div>
     </div>
     </div>
@@ -1441,20 +1473,20 @@
         function addSlider() {
             const TEMPLATE = `
         <div class="slider-container">
-            <a href="https://youtube.com/your_video_id_here" target="_blank">
+            <a href="https://youtube.com/@weareunder" target="_blank" aria-label="Watch handy demo videos on YouTube">
                 <div class="slider"> 
                     <div class="slides">
-                        <div class="slide" data-title="casual" data-subtitle="browse, scroll, and click <rr> without, well, clicking. it's <rr> computing, but make it comfy.">
+                        <div class="slide" data-title="casual" data-subtitle="browse, scroll, and click <span class='custom-break'></span> without, well, clicking. it's <span class='custom-break'></span> computing, but make it comfy.">
                             <video autoplay loop muted playsinline>
                                 <source src="./videos/figma.webm" type="video/webm">
                             </video>
                         </div>
-                        <div class="slide" data-title="design" data-subtitle="sculpt your ideas in thin air. <rr> your creativity, now unbound <rr> by clunky interfaces.">
+                        <div class="slide" data-title="design" data-subtitle="sculpt your ideas in thin air. <span class='custom-break'></span> your creativity, now unbound <span class='custom-break'></span> by clunky interfaces.">
                             <video autoplay loop muted playsinline>
                                 <source src="./videos/blender.webm" type="video/webm">
                             </video>
                         </div>
-                        <div class="slide" data-title="music" data-subtitle="conduct your digital orchestra. <rr> mix, loop, and create with <rr> a wave of your hand.">
+                        <div class="slide" data-title="music" data-subtitle="conduct your digital orchestra. <span class='custom-break'></span> mix, loop, and create with <span class='custom-break'></span> a wave of your hand.">
                             <video autoplay loop muted playsinline>
                                 <source src="./videos/music.webm" type="video/webm">
                             </video>
@@ -1467,11 +1499,11 @@
                 <div class="text-m"></div>
             </div>
             <div class="slider-buttons">
-                <button class="prev">
-                    <img src="https://weareunder.design/images/arrow_left.svg" />
+                <button class="prev" aria-label="Previous slide">
+                    <img src="https://weareunder.design/images/arrow_left.svg" alt="Previous" />
                 </button>
-                <button class="next">
-                    <img src="https://weareunder.design/images/arrow_right.svg" />
+                <button class="next" aria-label="Next slide">
+                    <img src="https://weareunder.design/images/arrow_right.svg" alt="Next" />
                 </button>
             </div>
         </div>
