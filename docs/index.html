@@ -427,7 +427,7 @@
     <under-header></under-header>
     <under-navigation></under-navigation>
     <div class="ping-pong ping-pong-container">
-        <a href="https://store.weareunder.design/products/hemi" id="cta-animation" target="_blank"
+        <a href="#preorder-section" id="cta-animation"
             class="ping-pong-circle handy-orange-bg text-light align-center justify-center">
             <h5 style="margin: 0;">preorder</h5>
         </a>
@@ -803,7 +803,7 @@
         </div>
     </div>
     <div class="view column align-center bg-warm-gray">
-        <div class="page gap-xl text-center">
+        <div class="page gap-xl text-center" id="preorder-section">
             <div>
               <h3>get your hands on the future</h3>
               <h5>
@@ -812,57 +812,19 @@
               </h5>
             </div>
             
-            <div class="align-center row gap-l flex-nowrap mobile-stack">
-                <div class="column gap-s">
-                    <span class="text-m">days</span>
-                    <div class="row gap-xs nowrap">
-                        <div class="box-s padding-m align-center handy-orange-border text-light" id="days-tens">
-                            <h1>0</h1>
-                        </div>
-                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="days-ones">
-                            <h1>0</h1>
-                        </div>
-                    </div>
-                </div>
-                <div class="column gap-s">
-                    <span class="text-m">hours</span>
-                    <div class="row gap-xs nowrap">
-                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="hours-tens">
-                            <h1>0</h1>
-                        </div>
-                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="hours-ones">
-                            <h1>0</h1>
-                        </div>
-                    </div>
-                </div>
-                <div class="column gap-s">
-                    <span class="text-m">minutes</span>
-                    <div class="row gap-xs nowrap">
-                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="minutes-tens">
-                            <h1>0</h1>
-                        </div>
-                        <div class="box-s padding-m align-center handy-orange-bg text-light" id="minutes-ones">
-                            <h1>0</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <span class="text-l">
-                to open source, app launch and end of hemi presale
-            </span>
             <div class="preorder-section box-m">
                 <div class="preorder-image box-m">
                     <img src="./images/preorder.svg" alt="Hemi device preview">
                 </div>
-                <a href="https://store.weareunder.design/products/hemi" target="_blank"
+                <a href="https://x.com/bicyclesystems" target="_blank"
                     class="preorder-circle box-m column align-center gap-xl handy-orange-bg radius-full text-light preorder-price">
                     <div class="column gap-xl">
                         <h2>$99</h2>
-                        <h3 style="margin: 0;">pre-order</h3>
+                        <h4 style="margin: 0;">follow us<br>for updates</h4>
                     </div>
                     <div class="column align-center gap-s">
-                        <span class="text-l">gestures.handy framework</span>
-                        <span class="text-l">early source code access</span>
+                        <span class="text-l">stay in the loop</span>
+                        <span class="text-l">hemi for handy</span>
                         <span class="text-l">handy app</span>
                     </div>
                 </a>
@@ -922,13 +884,9 @@
             </div>
         </div>
     </div>
-    <div class="view">
         <video class="box-l" src="./videos/handy_profile.webm" autoplay loop muted playsinline></video>
-    </div>
 
     <div class="view column align-center">
-
-
         <div class="page gap-xl">
             <div class="column align-start">
                 <h5>will handy work with my potato computer?</h5>
@@ -1129,67 +1087,13 @@
     </div>
 
 
-    <under-footer></under-footer>
+    <rnbw-footer></rnbw-footer>
     <script src="https://weareunder.design/js/circle.js"></script>
-    <script src="https://weareunder.design/js/footer.js"></script>
+    <script src="https://rnbw.design/js/rnbw-footer.js"></script>
     <script src="https://weareunder.design/js/navigation.js"></script>
     <script>
         // Initialize everything when the DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize countdown timer
-            function updateDisplay(id, value, isLeftZero) {
-                const tens = Math.floor(value / 10);
-                const ones = value % 10;
-                updateDigit(`${id}-tens`, tens, isLeftZero);
-                updateDigit(`${id}-ones`, ones, isLeftZero && tens === 0);
-            }
-
-            function updateDigit(id, value, isLeftZero) {
-                const element = document.querySelector(`#${id}`);
-                element.querySelector('h1').textContent = value;
-
-                if (value === 0 && isLeftZero) {
-                    element.classList.remove('bg-orange', 'text-light');
-                    element.classList.add('text-orange', 'border-orange');
-                } else {
-                    element.classList.remove('text-orange', 'border-orange');
-                    element.classList.add('bg-orange', 'text-light');
-                }
-            }
-
-            function startCountdown() {
-                // Set target date to 3 months from now
-                const now = new Date();
-                const targetDate = new Date(now);
-                targetDate.setMonth(now.getMonth() + 3);
-
-                function updateCountdown() {
-                    const now = new Date();
-                    const diff = targetDate - now;
-
-                    if (diff <= 0) {
-                        clearInterval(countdownInterval);
-                        updateDisplay('days', 0, true);
-                        updateDisplay('hours', 0, true);
-                        updateDisplay('minutes', 0, true);
-                        return;
-                    }
-
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-                    updateDisplay('days', days, true);
-                    updateDisplay('hours', hours, days === 0);
-                    updateDisplay('minutes', minutes, days === 0 && hours === 0);
-                }
-
-                updateCountdown();
-                const countdownInterval = setInterval(updateCountdown, 60000); // Update every minute
-            }
-
-            startCountdown();
-
             // Ping Pong Animation functionality
             window.pingPongVars = {
                 dot: null,
@@ -1313,7 +1217,6 @@
             }
 
             function resolveCollision(ball) {
-                // Only check collisions with other ping pong circles, not static elements
                 const balls = document.querySelectorAll('#cta-animation.ping-pong-circle');
                 const ballRect = ball.getBoundingClientRect();
                 const ballCenter = {
