@@ -24,6 +24,7 @@
         src="https://plausible.io/js/script.file-downloads.hash.outbound-links.js"></script>
     <script>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <style>
         /* Common Properties */
         :root {
@@ -755,7 +756,7 @@
               </h5>
             </div>
             
-            <video class="box-m motion-video" src="./videos/Fingers_motion.webm" autoplay loop muted playsinline></video>
+            <div id="fingers-motion-lottie" class="box-m motion-video"></div>
         </div>
     </div>
     <div class="view column align-center">
@@ -1472,6 +1473,20 @@
         }
 
         document.addEventListener('DOMContentLoaded', addSlider);
+
+        // Initialize Lottie animation for fingers motion
+        document.addEventListener('DOMContentLoaded', () => {
+            const fingersMotionContainer = document.getElementById('fingers-motion-lottie');
+            if (fingersMotionContainer) {
+                lottie.loadAnimation({
+                    container: fingersMotionContainer,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: './videos/fingers_motion.json'
+                });
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             const sliderContainer = document.querySelector('.slider-container');
